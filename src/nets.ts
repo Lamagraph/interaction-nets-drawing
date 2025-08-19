@@ -43,7 +43,8 @@ export async function parseJSON(net): Promise<[CustomNode[], Edge[]]> {
                     x: 50 + 50 * Math.floor(index / 5),
                     y: 50 + 50 * (index % 5)
                 },
-                type: 'custom'
+                type: 'custom',
+                // style: { transform: 'rotate(90deg)', transformOrigin: 'center center' }
             });
             index += 1;
         } else {

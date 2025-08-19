@@ -1,6 +1,11 @@
 import { Handle, Position, useNodeConnections } from '@xyflow/react';
 
 export default ({ id, data }) => {
+  // const connections = useNodeConnections({
+  //   id: id,
+  //   handleType: 'source',
+  // });
+
   return (
     <div style={{ position: 'relative' }}>
       <div className='auxiliaryPorts'>
@@ -34,6 +39,7 @@ export default ({ id, data }) => {
         </tr>
         <tr><td colSpan={data.auxiliaryPorts.length}>
           {data.label}
+          {/* {connections} */}
           <span style={{ color: 'gray' }}> {data.label ? `(${id})` : 'Write the label'}</span>
         </td></tr>
         <tr><td colSpan={data.auxiliaryPorts.length}>{data.principalPort.label}</td></tr>
