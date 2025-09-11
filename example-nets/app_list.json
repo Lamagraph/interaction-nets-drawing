@@ -3,7 +3,7 @@
     {
       "id": "N1",
       "data": {
-        "label": "P2",
+        "label": "2",
         "auxiliaryPorts": [],
         "principalPort": {
           "id": "P0",
@@ -34,7 +34,7 @@
     {
       "id": "N3",
       "data": {
-        "label": "P1",
+        "label": "1",
         "auxiliaryPorts": [],
         "principalPort": {
           "id": "P0",
