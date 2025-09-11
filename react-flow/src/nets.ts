@@ -54,17 +54,19 @@ export async function parseJSON(net): Promise<[CustomNode[], Edge[]]> {
     const edges: Edge[] = []
     edgesObj.forEach(([, edge], _) => {
         if (
-            validate(edge.id) && validate(edge.source) && validate(edge.target) &&
+            validate(edge.source) && validate(edge.target) &&
             (validate(edge.sourcePort) || validate(edge.sourceHandle)) &&
             (validate(edge.targetPort) || validate(edge.targetHandle)) &&
             (validate(edge.activePair, 'boolean') || validate(edge.animated, 'boolean'))
         ) {
+            const sourceHandle = edge.sourcePort || edge.sourceHandle;
+            const targetHandle = edge.targetPort || edge.targetHandle;
             edges.push({
-                id: edge.id,
+                id: edge.id || `E_${edge.source}:${sourceHandle}-${edge.target}:${targetHandle}`,
                 source: edge.source,
                 target: edge.target,
-                sourceHandle: edge.sourcePort || edge.sourceHandle,
-                targetHandle: `${edge.targetPort || edge.targetHandle}t`,
+                sourceHandle: sourceHandle,
+                targetHandle: `${targetHandle}t`,
                 animated: edge.activePair || edge.animated,
                 style: (edge.activePair || edge.animated) ? { stroke: 'blue' } : {},
                 // type: 'smoothstep'
