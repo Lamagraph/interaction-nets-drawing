@@ -1,8 +1,6 @@
-import { useState, useCallback } from 'react';
+import { useCallback } from 'react';
 import {
-  addEdge,
   useReactFlow,
-  Panel,
   ControlButton,
   Controls,
 } from '@xyflow/react';
@@ -10,9 +8,24 @@ import {
 import { ReloadIcon, DownloadIcon, UploadIcon } from '@radix-ui/react-icons'
 
 import '@xyflow/react/dist/style.css';
-import { parseFile } from '../nets';
 
-const ignoreKeys = ['type', 'sourcePosition', 'targetPosition', 'style', 'measured', 'viewport'];
+const allowedKeys = [
+  'nodes',
+  'id',
+  'data',
+  'label',
+  'auxiliaryPorts',
+  'principalPort',
+  'edges',
+  'source',
+  'target',
+  'sourcePort',
+  'sourceHandle',
+  'targetPort',
+  'targetHandle',
+  'activePair',
+  'animated',
+];
 
 const mapKeys = {
   'animated': 'activePair',
@@ -31,20 +44,25 @@ export default ({
   const onDownload = useCallback(() => {
     if (rfInstance) {
       const flow = rfInstance.toObject();
-      const replacer = (key, value) => {
-        if (ignoreKeys.includes(key)) {
-          return undefined;
+      function transformObject(obj) {
+        if (Array.isArray(obj)) {
+          return obj.map(transformObject);
+        } else if (obj && typeof obj === 'object') {
+          const result = {};
+          for (const [key, value] of Object.entries(obj)) {
+            if (allowedKeys.includes(key)) {
+              const newKey = mapKeys[key] || key;
+              result[newKey] = key === 'targetHandle'
+                ? value.slice(0, -1)
+                : transformObject(value);
+            }
+          }
+          return result;
         }
-        // if (key in mapKeys) {
-        //   flow[mapKeys[key]] = value;
-        //   return undefined;
-        // }
-        if (key === 'targetHandle') {
-          return value.slice(0, -1);
-        }
-        return value;
-      };
-      const dataStr = JSON.stringify(flow, replacer, 2);
+        return obj;
+      }
+
+      const dataStr = JSON.stringify(transformObject(flow), null, 2);
       const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
 
       const exportFileDefaultName = fileOpened.slice(0, -5) + '_edited.json';
@@ -86,9 +104,9 @@ export default ({
 
   return (
     <Controls>
-      <ControlButton onClick={onReload}><ReloadIcon /></ControlButton>
-      <ControlButton onClick={onDownload}><DownloadIcon /></ControlButton>
-      <ControlButton onClick={onUpload}><UploadIcon /></ControlButton>
+      <ControlButton title='Reload the network' onClick={onReload}><ReloadIcon /></ControlButton>
+      <ControlButton title='Download the network' onClick={onDownload}><DownloadIcon /></ControlButton>
+      <ControlButton title='Upload the network' onClick={onUpload}><UploadIcon /></ControlButton>
     </Controls >
   );
 };
