@@ -12,7 +12,7 @@ import {
 
 import '@xyflow/react/dist/style.css';
 
-import { type Port, type CustomNode, parseFile, parseJSON } from './nets';
+import { type Port, type CustomNode, getJson, parseJSON } from './nets';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import NodeLayout from './views/NodeLayout';
@@ -34,8 +34,11 @@ const Flow = () => {
 
   const loadData = async (file, network = '') => {
     try {
-      const net = network ? network : await parseFile(file);
-      if (network) setFileOpened(file);
+      const net = network ? network : await getJson(file);
+      if (network) {
+        setFileOpened(file);
+        
+      }
       const [n, e] = await parseJSON(net);
       setNodes(n);
       setEdges(e);
@@ -46,7 +49,7 @@ const Flow = () => {
   };
 
   useEffect(() => {
-    loadData('../nets/app_list.json');
+    loadData('../saved-nets/app_list.json');
   }, []);
 
   const { getNodes, setNodes, } = useReactFlow<CustomNode>();

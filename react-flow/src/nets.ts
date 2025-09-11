@@ -1,7 +1,5 @@
 import { type Node, type Edge } from '@xyflow/react';
 
-// import nets from '../nets/app_list.json';
-
 export type Port = {
     id: string;
     label: string | null;
@@ -17,7 +15,7 @@ function validate(item, type = 'string') {
     return (typeof item === type) && (item !== undefined);
 }
 
-export async function parseFile(file) {
+export async function getJson(file) {
     const response = await fetch(file);
     if (!response.ok) {
         throw new Error(`response.status: ${response.status}`);

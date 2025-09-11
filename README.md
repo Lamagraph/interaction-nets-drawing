@@ -1,22 +1,10 @@
-# react-flow-app
+# interaction-nets-drawing
 
-**react-flow-app** — a utility for visualizations of interaction networks using *React Flow*.
-
-# Installation
-
-```shell
-npm install
-```
-
-# Usage
-
-```shell
-npm run dev
-```
+**interaction-nets-drawing** — a library for visualizations of interaction nets.
 
 ## Representation
 
-See [`JSON-format`](./nets/app_list.json) network representation, for example.
+See [`JSON-format`](./example-nets/app_list.json) network representation, for example.
 
 ## License
 

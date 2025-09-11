@@ -5,7 +5,7 @@ import {
   Controls,
 } from '@xyflow/react';
 
-import { ReloadIcon, DownloadIcon, UploadIcon } from '@radix-ui/react-icons'
+import { DownloadIcon, UploadIcon } from '@radix-ui/react-icons'
 
 import '@xyflow/react/dist/style.css';
 
@@ -33,11 +33,7 @@ const mapKeys = {
   'targetHandle': 'targetPort',
 };
 
-export default ({
-  loadData,
-  fileOpened,
-  rfInstance
-}) => {
+export default ({ loadData, fileOpened, rfInstance }) => {
   const { setNodes, setEdges } = useReactFlow();
   const { setViewport } = useReactFlow();
 
@@ -98,13 +94,8 @@ export default ({
     input.click();
   }, [setNodes, setEdges, setViewport]);
 
-  const onReload = useCallback(async () => {
-    loadData(`../nets/${fileOpened}`);
-  }, [setNodes, setEdges, setViewport]);
-
   return (
     <Controls>
-      <ControlButton title='Reload the network' onClick={onReload}><ReloadIcon /></ControlButton>
       <ControlButton title='Download the network' onClick={onDownload}><DownloadIcon /></ControlButton>
       <ControlButton title='Upload the network' onClick={onUpload}><UploadIcon /></ControlButton>
     </Controls >
