@@ -30,13 +30,18 @@ export async function parseJSON(net): Promise<[CustomNode[], Edge[]]> {
     let index = 0;
     nodesObj.forEach(([, node], _) => {
         if (
-            validate(node.data.label) &&
-            Array.isArray(node.data.auxiliaryPorts) &&
-            validate(node.data.principalPort.id)
+            validate(node.id) &&
+            (validate(node.data?.label) || validate(node.label)) &&
+            (Array.isArray(node.data?.auxiliaryPorts) || Array.isArray(node.auxiliaryPorts)) &&
+            (validate(node.data?.principalPort.id) || validate(node.principalPort.id))
         ) {
             nodes.push({
                 id: node.id,
-                data: node.data as CustomNodeData,
+                data: node.data ?? {
+                    label: node.label,
+                    auxiliaryPorts: node.auxiliaryPorts,
+                    principalPort: node.principalPort
+                },
                 position: node.position || {
                     x: 50 + 50 * Math.floor(index / 5),
                     y: 50 + 50 * (index % 5)
@@ -56,8 +61,7 @@ export async function parseJSON(net): Promise<[CustomNode[], Edge[]]> {
         if (
             validate(edge.source) && validate(edge.target) &&
             (validate(edge.sourcePort) || validate(edge.sourceHandle)) &&
-            (validate(edge.targetPort) || validate(edge.targetHandle)) &&
-            (validate(edge.activePair, 'boolean') || validate(edge.animated, 'boolean'))
+            (validate(edge.targetPort) || validate(edge.targetHandle))
         ) {
             const sourceHandle = edge.sourcePort || edge.sourceHandle;
             const targetHandle = edge.targetPort || edge.targetHandle;
@@ -67,7 +71,7 @@ export async function parseJSON(net): Promise<[CustomNode[], Edge[]]> {
                 target: edge.target,
                 sourceHandle: sourceHandle,
                 targetHandle: `${targetHandle}t`,
-                animated: edge.activePair || edge.animated,
+                animated: edge.activePair ?? edge.animated ?? false,
                 style: (edge.activePair || edge.animated) ? { stroke: 'blue' } : {},
                 // type: 'smoothstep'
             } as Edge);

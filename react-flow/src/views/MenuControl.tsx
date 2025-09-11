@@ -46,7 +46,9 @@ export default ({ loadData, fileOpened, rfInstance }) => {
         } else if (obj && typeof obj === 'object') {
           const result = {};
           for (const [key, value] of Object.entries(obj)) {
-            if (allowedKeys.includes(key)) {
+            if (key === 'data') {
+              Object.assign(result, transformObject(value))
+            } else if (allowedKeys.includes(key)) {
               const newKey = mapKeys[key] || key;
               result[newKey] = key === 'targetHandle'
                 ? value.slice(0, -1)
