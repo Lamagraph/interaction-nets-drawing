@@ -23,7 +23,7 @@ class Port:
 @dataclass
 class Node:
     id: str
-    label: str | None
+    label: str
     auxiliary_ports: Set[Port]
     principal_port: Port
 
@@ -41,7 +41,7 @@ class Node:
 
 @dataclass
 class Edge:
-    id: str
+    id: str | None
     source: str
     target: str
     source_port: str

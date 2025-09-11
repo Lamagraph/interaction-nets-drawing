@@ -39,13 +39,22 @@ def gen_label_node(label: str, auxiliary_ports: Set[Port], principal_port: Port)
 def gen_str_node(node_j, nodes: Set[Node]) -> str:
     lines = ""
 
-    data = node_j["data"]
-    node = Node(
-        id=node_j["id"],
-        label=data["label"],
-        auxiliary_ports={Port(**port) for port in data["auxiliaryPorts"]},
-        principal_port=Port(**data["principalPort"]),
-    )
+    node: Node
+    data = node_j.get("data")
+    if data:
+        node = Node(
+            id=node_j.get("id"),
+            label=data.get("label"),
+            auxiliary_ports={Port(**port) for port in data.get("auxiliaryPorts")},
+            principal_port=Port(**data.get("principalPort")),
+        )
+    else:
+        node = Node(
+            id=node_j.get("id"),
+            label=node_j.get("label"),
+            auxiliary_ports={Port(**port) for port in node_j.get("auxiliaryPorts")},
+            principal_port=Port(**node_j.get("principalPort")),
+        )
 
     nodes.add(node)
 
@@ -76,12 +85,12 @@ def gen_str_edge(edge_j, nodes: Set[Node]) -> str:
     line = ""
 
     edge = Edge(
-        id=id,
-        source=edge_j["source"],
-        target=edge_j["target"],
-        source_port=edge_j["sourcePort"],
-        target_port=edge_j["targetPort"],
-        active_pair=edge_j["activePair"],
+        id=edge_j.get("id"),
+        source=edge_j.get("source"),
+        target=edge_j.get("target"),
+        source_port=edge_j.get("sourcePort"),
+        target_port=edge_j.get("targetPort"),
+        active_pair=edge_j.get("activePair"),
     )
 
     is_south_node_s, is_south_node_t = False, False
@@ -136,11 +145,11 @@ def gen_str_graph(name_graph: str, data_json: Any):
     lines += tab + "edge [arrowtail=dot, arrowhead=dot, arrowsize=0.4];\n\n"
 
     nodes: Set[Node] = set()
-    nodes_j = data_json["nodes"]
+    nodes_j = data_json.get("nodes")
     for node_j in nodes_j:
         lines += gen_str_node(node_j, nodes)
 
-    edges_j = data_json["edges"]
+    edges_j = data_json.get("edges")
     for edge_j in edges_j:
         lines += gen_str_edge(edge_j, nodes)
     lines += "\n"
