@@ -3,6 +3,7 @@ import { useReactFlow } from '@xyflow/react';
 import { useCallback, useState } from 'react';
 import { Panel } from '@xyflow/react';
 
+import { FaInfoCircle } from "react-icons/fa";
 import '@xyflow/react/dist/style.css';
 
 import NodeLayout from './NodeLayout';
@@ -22,7 +23,8 @@ export default ({
   nodeAuxiliaryLinks,
   setNodeAuxiliaryLinks,
   nodePrincipalLink,
-  setNodePrincipalLink
+  setNodePrincipalLink,
+  nodeSelected
 }) => {
   const { setNodes, setEdges } = useReactFlow();
 
@@ -35,9 +37,19 @@ export default ({
     event.dataTransfer.effectAllowed = 'move';
   };
 
+  const { getInternalNode } = useReactFlow();
+
   const onAdd = useCallback(() => {
     if (isAllowed()) {
-      addItem({ x: 50, y: 50 });
+      if (nodeSelected) {
+        const nodeInternal = getInternalNode(nodeSelected.id);
+        if (!nodeInternal) return null;
+
+        const absPosition = nodeInternal?.internals.positionAbsolute;
+        addItem(absPosition);
+      } else {
+        addItem({ x: 50, y: 50 });
+      }
     }
   }, [nodeId, nodeLabel, nodeAuxiliaryPorts, nodePrincipalPort, nodeAuxiliaryLinks, nodePrincipalLink, setNodes, setEdges]);
 
@@ -68,6 +80,15 @@ export default ({
                 className='xy-theme__checkbox'
               />
             </th>
+            {linkShowed && <th colSpan={2}></th>}
+            <th><a
+              href='https://github.com/Friend-zva/interaction-nets-drawing/blob/main/react-flow/README.md'
+              target='_blank'
+              className='xy-theme__label'
+              style={{ color: 'inherit' }}
+            >
+              <FaInfoCircle size={20} />
+            </a></th>
           </tr>
           {nodeAuxiliaryPorts.map((_, i) => (
             <tr key={i}>
@@ -205,7 +226,11 @@ export default ({
             )}
           </tr>
           <tr><td colSpan={2} style={{ padding: '10px' }}>
-            <button className='xy-theme__button' onClick={onAdd} disabled={!isAllowed()}>Add node</button>
+            <button
+              className='xy-theme__button'
+              onClick={onAdd}
+              disabled={!isAllowed()}
+            >{nodeSelected ? "Edit node" : "Add node"}</button>
           </td></tr>
           <tr><td colSpan={2}>
             <div
@@ -221,14 +246,10 @@ export default ({
                   auxiliaryPorts: nodeAuxiliaryPorts,
                   principalPort: nodePrincipalPort
                 }}
+                needLimit={false}
               />
             </div>
           </td></tr>
-          <tr><td colSpan={2}><a
-            href='https://github.com/Friend-zva/interaction-nets-drawing/blob/main/react-flow/README.md'
-            target='_blank'
-            className='xy-theme__label'
-          >Help</a></td></tr>
         </tbody></table>
       </div>
     </Panel>
