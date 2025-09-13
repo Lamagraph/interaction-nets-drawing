@@ -1,3 +1,4 @@
+from sys import argv
 from pathlib import Path
 import subprocess
 import json
@@ -181,5 +182,6 @@ def main(file: Path, need_save_dot: bool):
 
 
 if __name__ == "__main__":
-    file = "../example-nets/app_list.json"
+    # file = "../example-nets/app_list.json"
+    file = argv[1]
     main(Path(file), False)

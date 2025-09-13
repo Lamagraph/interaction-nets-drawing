@@ -2,155 +2,137 @@
   "nodes": [
     {
       "id": "N1",
-      "data": {
-        "label": "2",
-        "auxiliaryPorts": [],
-        "principalPort": {
-          "id": "P0",
-          "label": null
-        }
+      "label": "2",
+      "auxiliaryPorts": [],
+      "principalPort": {
+        "id": "P0",
+        "label": null
       }
     },
     {
       "id": "N2",
-      "data": {
-        "label": "Cons",
-        "auxiliaryPorts": [
-          {
-            "id": "P1",
-            "label": null
-          },
-          {
-            "id": "P2",
-            "label": "123"
-          }
-        ],
-        "principalPort": {
-          "id": "P0",
+      "label": "Cons",
+      "auxiliaryPorts": [
+        {
+          "id": "P1",
           "label": null
+        },
+        {
+          "id": "P2",
+          "label": "123"
         }
+      ],
+      "principalPort": {
+        "id": "P0",
+        "label": null
       }
     },
     {
       "id": "N3",
-      "data": {
-        "label": "1",
-        "auxiliaryPorts": [],
-        "principalPort": {
-          "id": "P0",
-          "label": null
-        }
+      "label": "1",
+      "auxiliaryPorts": [],
+      "principalPort": {
+        "id": "P0",
+        "label": null
       }
     },
     {
       "id": "N4",
-      "data": {
-        "label": "Cons",
-        "auxiliaryPorts": [
-          {
-            "id": "P1",
-            "label": null
-          },
-          {
-            "id": "P2",
-            "label": null
-          }
-        ],
-        "principalPort": {
-          "id": "P0",
+      "label": "Cons",
+      "auxiliaryPorts": [
+        {
+          "id": "P1",
+          "label": null
+        },
+        {
+          "id": "P2",
           "label": null
         }
+      ],
+      "principalPort": {
+        "id": "P0",
+        "label": null
       }
     },
     {
       "id": "N5",
-      "data": {
-        "label": "Diff",
-        "auxiliaryPorts": [
-          {
-            "id": "P1",
-            "label": null
-          },
-          {
-            "id": "P2",
-            "label": null
-          }
-        ],
-        "principalPort": {
-          "id": "P0",
-          "label": "012"
+      "label": "Diff",
+      "auxiliaryPorts": [
+        {
+          "id": "P1",
+          "label": null
+        },
+        {
+          "id": "P2",
+          "label": null
         }
+      ],
+      "principalPort": {
+        "id": "P0",
+        "label": "012"
       }
     },
     {
       "id": "N6",
-      "data": {
-        "label": "3",
-        "auxiliaryPorts": [],
-        "principalPort": {
-          "id": "P0",
-          "label": null
-        }
+      "label": "3",
+      "auxiliaryPorts": [],
+      "principalPort": {
+        "id": "P0",
+        "label": null
       }
     },
     {
       "id": "N7",
-      "data": {
-        "label": "Cons",
-        "auxiliaryPorts": [
-          {
-            "id": "P1",
-            "label": "12345"
-          },
-          {
-            "id": "P2",
-            "label": "6789"
-          }
-        ],
-        "principalPort": {
-          "id": "P0",
-          "label": null
+      "label": "Cons",
+      "auxiliaryPorts": [
+        {
+          "id": "P1",
+          "label": "12345"
+        },
+        {
+          "id": "P2",
+          "label": "6789"
         }
+      ],
+      "principalPort": {
+        "id": "P0",
+        "label": null
       }
     },
     {
       "id": "N8",
-      "data": {
-        "label": "Diff",
-        "auxiliaryPorts": [
-          {
-            "id": "P1",
-            "label": null
-          },
-          {
-            "id": "P2",
-            "label": null
-          }
-        ],
-        "principalPort": {
-          "id": "P0",
+      "label": "Diff",
+      "auxiliaryPorts": [
+        {
+          "id": "P1",
+          "label": null
+        },
+        {
+          "id": "P2",
           "label": null
         }
+      ],
+      "principalPort": {
+        "id": "P0",
+        "label": null
       }
     },
     {
       "id": "N9",
-      "data": {
-        "label": "Append",
-        "auxiliaryPorts": [
-          {
-            "id": "P1",
-            "label": "111"
-          },
-          {
-            "id": "P2",
-            "label": null
-          }
-        ],
-        "principalPort": {
-          "id": "P0",
-          "label": "000"
+      "label": "Append",
+      "auxiliaryPorts": [
+        {
+          "id": "P1",
+          "label": "111"
+        },
+        {
+          "id": "P2",
+          "label": null
         }
+      ],
+      "principalPort": {
+        "id": "P0",
+        "label": "000"
       }
     }
   ],

@@ -224,6 +224,11 @@ export default ({
               />
             </div>
           </td></tr>
+          <tr><td colSpan={2}><a
+            href='https://github.com/Friend-zva/interaction-nets-drawing/blob/main/react-flow/README.md'
+            target='_blank'
+            className='xy-theme__label'
+          >Help</a></td></tr>
         </tbody></table>
       </div>
     </Panel>
