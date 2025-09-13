@@ -1,14 +1,36 @@
 import { Handle, useNodeConnections } from '@xyflow/react';
+import { useEffect, useState } from 'react';
 
 export default (props) => {
-  const connections = useNodeConnections({
+  const connectionsS = useNodeConnections({
     handleType: props.type,
   });
+  const connectionsT = useNodeConnections({
+    handleType: 'target',
+  });
+
+  const [isNotConnectable, setIsNotConnectable] = useState(true);
+
+  useEffect(() => {
+    setIsNotConnectable(
+      connectionsS.some(eds => eds.sourceHandle === props.id) ||
+      connectionsT.some(eds => eds.targetHandle === `${props.id}t`)
+    );
+  }, [connectionsS, connectionsT]);
 
   return (
-    <Handle
-      {...props}
-      isConnectable={connections.length < 1}
-    />
+    <div>
+      <Handle
+        {...props}
+        isConnectable={!isNotConnectable}
+      />
+      <Handle
+        {...props}
+        type='target'
+        key={`${props.id}t`}
+        id={`${props.id}t`}
+        isConnectable={!isNotConnectable}
+      />
+    </div>
   );
 };

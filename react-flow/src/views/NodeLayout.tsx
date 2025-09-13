@@ -13,7 +13,6 @@ export default ({ id, data, needLimit = true }) => {
         {data.auxiliaryPorts.map(port => (
           <div style={{ position: 'relative' }}>
             {handle('source', Position.Top, port.id)}
-            {handle('target', Position.Top, `${port.id}t`)}
           </div>
         ))}
       </div>
@@ -34,7 +33,6 @@ export default ({ id, data, needLimit = true }) => {
       <div className='principalPort'>
         <div style={{ position: 'relative' }}>
           {handle('source', Position.Bottom, data.principalPort.id, { background: 'blue' })}
-          {handle('target', Position.Bottom, `${data.principalPort.id}t`, { background: 'blue' })}
         </div>
       </div>
     </div >

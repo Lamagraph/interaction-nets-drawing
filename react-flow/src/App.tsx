@@ -70,7 +70,6 @@ const Flow = () => {
   const { screenToFlowPosition } = useReactFlow();
   const [type] = useDnD();
 
-  const [nodeInspectorActive, setNodeInspectorActive] = useState(true);
   const [nodeSelected, setNodeSelected] = useState<CustomNode>();
 
   useEffect(() => {
@@ -79,7 +78,7 @@ const Flow = () => {
       setNodeLabel('');
       setNodeAuxiliaryPorts([]);
       setNodePrincipalPort({ id: '', label: null });
-      setNodeAuxiliaryPorts([]);
+      setNodeAuxiliaryLinks([]);
       setNodePrincipalLink({ idNode: '', idPort: '' });
       return
     }
@@ -118,7 +117,7 @@ const Flow = () => {
     });
   }, [nodeSelected]);
 
-  const onChange = useCallback(({ nodes, edges }) => {
+  const onChange = useCallback(({ nodes, }) => {
     setNodeSelected(nodes[0]);
   }, []);
   useOnSelectionChange({
@@ -137,7 +136,7 @@ const Flow = () => {
   }, [nodeId, nodeLabel, nodeAuxiliaryPorts, nodePrincipalPort, setNodes]);
 
   const addItem = (position) => {
-    const newNode: CustomNode = {
+    const nodeNew: CustomNode = {
       id: nodeId,
       data: {
         label: nodeLabel,
@@ -147,25 +146,27 @@ const Flow = () => {
       position,
       type: 'custom'
     };
+    setEdges((eds) => eds.filter((e) => e.source != nodeId && e.target != nodeId));
     setNodes((nds) => {
-      const newNodes = nds.concat(newNode);
+      const nodesNew = nds.filter((n) => n.id !== nodeId);
+      nodesNew.push(nodeNew);
 
-      nodeAuxiliaryLinks.forEach((ids) => {
-        if (ids.idNode && ids.idPort && newNodes.find((n, _) => n.id == ids.idNode)) {
-          const newEdge: Edge = {
-            id: `E_${ids.idNode}:${ids.idPort}-${nodeId}:${nodePrincipalPort.id}`,
+      nodeAuxiliaryLinks.forEach((ids, index) => {
+        if (nodesNew.find((n, _) => n.id == ids.idNode)) {
+          const edgeNew: Edge = {
+            id: `E_${ids.idNode}:${ids.idPort}-${nodeId}:${nodeAuxiliaryPorts[index].id}`,
             source: ids.idNode,
             target: nodeId,
             sourceHandle: ids.idPort,
-            targetHandle: `${nodePrincipalPort.id}t`,
+            targetHandle: `${nodeAuxiliaryPorts[index].id}t`,
           }
-          setEdges((es) => es.concat(newEdge));
+          setEdges((es) => es.concat(edgeNew));
         }
       });
 
-      if (nodePrincipalLink.idNode && nodePrincipalLink.idPort && newNodes.find((n, _) => n.id == nodePrincipalLink.idNode)) {
-        const isAP = newNodes.find((n, _) => n.id == nodePrincipalPort.id && n.data.principalPort.id == nodePrincipalLink.idPort);
-        const newEdge: Edge = {
+      if (nodesNew.find((n, _) => n.id == nodePrincipalLink.idNode)) {
+        const isAP = nodesNew.find((n, _) => n.id == nodePrincipalPort.id && n.data.principalPort.id == nodePrincipalLink.idPort);
+        const edgeNew: Edge = {
           id: `E_${nodeId}:${nodePrincipalPort.id}-${nodePrincipalLink.idNode}:${nodePrincipalLink.idPort}`,
           source: nodeId,
           target: nodePrincipalLink.idNode,
@@ -174,17 +175,16 @@ const Flow = () => {
           animated: isAP ? true : false,
           style: isAP ? { stroke: 'blue' } : {},
         }
-        setEdges((es) => es.concat(newEdge));
+        setEdges((es) => es.concat(edgeNew));
       }
 
-      return newNodes;
+      return nodesNew;
     });
 
     setNodeId('');
     setNodeLabel('');
     setNodeAuxiliaryPorts([]);
     setNodePrincipalPort({ id: '', label: null });
-
     setNodeAuxiliaryLinks([]);
     setNodePrincipalLink({ idNode: '', idPort: '' });
   };
