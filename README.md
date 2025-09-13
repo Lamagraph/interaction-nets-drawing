@@ -4,7 +4,7 @@
 
 ## Representation
 
-See [`JSON-format`](./example-nets/app_list.json) network representation, for example.
+See the [`JSON Schema`](./schema-net.json) for network representation.
 
 ## License
 
