@@ -1,32 +1,19 @@
-import { Handle, Position, useNodeConnections } from '@xyflow/react';
+import { Handle, Position } from '@xyflow/react';
+import HandleLayout from './HandleLayout';
 
-export default ({ id, data }) => {
-  // const connections = useNodeConnections({
-  //   id: id,
-  //   handleType: 'source',
-  // });
+export default ({ id, data, needLimit = true }) => {
+  const handle = (type, pos, id, style = {}) => {
+    if (!needLimit) return <Handle type={type} position={pos} key={id} id={id} style={style} />
+    return <HandleLayout type={type} position={pos} key={id} id={id} style={style} />
+  }
 
   return (
     <div style={{ position: 'relative' }}>
       <div className='auxiliaryPorts'>
         {data.auxiliaryPorts.map(port => (
           <div style={{ position: 'relative' }}>
-            <Handle
-              type='source'
-              position={Position.Top}
-              key={port.id}
-              id={port.id}
-            // isConnectable={useNodeConnections({ handleType: 'source' }).length == 0}
-            // isConnectableStart={useNodeConnections({ handleType: 'source', handleId: port.id }).length == 0}
-            />
-            <Handle
-              type='target'
-              position={Position.Top}
-              key={`${port.id}t`}
-              id={`${port.id}t`}
-            // isConnectable={useNodeConnections({ handleType: 'target' }).length == 0}
-            // isConnectable={useNodeConnections({ handleType: 'target', handleId: `${port.id}t` }).length == 0}
-            />
+            {handle('source', Position.Top, port.id)}
+            {handle('target', Position.Top, `${port.id}t`)}
           </div>
         ))}
       </div>
@@ -39,7 +26,6 @@ export default ({ id, data }) => {
         </tr>
         <tr><td colSpan={data.auxiliaryPorts.length}>
           {data.label}
-          {/* {connections} */}
           <span style={{ color: 'gray' }}> {data.label ? `(${id})` : 'Write the label'}</span>
         </td></tr>
         <tr><td colSpan={data.auxiliaryPorts.length}>{data.principalPort.label}</td></tr>
@@ -47,24 +33,8 @@ export default ({ id, data }) => {
 
       <div className='principalPort'>
         <div style={{ position: 'relative' }}>
-          <Handle
-            type='source'
-            position={Position.Bottom}
-            key={data.principalPort.id}
-            id={data.principalPort.id}
-            // isConnectable={useNodeConnections({ handleType: 'source' }).length == 0}
-            // isConnectableStart={useNodeConnections({ handleType: 'source', handleId: data.principalPort.id }).length == 0}
-            style={{ background: 'blue' }}
-          />
-          <Handle
-            type='target'
-            position={Position.Bottom}
-            key={`${data.principalPort.id}t`}
-            id={`${data.principalPort.id}t`}
-            // isConnectable={useNodeConnections({ handleType: 'target' }).length == 0}
-            // isConnectable={useNodeConnections({ handleType: 'target', handleId: `${data.principalPort.id}t` }).length == 0}
-            style={{ background: 'blue' }}
-          />
+          {handle('source', Position.Bottom, data.principalPort.id, { background: 'blue' })}
+          {handle('target', Position.Bottom, `${data.principalPort.id}t`, { background: 'blue' })}
         </div>
       </div>
     </div >
