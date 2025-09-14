@@ -9,7 +9,10 @@ import {
   addEdge,
   Edge,
   useOnSelectionChange,
+  BaseEdge,
 } from '@xyflow/react';
+
+import { SmartBezierEdge, SmartStraightEdge, SmartStepEdge } from "@tisoap/react-flow-smart-edge";
 
 import '@xyflow/react/dist/style.css';
 
@@ -21,9 +24,17 @@ import MenuControl from './views/MenuControl';
 import MenuLayouts from './views/MenuLayouts';
 import { DnDProvider, useDnD } from './views/DnDContext';
 import MenuConfig from './views/MenuConfig';
+import MenuEdges from './views/MenuEdges';
 
 const nodeTypes = {
   custom: NodeLayout,
+};
+
+const edgeTypes = {
+  bezier: BaseEdge,
+  smartBezier: SmartBezierEdge,
+  smartStraight: SmartStraightEdge,
+  smartStep: SmartStepEdge,
 };
 
 const Flow = () => {
@@ -31,6 +42,16 @@ const Flow = () => {
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
 
   const [fileOpened, setFileOpened] = useState('app_list.json');
+  const [typeEdge, setTypeEdge] = useState('bezier');
+
+  useEffect(() => {
+    setEdges(prev =>
+      prev.map(edge => ({
+        ...edge,
+        type: typeEdge
+      }))
+    );
+  }, [typeEdge]);
 
   const loadData = async (file, network = '') => {
     try {
@@ -219,6 +240,7 @@ const Flow = () => {
           nodes={nodes}
           edges={edges}
           nodeTypes={nodeTypes}
+          edgeTypes={edgeTypes}
           onInit={setRfInstance}
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
@@ -251,6 +273,7 @@ const Flow = () => {
             fileOpened={fileOpened}
             rfInstance={rfInstance}
           />
+          <MenuEdges setTypeEdge={setTypeEdge} />
           <Background />
           <MiniMap />
         </ReactFlow>
