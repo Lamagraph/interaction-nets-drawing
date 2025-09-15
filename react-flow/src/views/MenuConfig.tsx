@@ -1,13 +1,12 @@
-import { useReactFlow } from '@xyflow/react';
-
 import { useCallback, useState } from 'react';
-import { Panel } from '@xyflow/react';
+import { Panel, type Edge, useReactFlow } from '@xyflow/react';
 
 import { FaInfoCircle } from "react-icons/fa";
 import '@xyflow/react/dist/style.css';
 
 import NodeLayout from './NodeLayout';
 import { useDnD } from './DnDContext';
+import { type Agent } from '../nets';
 
 export default ({
   addItem,
@@ -26,9 +25,9 @@ export default ({
   setNodePrincipalLink,
   nodeSelected
 }) => {
-  const { setNodes, setEdges } = useReactFlow();
+  const { setNodes, setEdges } = useReactFlow<Agent, Edge>();
 
-  const [linkShowed, setLinkShowed] = useState(false);
+  const [linkShowed, setLinkShowed] = useState<boolean>(false);
 
   const [_, setType] = useDnD();
 
@@ -237,7 +236,7 @@ export default ({
               className='react-flow__node'
               style={{ position: 'relative', cursor: isAllowed() ? 'grab' : 'not-allowed' }}
               draggable={isAllowed() ? true : false}
-              onDragStart={(event) => onDragStart(event, 'custom')}
+              onDragStart={(event) => onDragStart(event, 'agent')}
             >
               <NodeLayout
                 id={nodeId}

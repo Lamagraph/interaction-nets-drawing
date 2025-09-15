@@ -1,13 +1,16 @@
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import {
   useReactFlow,
   ControlButton,
   Controls,
+  Edge,
 } from '@xyflow/react';
 
-import { DownloadIcon, UploadIcon } from '@radix-ui/react-icons'
+import { DownloadIcon, UploadIcon, ArrowRightIcon, ArrowLeftIcon } from '@radix-ui/react-icons'
 
 import '@xyflow/react/dist/style.css';
+
+import { type Agent, getObjectsFromFile, parseJSON } from '../nets';
 
 const allowedKeys = [
   'nodes',
@@ -33,9 +36,30 @@ const mapKeys = {
   'targetHandle': 'targetPort',
 };
 
-export default ({ loadData, fileOpened, rfInstance }) => {
+export default ({
+  nodes,
+  edges,
+  typeEdge,
+  fileOpened,
+  rfInstance,
+  isRunning,
+  setFileOpened,
+  setIsRunning
+}: {
+  nodes: Agent[];
+  edges: Edge[];
+  typeEdge: string;
+  fileOpened: string;
+  rfInstance: any;
+  isRunning: boolean;
+  setFileOpened: React.Dispatch<React.SetStateAction<string>>,
+  setIsRunning: React.Dispatch<React.SetStateAction<boolean>>,
+}) => {
   const { setNodes, setEdges } = useReactFlow();
   const { setViewport } = useReactFlow();
+
+  const [netsSaved, setNetsSaved] = useState<[Agent[], Edge[], string][]>([]);
+  const [indexCur, setIndexCur] = useState<number>(-1);
 
   const onDownload = useCallback(() => {
     if (rfInstance) {
@@ -62,7 +86,6 @@ export default ({ loadData, fileOpened, rfInstance }) => {
 
       const dataStr = JSON.stringify(transformObject(flow), null, 2);
       const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
-
       const exportFileDefaultName = fileOpened.slice(0, -5) + '_edited.json';
 
       const linkElement = document.createElement('a');
@@ -70,27 +93,39 @@ export default ({ loadData, fileOpened, rfInstance }) => {
       linkElement.setAttribute('download', exportFileDefaultName);
       linkElement.click();
     }
-  }, [rfInstance]);
+  }, [rfInstance, fileOpened]);
 
   const onUpload = useCallback(() => {
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = '.json';
+    input.webkitdirectory = true;
+    input.multiple = true;
 
-    input.onchange = (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
+    const nets: [Agent[], Edge[], string][] = [];
 
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        try {
-          const jsonData = JSON.parse(event.target.result);
-          loadData(file.name, jsonData);
-        } catch (err) {
-          console.error(`Error parsing ${file}:`, err);
-        }
-      };
-      reader.readAsText(file);
+    input.onchange = async (event) => {
+      const files = (event.target as HTMLInputElement).files;
+      if (!files || files.length === 0) return;
+
+      const arrayFiles = Array.from(files)
+        .sort((a, b) => a.name.localeCompare(b.name, undefined, {
+          numeric: true,
+          sensitivity: 'base'
+        }));
+
+      for (const file of arrayFiles) {
+        const net = await getObjectsFromFile(file);
+        const [nds, eds] = await parseJSON(net, typeEdge);
+        nets.push([nds, eds, file.name]);
+      }
+
+      const indexNew = 0;
+      setIndexCur(indexNew);
+      setNetsSaved(nets);
+      setNodes(nets[indexNew][0]);
+      setEdges(nets[indexNew][1]);
+      setFileOpened(nets[indexNew][2]);
     };
 
     input.click();
@@ -98,8 +133,8 @@ export default ({ loadData, fileOpened, rfInstance }) => {
 
   return (
     <Controls>
+      <ControlButton title='Upload networks' onClick={onUpload}><UploadIcon /></ControlButton>
       <ControlButton title='Download the network' onClick={onDownload}><DownloadIcon /></ControlButton>
-      <ControlButton title='Upload the network' onClick={onUpload}><UploadIcon /></ControlButton>
     </Controls >
   );
 };

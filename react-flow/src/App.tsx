@@ -1,3 +1,4 @@
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   ReactFlow,
   Background,
@@ -9,16 +10,17 @@ import {
   addEdge,
   Edge,
   useOnSelectionChange,
-  BaseEdge,
+  BezierEdge,
+  SmoothStepEdge,
+  Connection,
+  XYPosition,
 } from '@xyflow/react';
 
 import { SmartBezierEdge, SmartStraightEdge, SmartStepEdge } from "@tisoap/react-flow-smart-edge";
 
 import '@xyflow/react/dist/style.css';
 
-import { type Port, type CustomNode, getJson, parseJSON } from './nets';
-import { useCallback, useEffect, useRef, useState } from 'react';
-
+import { type Port, type Agent, getObjectsByName, parseJSON, isActivePair } from './nets';
 import NodeLayout from './views/NodeLayout';
 import MenuControl from './views/MenuControl';
 import MenuLayouts from './views/MenuLayouts';
@@ -27,22 +29,28 @@ import MenuConfig from './views/MenuConfig';
 import MenuEdges from './views/MenuEdges';
 
 const nodeTypes = {
-  custom: NodeLayout,
+  agent: NodeLayout,
 };
 
 const edgeTypes = {
-  bezier: BaseEdge,
+  bezier: BezierEdge,
+  smoothstep: SmoothStepEdge,
   smartBezier: SmartBezierEdge,
   smartStraight: SmartStraightEdge,
   smartStep: SmartStepEdge,
 };
 
+const dirNetsSaved = '../saved-nets/';
+const nameFileStart = 'app_list_1.json'
+
 const Flow = () => {
-  const [nodes, , onNodesChange] = useNodesState<CustomNode>([]);
+  const [nodes, setNodes, onNodesChange] = useNodesState<Agent>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
 
-  const [fileOpened, setFileOpened] = useState('app_list.json');
-  const [typeEdge, setTypeEdge] = useState('bezier');
+  const [fileOpened, setFileOpened] = useState<string>(nameFileStart);
+  const [typeEdge, setTypeEdge] = useState<string>('bezier');
+
+  const [isRunning, setIsRunning] = useState<boolean>(false);
 
   useEffect(() => {
     setEdges(prev =>
@@ -53,45 +61,45 @@ const Flow = () => {
     );
   }, [typeEdge]);
 
-  const loadData = async (file, network = '') => {
+  const loadNetStart = async (nameFile: string) => {
     try {
-      const net = network ? network : await getJson(file);
-      if (network) {
-        setFileOpened(file);
-      }
-      const [n, e] = await parseJSON(net);
-      setNodes(n);
-      setEdges(e);
+      const net = await getObjectsByName(nameFile);
+      const [nds, eds] = await parseJSON(net, typeEdge);
+      setNodes(nds);
+      setEdges(eds);
     } catch {
       setNodes([]);
       setEdges([]);
     }
   };
 
-  useEffect(() => {
-    loadData('../saved-nets/app_list.json');
-  }, []);
-
-  const { getNodes, setNodes } = useReactFlow<CustomNode>();
+  useEffect(() => { loadNetStart(dirNetsSaved + nameFileStart) }, []);
 
   const reactFlowWrapper = useRef(null);
 
   const [rfInstance, setRfInstance] = useState(null);
 
-  const [nodeId, setNodeId] = useState('');
-  const [nodeLabel, setNodeLabel] = useState('');
+  const [nodeId, setNodeId] = useState<string>('');
+  const [nodeLabel, setNodeLabel] = useState<string>('');
   const [nodeAuxiliaryPorts, setNodeAuxiliaryPorts] = useState<Port[]>([]);
   const [nodePrincipalPort, setNodePrincipalPort] = useState<Port>({ id: '', label: null });
-  const [nodeAuxiliaryLinks, setNodeAuxiliaryLinks] = useState<{
-    idNode: string;
-    idPort: string;
-  }[]>([]);
-  const [nodePrincipalLink, setNodePrincipalLink] = useState({ idNode: '', idPort: '' });
+  const [nodeAuxiliaryLinks, setNodeAuxiliaryLinks] = useState<
+    {
+      idNode: string;
+      idPort: string;
+    }[]
+  >([]);
+  const [nodePrincipalLink, setNodePrincipalLink] = useState<
+    {
+      idNode: string;
+      idPort: string;
+    }
+  >({ idNode: '', idPort: '' });
 
-  const { screenToFlowPosition } = useReactFlow();
+  const { screenToFlowPosition } = useReactFlow<Agent, Edge>();
   const [type] = useDnD();
 
-  const [nodeSelected, setNodeSelected] = useState<CustomNode>();
+  const [nodeSelected, setNodeSelected] = useState<Agent>();
 
   useEffect(() => {
     if (!nodeSelected) {
@@ -106,10 +114,10 @@ const Flow = () => {
 
     setNodeId(nodeSelected.id);
     setNodeLabel(nodeSelected.data.label);
-    const auxP = nodeSelected.data.auxiliaryPorts;
-    setNodeAuxiliaryPorts(auxP);
+    const auxPs = nodeSelected.data.auxiliaryPorts;
+    setNodeAuxiliaryPorts(auxPs);
     setNodePrincipalPort(nodeSelected.data.principalPort);
-    setNodeAuxiliaryLinks(Array(auxP.length).fill({ idNode: "", idPort: "" }));
+    setNodeAuxiliaryLinks(Array(auxPs.length).fill({ idNode: "", idPort: "" }));
 
     edges.forEach((edge) => {
       if (edge.source == nodeSelected.id) {
@@ -118,7 +126,7 @@ const Flow = () => {
         } else {
           setNodeAuxiliaryLinks(prev =>
             prev.map((port, j) =>
-              j === auxP.findIndex((port) => port.id == edge.sourceHandle) ?
+              j === auxPs.findIndex((port) => port.id == edge.sourceHandle) ?
                 { ...port, idNode: edge.target, idPort: edge.targetHandle!.slice(0, -1) } : port
             )
           );
@@ -129,7 +137,7 @@ const Flow = () => {
         } else {
           setNodeAuxiliaryLinks(prev =>
             prev.map((port, j) =>
-              j === auxP.findIndex((port) => port.id == edge.targetHandle!.slice(0, -1)) ?
+              j === auxPs.findIndex((port) => port.id == edge.targetHandle!.slice(0, -1)) ?
                 { ...port, idNode: edge.source, idPort: edge.sourceHandle! } : port
             )
           );
@@ -145,7 +153,13 @@ const Flow = () => {
     onChange
   });
 
-  const onConnect = useCallback((params) => setEdges((eds) => addEdge(params, eds)), []);
+  const onConnect = useCallback(
+    (params: Connection) => {
+      setEdges((eds: Edge[]) =>
+        addEdge({ ...params, type: typeEdge }, eds)
+      );
+    }, [setEdges, typeEdge]
+  );
 
   const onDragOver = useCallback((event) => {
     event.preventDefault();
@@ -156,8 +170,8 @@ const Flow = () => {
     return (nodeId && nodeLabel && nodePrincipalPort.id && !nodeAuxiliaryPorts.find((port, _) => !port.id));
   }, [nodeId, nodeLabel, nodeAuxiliaryPorts, nodePrincipalPort, setNodes]);
 
-  const addItem = (position) => {
-    const nodeNew: CustomNode = {
+  const addItem = (position: XYPosition) => {
+    const ndNew: Agent = {
       id: nodeId,
       data: {
         label: nodeLabel,
@@ -165,41 +179,46 @@ const Flow = () => {
         principalPort: nodePrincipalPort
       },
       position,
-      type: 'custom'
+      type: 'agent'
     };
+
     setEdges((eds) => eds.filter((e) => e.source != nodeId && e.target != nodeId));
     setNodes((nds) => {
-      const nodesNew = nds.filter((n) => n.id !== nodeId);
-      nodesNew.push(nodeNew);
+      const ndsNew = nds.filter((n) => n.id !== nodeId);
+      ndsNew.push(ndNew);
 
       nodeAuxiliaryLinks.forEach((ids, index) => {
-        if (nodesNew.find((n, _) => n.id == ids.idNode)) {
+        if (ndsNew.find((n, _) => n.id == ids.idNode)) {
           const edgeNew: Edge = {
             id: `E_${ids.idNode}:${ids.idPort}-${nodeId}:${nodeAuxiliaryPorts[index].id}`,
             source: ids.idNode,
             target: nodeId,
             sourceHandle: ids.idPort,
             targetHandle: `${nodeAuxiliaryPorts[index].id}t`,
+            type: typeEdge,
           }
           setEdges((es) => es.concat(edgeNew));
         }
       });
 
-      if (nodesNew.find((n, _) => n.id == nodePrincipalLink.idNode)) {
-        const isAP = nodesNew.find((n, _) => n.id == nodePrincipalPort.id && n.data.principalPort.id == nodePrincipalLink.idPort);
-        const edgeNew: Edge = {
+      if (ndsNew.find((n, _) => n.id == nodePrincipalLink.idNode)) {
+        const isAuxP = ndsNew.find((n, _) =>
+          n.id == nodePrincipalPort.id && n.data.principalPort.id == nodePrincipalLink.idPort
+        );
+        const edNew: Edge = {
           id: `E_${nodeId}:${nodePrincipalPort.id}-${nodePrincipalLink.idNode}:${nodePrincipalLink.idPort}`,
           source: nodeId,
           target: nodePrincipalLink.idNode,
           sourceHandle: nodePrincipalPort.id,
           targetHandle: `${nodePrincipalLink.idPort}t`,
-          animated: isAP ? true : false,
-          style: isAP ? { stroke: 'blue' } : {},
+          animated: isAuxP ? true : false,
+          style: isAuxP ? { stroke: 'blue' } : {},
+          type: typeEdge,
         }
-        setEdges((es) => es.concat(edgeNew));
+        setEdges((es) => es.concat(edNew));
       }
 
-      return nodesNew;
+      return ndsNew;
     });
 
     setNodeId('');
@@ -267,11 +286,19 @@ const Flow = () => {
             setNodePrincipalLink={setNodePrincipalLink}
             nodeSelected={nodeSelected}
           />
-          <MenuLayouts />
+          <MenuLayouts
+            isRunning={isRunning}
+            setIsRunning={setIsRunning}
+          />
           <MenuControl
-            loadData={loadData}
+            nodes={nodes}
+            edges={edges}
+            typeEdge={typeEdge}
             fileOpened={fileOpened}
+            setFileOpened={setFileOpened}
             rfInstance={rfInstance}
+            isRunning={isRunning}
+            setIsRunning={setIsRunning}
           />
           <MenuEdges setTypeEdge={setTypeEdge} />
           <Background />

@@ -13,6 +13,7 @@ export default ({ setTypeEdge }) => {
         data-testid="colormode-select"
       >
         <option value="bazier">bazier</option>
+        <option value="smoothstep">smoothstep</option>
         <option value="smartBezier">smart bezier</option>
         <option value="smartStraight">smart straight</option>
         <option value="smartStep">smart step</option>

@@ -1,54 +1,52 @@
-import { Panel, useNodesInitialized, useReactFlow } from '@xyflow/react';
+import { useState } from 'react';
+import { Edge, Panel, useNodesInitialized, useReactFlow } from '@xyflow/react';
+
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
-import { type CustomNode } from '../nets';
-
+import { type Agent } from '../nets';
 import { getLayoutedNodes as dagreLayoutNodes } from '../layouts/dagreLayout';
 import { getLayoutedNodes as elkHLayoutNodes } from '../layouts/elkLayoutHandles';
 import { getLayoutedNodes as elkLayoutNodes, elkOptions } from '../layouts/elkLayouts';
 import { getLayoutedNodes as dLayoutNodes } from '../layouts/dLayout';
 import { getLayoutedNodes as dForceLayoutNodes } from '../layouts/dForceLayout';
-import { useState } from 'react';
 
-export default () => {
-  const { getNodes, getEdges, setNodes, fitView } = useReactFlow<CustomNode>();
+export default ({ isRunning, setIsRunning }) => {
+  const { getNodes, getEdges, setNodes, fitView } = useReactFlow<Agent, Edge>();
   const nodesInitialized = useNodesInitialized();
 
   const [, { toggle }] = dForceLayoutNodes();
 
-  const [isRunning, setIsRunning] = useState(false);
-
-  const [layoutsShowed, setLayoutsShowed] = useState(false);
+  const [layoutsShowed, setLayoutsShowed] = useState<boolean>(false);
 
   const dagreLayout = async (direction: string) => {
     if (nodesInitialized) {
-      const layoutedNodes = await dagreLayoutNodes(getNodes() as CustomNode[], getEdges(), direction);
-      setNodes(layoutedNodes);
+      const ndsLayouted = await dagreLayoutNodes(getNodes(), getEdges(), direction);
+      setNodes(ndsLayouted);
       fitView();
     }
   };
 
   const elkHandlesLayout = async () => {
     if (nodesInitialized) {
-      const layoutedNodes = await elkHLayoutNodes(getNodes() as CustomNode[], getEdges());
-      setNodes(layoutedNodes);
+      const ndsLayouted = await elkHLayoutNodes(getNodes(), getEdges());
+      setNodes(ndsLayouted);
       fitView();
     }
   };
 
   const elkLayout = async (direction: string) => {
     if (nodesInitialized) {
-      const layoutedNodes = await elkLayoutNodes(getNodes() as CustomNode[], getEdges(),
+      const ndsLayouted = await elkLayoutNodes(getNodes(), getEdges(),
         { 'elk.direction': direction, ...elkOptions });
-      setNodes(layoutedNodes);
+      setNodes(ndsLayouted);
       fitView();
     }
   };
 
   const dLayout = async () => {
     if (nodesInitialized) {
-      const layoutedNodes = await dLayoutNodes(getNodes() as CustomNode[], getEdges());
-      setNodes(layoutedNodes);
+      const ndsLayouted = await dLayoutNodes(getNodes(), getEdges());
+      setNodes(ndsLayouted);
       fitView();
     }
   };
@@ -90,7 +88,7 @@ export default () => {
             </button>
           </>
         )}
-        <button className='xy-theme__button' onClick={dForceLayout}>
+        <button className='xy-theme__button' onClick={dForceLayout} id={'forceLayout'}>
           {isRunning ? 'Stop' : 'Start'} D3-force
         </button>
       </div>
