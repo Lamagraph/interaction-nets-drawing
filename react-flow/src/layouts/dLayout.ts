@@ -1,10 +1,16 @@
-import { stratify, tree } from 'd3-hierarchy';
+// https://reactflow.dev/learn/layouting/layouting#d3-hierarchy
+
+import { type Edge } from '@xyflow/react';
+import { HierarchyNode, stratify, tree } from 'd3-hierarchy';
+
 import '@xyflow/react/dist/style.css';
 
-const g = tree();
+import { type Agent } from '../nets';
 
-export const getLayoutedNodes = async (nodes, edges) => {
-    if (nodes.length === 0) return { nodes, edges };
+const g = tree<Agent>();
+
+export const getLayoutedNodes = (nodes: Agent[], edges: Edge[]): Agent[] => {
+    if (nodes.length === 0) return nodes;
 
     const { width, height } = document
         .querySelector(`[data-id='${nodes[0].id}']`)
@@ -39,10 +45,10 @@ export const getLayoutedNodes = async (nodes, edges) => {
         .id((node) => node.id)
         .parentId((node) => edgesToLayout.find((edge) => edge.target === node.id)?.source);
 
-    const root = hierarchy(nodesToLayout);
+    const root: HierarchyNode<Agent> = hierarchy(nodesToLayout);
     const layout = g.nodeSize([width * 2, height * 2])(root);
 
-    const resultNodes = layout
+    const resultNodes: Agent[] = layout
         .descendants()
         .map((node) => ({ ...node.data, position: { x: node.x, y: node.y } }))
         .filter(node => node.id !== 'artificial-root');

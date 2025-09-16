@@ -1,6 +1,11 @@
+// https://reactflow.dev/examples/layout/elkjs
+
+import { type Edge } from '@xyflow/react';
 import ELK from 'elkjs/lib/elk.bundled.js';
 
 import '@xyflow/react/dist/style.css';
+
+import { type Agent } from '../nets';
 
 const elk = new ELK();
 
@@ -14,7 +19,7 @@ export const elkOptions = {
     'elk.spacing.nodeNode': '80',
 };
 
-export const getLayoutedNodes = async (nodes, edges, options = {}) => {
+export const getLayoutedNodes = async (nodes: Agent[], edges: Edge[], options = {}): Promise<Agent[]> => {
     const isHorizontal = options?.['elk.direction'] === 'RIGHT';
     const graph = {
         id: 'root',
@@ -32,7 +37,7 @@ export const getLayoutedNodes = async (nodes, edges, options = {}) => {
 
     const layoutedGraph = await elk.layout(graph);
 
-    const layoutedNodes = nodes.map((node) => {
+    const layoutedNodes: Agent[] = nodes.map((node) => {
         const layoutedNode = layoutedGraph.children?.find((lgNode) => lgNode.id === node.id);
 
         return {

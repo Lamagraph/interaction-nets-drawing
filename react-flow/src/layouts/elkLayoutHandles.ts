@@ -1,4 +1,9 @@
+// https://reactflow.dev/examples/layout/elkjs-multiple-handles
+
+import { type Edge } from '@xyflow/react';
 import ELK from 'elkjs/lib/elk.bundled.js';
+
+import { type Agent } from '../nets';
 
 // elk layouting options can be found here:
 // https://www.eclipse.org/elk/reference/algorithms/org-eclipse-elk-layered.html
@@ -12,7 +17,7 @@ const layoutOptions = {
 
 const elk = new ELK();
 
-export const getLayoutedNodes = async (nodes, edges) => {
+export const getLayoutedNodes = async (nodes: Agent[], edges: Edge[]): Promise<Agent[]> => {
     const graph = {
         id: 'root',
         layoutOptions,
@@ -66,7 +71,7 @@ export const getLayoutedNodes = async (nodes, edges) => {
 
     const layoutedGraph = await elk.layout(graph);
 
-    const layoutedNodes = nodes.map((node) => {
+    const layoutedNodes: Agent[] = nodes.map((node) => {
         const layoutedNode = layoutedGraph.children?.find((lgNode) => lgNode.id === node.id);
 
         return {
