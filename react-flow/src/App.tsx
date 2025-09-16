@@ -20,7 +20,7 @@ import { SmartBezierEdge, SmartStraightEdge, SmartStepEdge } from "@tisoap/react
 
 import '@xyflow/react/dist/style.css';
 
-import { type Port, type Agent, getObjectsByName, parseJSON, isActivePair } from './nets';
+import { type Port, type Agent, getObjectsByName, parseJSON, isActivePair, getTargetHandle, validate } from './nets';
 import NodeLayout from './views/NodeLayout';
 import MenuControl from './views/MenuControl';
 import MenuLayouts from './views/MenuLayouts';
@@ -44,22 +44,13 @@ const dirNetsSaved = '../saved-nets/';
 const nameFileStart = 'app_list_1.json'
 
 const Flow = () => {
+  // Main
+
   const [nodes, setNodes, onNodesChange] = useNodesState<Agent>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
-
   const [fileOpened, setFileOpened] = useState<string>(nameFileStart);
-  const [typeEdge, setTypeEdge] = useState<string>('bezier');
 
-  const [isRunning, setIsRunning] = useState<boolean>(false);
-
-  useEffect(() => {
-    setEdges(prev =>
-      prev.map(edge => ({
-        ...edge,
-        type: typeEdge
-      }))
-    );
-  }, [typeEdge]);
+  // Start
 
   const loadNetStart = async (nameFile: string) => {
     try {
@@ -75,100 +66,39 @@ const Flow = () => {
 
   useEffect(() => { loadNetStart(dirNetsSaved + nameFileStart) }, []);
 
-  const reactFlowWrapper = useRef(null);
+  // Type edge
 
-  const [rfInstance, setRfInstance] = useState(null);
+  const [typeEdge, setTypeEdge] = useState<string>('bezier');
+
+  useEffect(() => {
+    setEdges(eds =>
+      eds.map(edge => ({ ...edge, type: typeEdge }))
+    );
+  }, [typeEdge]);
+
+  const [isRunning, setIsRunning] = useState<boolean>(false);
+
+  // Add and edit net
 
   const [nodeId, setNodeId] = useState<string>('');
   const [nodeLabel, setNodeLabel] = useState<string>('');
-  const [nodeAuxiliaryPorts, setNodeAuxiliaryPorts] = useState<Port[]>([]);
   const [nodePrincipalPort, setNodePrincipalPort] = useState<Port>({ id: '', label: null });
-  const [nodeAuxiliaryLinks, setNodeAuxiliaryLinks] = useState<
-    {
-      idNode: string;
-      idPort: string;
-    }[]
-  >([]);
+  const [nodeAuxiliaryPorts, setNodeAuxiliaryPorts] = useState<Port[]>([]);
+
   const [nodePrincipalLink, setNodePrincipalLink] = useState<
     {
       idNode: string;
       idPort: string;
     }
   >({ idNode: '', idPort: '' });
+  const [nodeAuxiliaryLinks, setNodeAuxiliaryLinks] = useState<
+    {
+      idNode: string;
+      idPort: string;
+    }[]
+  >([]);
 
-  const { screenToFlowPosition } = useReactFlow<Agent, Edge>();
-  const [type] = useDnD();
-
-  const [nodeSelected, setNodeSelected] = useState<Agent>();
-
-  useEffect(() => {
-    if (!nodeSelected) {
-      setNodeId('');
-      setNodeLabel('');
-      setNodeAuxiliaryPorts([]);
-      setNodePrincipalPort({ id: '', label: null });
-      setNodeAuxiliaryLinks([]);
-      setNodePrincipalLink({ idNode: '', idPort: '' });
-      return
-    }
-
-    setNodeId(nodeSelected.id);
-    setNodeLabel(nodeSelected.data.label);
-    const auxPs = nodeSelected.data.auxiliaryPorts;
-    setNodeAuxiliaryPorts(auxPs);
-    setNodePrincipalPort(nodeSelected.data.principalPort);
-    setNodeAuxiliaryLinks(Array(auxPs.length).fill({ idNode: "", idPort: "" }));
-
-    edges.forEach((edge) => {
-      if (edge.source == nodeSelected.id) {
-        if (nodeSelected.data.principalPort.id == edge.sourceHandle) {
-          setNodePrincipalLink({ idNode: edge.target, idPort: edge.targetHandle!.slice(0, -1) })
-        } else {
-          setNodeAuxiliaryLinks(prev =>
-            prev.map((port, j) =>
-              j === auxPs.findIndex((port) => port.id == edge.sourceHandle) ?
-                { ...port, idNode: edge.target, idPort: edge.targetHandle!.slice(0, -1) } : port
-            )
-          );
-        }
-      } else if (edge.target == nodeSelected.id) {
-        if (nodeSelected.data.principalPort.id == edge.targetHandle!.slice(0, -1)) {
-          setNodePrincipalLink({ idNode: edge.source, idPort: edge.sourceHandle! })
-        } else {
-          setNodeAuxiliaryLinks(prev =>
-            prev.map((port, j) =>
-              j === auxPs.findIndex((port) => port.id == edge.targetHandle!.slice(0, -1)) ?
-                { ...port, idNode: edge.source, idPort: edge.sourceHandle! } : port
-            )
-          );
-        }
-      }
-    });
-  }, [nodeSelected]);
-
-  const onChange = useCallback(({ nodes, }) => {
-    setNodeSelected(nodes[0]);
-  }, []);
-  useOnSelectionChange({
-    onChange
-  });
-
-  const onConnect = useCallback(
-    (params: Connection) => {
-      setEdges((eds: Edge[]) =>
-        addEdge({ ...params, type: typeEdge }, eds)
-      );
-    }, [setEdges, typeEdge]
-  );
-
-  const onDragOver = useCallback((event) => {
-    event.preventDefault();
-    event.dataTransfer.dropEffect = 'move';
-  }, []);
-
-  const isAllowed = useCallback(() => {
-    return (nodeId && nodeLabel && nodePrincipalPort.id && !nodeAuxiliaryPorts.find((port, _) => !port.id));
-  }, [nodeId, nodeLabel, nodeAuxiliaryPorts, nodePrincipalPort, setNodes]);
+  /// Add node
 
   const addItem = (position: XYPosition) => {
     const ndNew: Agent = {
@@ -188,8 +118,8 @@ const Flow = () => {
       ndsNew.push(ndNew);
 
       nodeAuxiliaryLinks.forEach((ids, index) => {
-        if (ndsNew.find((n, _) => n.id == ids.idNode)) {
-          const edgeNew: Edge = {
+        if (ndsNew.some(n => n.id === ids.idNode)) {
+          const edNew: Edge = {
             id: `E_${ids.idNode}:${ids.idPort}-${nodeId}:${nodeAuxiliaryPorts[index].id}`,
             source: ids.idNode,
             target: nodeId,
@@ -197,25 +127,24 @@ const Flow = () => {
             targetHandle: `${nodeAuxiliaryPorts[index].id}t`,
             type: typeEdge,
           }
-          setEdges((es) => es.concat(edgeNew));
+          setEdges((es) => [...es, edNew]);
         }
       });
 
-      if (ndsNew.find((n, _) => n.id == nodePrincipalLink.idNode)) {
-        const isAuxP = ndsNew.find((n, _) =>
-          n.id == nodePrincipalPort.id && n.data.principalPort.id == nodePrincipalLink.idPort
-        );
+      const ndTarget = ndsNew.find(n => n.id === nodePrincipalLink.idNode);
+      if (ndTarget) {
+        const isAuxPort = nodePrincipalLink.idPort === ndTarget.data.principalPort.id;
         const edNew: Edge = {
           id: `E_${nodeId}:${nodePrincipalPort.id}-${nodePrincipalLink.idNode}:${nodePrincipalLink.idPort}`,
           source: nodeId,
           target: nodePrincipalLink.idNode,
           sourceHandle: nodePrincipalPort.id,
           targetHandle: `${nodePrincipalLink.idPort}t`,
-          animated: isAuxP ? true : false,
-          style: isAuxP ? { stroke: 'blue' } : {},
+          animated: isAuxPort ? true : false,
+          style: isAuxPort ? { stroke: 'blue' } : {},
           type: typeEdge,
         }
-        setEdges((es) => es.concat(edNew));
+        setEdges((es) => [...es, edNew]);
       }
 
       return ndsNew;
@@ -228,6 +157,11 @@ const Flow = () => {
     setNodeAuxiliaryLinks([]);
     setNodePrincipalLink({ idNode: '', idPort: '' });
   };
+
+  //// Add node with drag
+
+  const { screenToFlowPosition } = useReactFlow<Agent, Edge>();
+  const [type] = useDnD();
 
   const onDrop = useCallback(
     (event) => {
@@ -251,6 +185,103 @@ const Flow = () => {
     event.dataTransfer.setData('text/plain', nodeType);
     event.dataTransfer.effectAllowed = 'move';
   };
+
+  /// Add edge with drag
+
+  const onConnect = useCallback((params: Connection) => {
+    const isActPair = isActivePair(params, nodes);
+    console.log(isActPair);
+    setEdges(eds =>
+      addEdge({
+        ...params,
+        type: typeEdge,
+        animated: isActPair,
+        style: isActPair ? { stroke: 'blue' } : {}
+      }, eds)
+    );
+  }, [setEdges, typeEdge, nodes]);
+
+  const onDragOver = useCallback((event) => {
+    event.preventDefault();
+    event.dataTransfer.dropEffect = 'move';
+  }, []);
+
+  /// Selected node
+
+  const [nodeSelected, setNodeSelected] = useState<Agent>();
+
+  const onChange = useCallback(({ nodes, }) => {
+    setNodeSelected(nodes[0]);
+  }, []);
+  useOnSelectionChange({
+    onChange
+  });
+
+  useEffect(() => {
+    if (!nodeSelected) {
+      setNodeId('');
+      setNodeLabel('');
+      setNodeAuxiliaryPorts([]);
+      setNodePrincipalPort({ id: '', label: null });
+      setNodeAuxiliaryLinks([]);
+      setNodePrincipalLink({ idNode: '', idPort: '' });
+      return
+    }
+
+    setNodeId(nodeSelected.id);
+    setNodeLabel(nodeSelected.data.label);
+    const auxPorts = nodeSelected.data.auxiliaryPorts;
+    setNodeAuxiliaryPorts(auxPorts);
+    setNodePrincipalPort(nodeSelected.data.principalPort);
+    setNodeAuxiliaryLinks(Array(auxPorts.length).fill({ idNode: "", idPort: "" }));
+
+    edges.forEach((edge) => {
+      if (edge.source === nodeSelected.id) {
+        if (nodeSelected.data.principalPort.id === edge.sourceHandle) {
+          setNodePrincipalLink({ idNode: edge.target, idPort: getTargetHandle(edge) })
+        } else {
+          const indexAuxPort = auxPorts.findIndex(port => port.id === edge.sourceHandle);
+          setNodeAuxiliaryLinks(prev =>
+            prev.map((port, i) =>
+              i === indexAuxPort ? { ...port, idNode: edge.target, idPort: getTargetHandle(edge) } : port
+            )
+          );
+        }
+      } else if (edge.target === nodeSelected.id) {
+        if (nodeSelected.data.principalPort.id === getTargetHandle(edge)) {
+          setNodePrincipalLink({ idNode: edge.source, idPort: edge.sourceHandle! })
+        } else {
+          const indexAuxPort = auxPorts.findIndex(port => port.id === getTargetHandle(edge));
+          setNodeAuxiliaryLinks(prev =>
+            prev.map((port, i) =>
+              i === indexAuxPort ? { ...port, idNode: edge.source, idPort: edge.sourceHandle! } : port
+            )
+          );
+        }
+      }
+    });
+  }, [nodeSelected]);
+
+  // Adding button
+
+  const isAllowed = useCallback(() => {
+    if (!validate(nodeId) || !validate(nodeLabel) || !validate(nodePrincipalPort.id)) return false;
+
+    const setPorts = new Set([nodePrincipalPort.id]);
+
+    for (const port of nodeAuxiliaryPorts) {
+      if (!validate(port.id)) return false;
+      setPorts.add(port.id.trim());
+    }
+
+    return setPorts.size === nodeAuxiliaryPorts.length + 1
+  }, [nodeId, nodeLabel, nodePrincipalPort, nodeAuxiliaryPorts]);
+
+  // Utils
+
+  const reactFlowWrapper = useRef(null);
+
+  const [rfInstance, setRfInstance] = useState(null);
 
   return (
     <div className='dndflow'>
