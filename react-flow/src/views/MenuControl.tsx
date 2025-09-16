@@ -10,7 +10,7 @@ import { DownloadIcon, UploadIcon, ArrowRightIcon, ArrowLeftIcon } from '@radix-
 
 import '@xyflow/react/dist/style.css';
 
-import { type Agent, getObjectsFromFile, getTargetHandle, parseJSON } from '../nets';
+import { type Agent, getObjectsFromFile, parseJSON } from '../nets';
 
 const allowedKeys = [
   'nodes',
@@ -66,27 +66,31 @@ export default (props: PropsMenuControl) => {
   const [indexCur, setIndexCur] = useState<number>(-1);
 
   const onDownload = useCallback(() => {
+    const transformObject = (obj) => {
+      if (Array.isArray(obj)) {
+        return obj.map(transformObject);
+      } else if (obj && typeof obj === 'object') {
+        const result = {};
+
+        for (const [key, value] of Object.entries<string>(obj)) {
+          if (key === 'data') {
+            Object.assign(result, transformObject(value))
+          } else if (allowedKeys.includes(key)) {
+            const newKey = mapKeys[key] || key;
+            const newValue = key === 'targetHandle'
+              ? value.slice(0, -1)
+              : transformObject(value);
+            result[newKey] = newValue
+          }
+        }
+
+        return result;
+      }
+      return obj;
+    }
+
     if (rfInstance) {
       const flow = rfInstance.toObject();
-      function transformObject(obj) {
-        if (Array.isArray(obj)) {
-          return obj.map(transformObject);
-        } else if (obj && typeof obj === 'object') {
-          const result = {};
-          for (const [key, value] of Object.entries(obj)) {
-            if (key === 'data') {
-              Object.assign(result, transformObject(value))
-            } else if (allowedKeys.includes(key)) {
-              const newKey = mapKeys[key] || key;
-              result[newKey] = key === 'targetHandle'
-                ? getTargetHandle(value)
-                : transformObject(value);
-            }
-          }
-          return result;
-        }
-        return obj;
-      }
 
       const dataStr = JSON.stringify(transformObject(flow), null, 2);
       const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
