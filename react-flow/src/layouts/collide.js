@@ -1,6 +1,8 @@
+// https://reactflow.dev/learn/layouting/layouting#d3-force
+
 import { quadtree } from 'd3-quadtree';
 
-export function collide() {
+export default () => {
     let nodes = [];
     let force = (alpha) => {
         const tree = quadtree(
@@ -45,5 +47,3 @@ export function collide() {
 
     return force;
 }
-
-export default collide;

@@ -1,3 +1,11 @@
+// https://reactflow.dev/learn/layouting/layouting#d3-force
+
+import { useMemo, useRef } from 'react';
+import {
+    useReactFlow,
+    useNodesInitialized,
+    type Edge
+} from '@xyflow/react';
 import {
     forceSimulation,
     forceLink,
@@ -5,13 +13,9 @@ import {
     forceX,
     forceY,
 } from 'd3-force';
-import { useMemo, useRef } from 'react';
-import {
-    useReactFlow,
-    useNodesInitialized
-} from '@xyflow/react';
 
-import { collide } from './collide.js';
+import collide from './collide.js';
+import { type Agent } from '../nets';
 
 const simulation = forceSimulation()
     .force('charge', forceManyBody().strength(-1000))
@@ -21,9 +25,11 @@ const simulation = forceSimulation()
     .alphaTarget(0.05)
     .stop();
 
-export const getLayoutedNodes = () => {
-    const { getNodes, setNodes, getEdges, fitView } = useReactFlow();
-    const initialized = useNodesInitialized();
+export const getLayoutedNodes = (): (
+    { toggle: () => void }
+) => {
+    const { getNodes, getEdges, setNodes, fitView } = useReactFlow<Agent, Edge>();
+    const nodesInitialized = useNodesInitialized();
 
     const draggingNodeRef = useRef(null);
     const dragEvents = useMemo(
@@ -35,27 +41,12 @@ export const getLayoutedNodes = () => {
         [],
     );
 
+    let isRunning = false;
+    let edges = getEdges().map((edge) => edge);
+
     return useMemo(() => {
-        let nodes = getNodes().map((node) => ({
-            ...node,
-            x: node.position.x,
-            y: node.position.y,
-        }));
-        let edges = getEdges().map((edge) => edge);
-        let running = false;
-
-        if (!initialized || nodes.length === 0) return [false, {}, dragEvents];
-
-        simulation.nodes(nodes).force(
-            'link',
-            forceLink(edges)
-                .id((d) => d.id)
-                .strength(0.05)
-                .distance(100),
-        );
-
-        const tick = () => {
-            getNodes().forEach((node, i) => {
+        const tick = (nodes: Agent[]) => {
+            getNodes().forEach((node: Agent, i: number) => {
                 const dragging = draggingNodeRef.current?.id === node.id;
 
                 if (dragging) {
@@ -77,26 +68,40 @@ export const getLayoutedNodes = () => {
 
             window.requestAnimationFrame(() => {
                 fitView();
-
-                if (running) tick();
+                if (isRunning) tick(nodes);
             });
         };
 
         const toggle = () => {
-            if (!running) {
-                getNodes().forEach((node, index) => {
+            let nodes = getNodes().map((node) => ({
+                ...node,
+                x: node.position.x,
+                y: node.position.y,
+            }));
+            if (!nodesInitialized || nodes.length === 0) return {};
+
+            simulation.nodes(nodes).force(
+                'link',
+                forceLink(edges)
+                    .id((d) => d.id)
+                    .strength(0.05)
+                    .distance(100),
+            );
+
+            if (!isRunning) {
+                const nds = getNodes();
+                nds.forEach((node, index) => {
                     let simNode = nodes[index];
                     Object.assign(simNode, node);
                     simNode.x = node.position.x;
                     simNode.y = node.position.y;
                 });
             }
-            running = !running;
-            running && window.requestAnimationFrame(tick);
+
+            isRunning = !isRunning;
+            isRunning && window.requestAnimationFrame(() => tick(nodes));
         };
 
-        const isRunning = () => running;
-
-        return [true, { toggle, isRunning }, dragEvents];
-    }, [initialized, dragEvents, getNodes, getEdges, setNodes, fitView]);
+        return { toggle };
+    }, [nodesInitialized, dragEvents, getNodes, getEdges, setNodes, fitView]);
 };

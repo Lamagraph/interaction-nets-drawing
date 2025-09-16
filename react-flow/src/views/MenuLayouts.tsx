@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Edge, Panel, useNodesInitialized, useReactFlow } from '@xyflow/react';
+import { type Edge, Panel, useNodesInitialized, useReactFlow } from '@xyflow/react';
 
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
@@ -10,51 +10,54 @@ import { getLayoutedNodes as elkLayoutNodes, elkOptions } from '../layouts/elkLa
 import { getLayoutedNodes as dLayoutNodes } from '../layouts/dLayout';
 import { getLayoutedNodes as dForceLayoutNodes } from '../layouts/dForceLayout';
 
-export default ({ isRunning, setIsRunning }) => {
+export default (
+  { isRunningLayout, setIsRunningLayout }:
+    { isRunningLayout: boolean, setIsRunningLayout: React.Dispatch<React.SetStateAction<boolean>> }
+) => {
   const { getNodes, getEdges, setNodes, fitView } = useReactFlow<Agent, Edge>();
   const nodesInitialized = useNodesInitialized();
 
-  const [, { toggle }] = dForceLayoutNodes();
-
-  const [layoutsShowed, setLayoutsShowed] = useState<boolean>(false);
-
-  const dagreLayout = async (direction: string) => {
+  const dagreLayout = (direction: string) => {
     if (nodesInitialized) {
-      const ndsLayouted = await dagreLayoutNodes(getNodes(), getEdges(), direction);
-      setNodes(ndsLayouted);
+      const nodesLayouted = dagreLayoutNodes(getNodes(), getEdges(), direction);
+      setNodes(nodesLayouted);
+      fitView();
+    }
+  };
+
+  const dLayout = () => {
+    if (nodesInitialized) {
+      const nodesLayouted = dLayoutNodes(getNodes(), getEdges());
+      setNodes(nodesLayouted);
       fitView();
     }
   };
 
   const elkHandlesLayout = async () => {
     if (nodesInitialized) {
-      const ndsLayouted = await elkHLayoutNodes(getNodes(), getEdges());
-      setNodes(ndsLayouted);
+      const nodesLayouted = await elkHLayoutNodes(getNodes(), getEdges());
+      setNodes(nodesLayouted);
       fitView();
     }
   };
 
   const elkLayout = async (direction: string) => {
     if (nodesInitialized) {
-      const ndsLayouted = await elkLayoutNodes(getNodes(), getEdges(),
+      const nodesLayouted = await elkLayoutNodes(getNodes(), getEdges(),
         { 'elk.direction': direction, ...elkOptions });
-      setNodes(ndsLayouted);
+      setNodes(nodesLayouted);
       fitView();
     }
   };
 
-  const dLayout = async () => {
-    if (nodesInitialized) {
-      const ndsLayouted = await dLayoutNodes(getNodes(), getEdges());
-      setNodes(ndsLayouted);
-      fitView();
-    }
-  };
+  const { toggle } = dForceLayoutNodes();
 
   const dForceLayout = () => {
     toggle();
-    setIsRunning(!isRunning);
+    setIsRunningLayout(!isRunningLayout);
   };
+
+  const [layoutsShowed, setLayoutsShowed] = useState<boolean>(false);
 
   return (
     <Panel position='top-right' className='panel-layouts'>
@@ -68,28 +71,28 @@ export default ({ isRunning, setIsRunning }) => {
         </button>
         {layoutsShowed && (
           <>
-            <button className='xy-theme__button' onClick={() => dagreLayout('TB')} disabled={isRunning} >
+            <button className='xy-theme__button' onClick={() => dagreLayout('TB')} disabled={isRunningLayout} >
               Dagre: vertical
             </button>
-            <button className='xy-theme__button' onClick={() => dagreLayout('LR')} disabled={isRunning} >
+            <button className='xy-theme__button' onClick={() => dagreLayout('LR')} disabled={isRunningLayout} >
               Dagre: horizontal
             </button>
-            <button className='xy-theme__button' onClick={elkHandlesLayout} disabled={isRunning} >
+            <button className='xy-theme__button' onClick={elkHandlesLayout} disabled={isRunningLayout} >
               ELK-handles
             </button>
-            <button className='xy-theme__button' onClick={() => elkLayout('DOWN')} disabled={isRunning} >
+            <button className='xy-theme__button' onClick={() => elkLayout('DOWN')} disabled={isRunningLayout} >
               ELK: vertical
             </button>
-            <button className='xy-theme__button' onClick={() => elkLayout('RIGHT')} disabled={isRunning} >
+            <button className='xy-theme__button' onClick={() => elkLayout('RIGHT')} disabled={isRunningLayout} >
               ELK: horizontal
             </button>
-            <button className='xy-theme__button' onClick={dLayout} disabled={isRunning} >
+            <button className='xy-theme__button' onClick={dLayout} disabled={isRunningLayout} >
               D3-hierarchy
             </button>
           </>
         )}
         <button className='xy-theme__button' onClick={dForceLayout} id={'forceLayout'}>
-          {isRunning ? 'Stop' : 'Start'} D3-force
+          {isRunningLayout ? 'Stop' : 'Start'} D3-force
         </button>
       </div>
     </Panel>
