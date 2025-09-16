@@ -8,25 +8,33 @@ import {
   ReactFlowProvider,
   useReactFlow,
   addEdge,
-  Edge,
+  type Edge,
   useOnSelectionChange,
   BezierEdge,
   SmoothStepEdge,
   Connection,
   XYPosition,
+  Panel,
 } from '@xyflow/react';
 
-import { SmartBezierEdge, SmartStraightEdge, SmartStepEdge } from "@tisoap/react-flow-smart-edge";
+import { SmartBezierEdge, SmartStraightEdge, SmartStepEdge } from '@tisoap/react-flow-smart-edge';
 
 import '@xyflow/react/dist/style.css';
 
-import { type Port, type Agent, getObjectsByName, parseJSON, isActivePair, getTargetHandle, validate } from './nets';
+import { type Port, type Agent, getObjectsByName, parseJSON, isActivePair, getTargetHandle, validate, defPort } from './nets';
 import NodeLayout from './views/NodeLayout';
 import MenuControl from './views/MenuControl';
 import MenuLayouts from './views/MenuLayouts';
 import { DnDProvider, useDnD } from './views/DnDContext';
 import MenuConfig from './views/MenuConfig';
 import MenuEdges from './views/MenuEdges';
+
+export interface PointConnetion {
+  idNode: string;
+  idPort: string;
+}
+
+export const defPointCon = { idNode: '', idPort: '' };
 
 const nodeTypes = {
   agent: NodeLayout,
@@ -49,6 +57,7 @@ const Flow = () => {
   const [nodes, setNodes, onNodesChange] = useNodesState<Agent>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
   const [fileOpened, setFileOpened] = useState<string>(nameFileStart);
+  const [isRunningLayout, setIsRunningLayout] = useState<boolean>(false);
 
   // Start
 
@@ -76,31 +85,30 @@ const Flow = () => {
     );
   }, [typeEdge]);
 
-  const [isRunning, setIsRunning] = useState<boolean>(false);
-
   // Add and edit net
 
   const [nodeId, setNodeId] = useState<string>('');
   const [nodeLabel, setNodeLabel] = useState<string>('');
-  const [nodePrincipalPort, setNodePrincipalPort] = useState<Port>({ id: '', label: null });
+  const [nodePrincipalPort, setNodePrincipalPort] = useState<Port>(defPort);
   const [nodeAuxiliaryPorts, setNodeAuxiliaryPorts] = useState<Port[]>([]);
 
-  const [nodePrincipalLink, setNodePrincipalLink] = useState<
-    {
-      idNode: string;
-      idPort: string;
-    }
-  >({ idNode: '', idPort: '' });
-  const [nodeAuxiliaryLinks, setNodeAuxiliaryLinks] = useState<
-    {
-      idNode: string;
-      idPort: string;
-    }[]
-  >([]);
+  const [nodePrincipalLink, setNodePrincipalLink] = useState<PointConnetion>(defPointCon);
+  const [nodeAuxiliaryLinks, setNodeAuxiliaryLinks] = useState<PointConnetion[]>([]);
+
+  const cleanUpInfoNode = useCallback(() => {
+    setNodeId('');
+    setNodeLabel('');
+    setNodeAuxiliaryPorts([]);
+    setNodePrincipalPort(defPort);
+    setNodeAuxiliaryLinks([]);
+    setNodePrincipalLink(defPointCon);
+  }, []);
 
   /// Add node
 
   const addItem = (position: XYPosition) => {
+    setIsRunningLayout(false);
+
     const ndNew: Agent = {
       id: nodeId,
       data: {
@@ -150,38 +158,30 @@ const Flow = () => {
       return ndsNew;
     });
 
-    setNodeId('');
-    setNodeLabel('');
-    setNodeAuxiliaryPorts([]);
-    setNodePrincipalPort({ id: '', label: null });
-    setNodeAuxiliaryLinks([]);
-    setNodePrincipalLink({ idNode: '', idPort: '' });
+    cleanUpInfoNode();
   };
 
   //// Add node with drag
 
   const { screenToFlowPosition } = useReactFlow<Agent, Edge>();
-  const [type] = useDnD();
+  const [type, setType] = useDnD();
 
-  const onDrop = useCallback(
-    (event) => {
-      event.preventDefault();
-      if (!type && !isAllowed()) {
-        return;
-      }
+  const onDrop = useCallback((event) => {
+    event.preventDefault();
+    if (!type && !isAllowed()) {
+      return;
+    }
 
-      const position = screenToFlowPosition({
-        x: event.clientX,
-        y: event.clientY,
-      });
+    const position = screenToFlowPosition({
+      x: event.clientX,
+      y: event.clientY,
+    });
 
-      addItem(position);
-    },
-    [screenToFlowPosition, type],
-  );
+    addItem(position);
+  }, [screenToFlowPosition, type]);
 
   const onDragStart = (event, nodeType) => {
-    setType(nodeType);
+    if (setType) setType(nodeType);
     event.dataTransfer.setData('text/plain', nodeType);
     event.dataTransfer.effectAllowed = 'move';
   };
@@ -190,7 +190,8 @@ const Flow = () => {
 
   const onConnect = useCallback((params: Connection) => {
     const isActPair = isActivePair(params, nodes);
-    console.log(isActPair);
+    setIsRunningLayout(false);
+
     setEdges(eds =>
       addEdge({
         ...params,
@@ -219,12 +220,7 @@ const Flow = () => {
 
   useEffect(() => {
     if (!nodeSelected) {
-      setNodeId('');
-      setNodeLabel('');
-      setNodeAuxiliaryPorts([]);
-      setNodePrincipalPort({ id: '', label: null });
-      setNodeAuxiliaryLinks([]);
-      setNodePrincipalLink({ idNode: '', idPort: '' });
+      cleanUpInfoNode();
       return
     }
 
@@ -233,7 +229,7 @@ const Flow = () => {
     const auxPorts = nodeSelected.data.auxiliaryPorts;
     setNodeAuxiliaryPorts(auxPorts);
     setNodePrincipalPort(nodeSelected.data.principalPort);
-    setNodeAuxiliaryLinks(Array(auxPorts.length).fill({ idNode: "", idPort: "" }));
+    setNodeAuxiliaryLinks(Array(auxPorts.length).fill(defPointCon));
 
     edges.forEach((edge) => {
       if (edge.source === nodeSelected.id) {
@@ -241,8 +237,8 @@ const Flow = () => {
           setNodePrincipalLink({ idNode: edge.target, idPort: getTargetHandle(edge) })
         } else {
           const indexAuxPort = auxPorts.findIndex(port => port.id === edge.sourceHandle);
-          setNodeAuxiliaryLinks(prev =>
-            prev.map((port, i) =>
+          setNodeAuxiliaryLinks(links =>
+            links.map((port, i) =>
               i === indexAuxPort ? { ...port, idNode: edge.target, idPort: getTargetHandle(edge) } : port
             )
           );
@@ -252,15 +248,22 @@ const Flow = () => {
           setNodePrincipalLink({ idNode: edge.source, idPort: edge.sourceHandle! })
         } else {
           const indexAuxPort = auxPorts.findIndex(port => port.id === getTargetHandle(edge));
-          setNodeAuxiliaryLinks(prev =>
-            prev.map((port, i) =>
+          setNodeAuxiliaryLinks(links =>
+            links.map((port, i) =>
               i === indexAuxPort ? { ...port, idNode: edge.source, idPort: edge.sourceHandle! } : port
             )
           );
         }
       }
     });
-  }, [nodeSelected]);
+  }, [nodeSelected, isRunningLayout]);
+
+  useEffect(() => {
+    if (isRunningLayout && nodeSelected) {
+      nodeSelected.selected = false;
+      cleanUpInfoNode();
+    }
+  }, [isRunningLayout, nodeSelected]);
 
   // Adding button
 
@@ -298,7 +301,20 @@ const Flow = () => {
           onDrop={onDrop}
           onDragStart={onDragStart}
           onDragOver={onDragOver}
+          attributionPosition='bottom-left'
           fitView
+          // If layout is running
+          nodesDraggable={!isRunningLayout}
+          nodesConnectable={!isRunningLayout}
+          nodesFocusable={!isRunningLayout}
+          edgesFocusable={!isRunningLayout}
+          elementsSelectable={!isRunningLayout}
+          panOnDrag={!isRunningLayout}
+          zoomOnScroll={!isRunningLayout}
+          zoomOnPinch={!isRunningLayout}
+          zoomOnDoubleClick={!isRunningLayout}
+          connectOnClick={!isRunningLayout}
+          deleteKeyCode={!isRunningLayout ? ["Delete", "Backspace"] : null}
         >
           <MenuConfig
             addItem={addItem}
@@ -316,22 +332,28 @@ const Flow = () => {
             nodePrincipalLink={nodePrincipalLink}
             setNodePrincipalLink={setNodePrincipalLink}
             nodeSelected={nodeSelected}
+            isRunningLayout={isRunningLayout}
           />
           <MenuLayouts
-            isRunning={isRunning}
-            setIsRunning={setIsRunning}
+            isRunningLayout={isRunningLayout}
+            setIsRunningLayout={setIsRunningLayout}
           />
-          <MenuControl
-            nodes={nodes}
-            edges={edges}
-            typeEdge={typeEdge}
-            fileOpened={fileOpened}
-            setFileOpened={setFileOpened}
-            rfInstance={rfInstance}
-            isRunning={isRunning}
-            setIsRunning={setIsRunning}
-          />
-          <MenuEdges setTypeEdge={setTypeEdge} />
+          <div>
+            <MenuControl
+              nodes={nodes}
+              edges={edges}
+              typeEdge={typeEdge}
+              fileOpened={fileOpened}
+              setFileOpened={setFileOpened}
+              rfInstance={rfInstance}
+              isRunningLayout={isRunningLayout}
+              setIsRunningLayout={setIsRunningLayout}
+            />
+            <MenuEdges setTypeEdge={setTypeEdge} />
+            <Panel position='bottom-left' className='xy-theme__label' style={{ margin: '15px', left: '188px' }}>
+              <label>File: {fileOpened}</label>
+            </Panel>
+          </div>
           <Background />
           <MiniMap />
         </ReactFlow>

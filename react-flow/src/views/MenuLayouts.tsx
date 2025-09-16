@@ -54,7 +54,7 @@ export default (
 
   const dForceLayout = () => {
     toggle();
-    setIsRunningLayout(!isRunningLayout);
+    setIsRunningLayout(isRunning => !isRunning);
   };
 
   const [layoutsShowed, setLayoutsShowed] = useState<boolean>(false);
