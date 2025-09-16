@@ -131,8 +131,58 @@ export default ({
     input.click();
   }, [setNodes, setEdges, setViewport]);
 
+  const updateNetwork = useCallback((isStepUp: boolean) => {
+    if (indexCur < 0) return
+
+    const indexNew = isStepUp ? indexCur + 1 : indexCur - 1;
+    const color = isStepUp ? 'lightgreen' : 'lightsalmon';
+
+    const editItems = (arr, arrOld, arrNew, isNode) => {
+      arrOld.forEach((item) => {
+        const itemExisted = arr.find(i => i.id === item.id);
+        if (itemExisted) {
+          arrNew.push({
+            ...itemExisted,
+            style: item.style,
+          });
+        } else {
+          arrNew.push({
+            ...item,
+            style: {
+              ...item.style,
+              backgroundColor: isNode ? color : null,
+              stroke: isNode ? null : color,
+            }
+          });
+        }
+      });
+    };
+
+    const ndsNew: Agent[] = []
+    editItems(nodes, netsSaved[indexNew][0], ndsNew, true);
+
+    const edsNew: Edge[] = []
+    editItems(edges, netsSaved[indexNew][1], edsNew, false);
+
+    setIndexCur(indexNew);
+    setFileOpened(netsSaved[indexNew][2]);
+    setNodes(ndsNew);
+    setEdges(edsNew);
+
+  }, [netsSaved, nodes, edges, isRunning]);
+
   return (
     <Controls>
+      <ControlButton
+        title='Next step'
+        disabled={indexCur == netsSaved.length - 1}
+        onClick={() => updateNetwork(true)}
+      ><ArrowRightIcon /></ControlButton>
+      <ControlButton
+        title='Prev step'
+        disabled={indexCur <= 0}
+        onClick={() => updateNetwork(false)}
+      ><ArrowLeftIcon /></ControlButton>
       <ControlButton title='Upload networks' onClick={onUpload}><UploadIcon /></ControlButton>
       <ControlButton title='Download the network' onClick={onDownload}><DownloadIcon /></ControlButton>
     </Controls >
