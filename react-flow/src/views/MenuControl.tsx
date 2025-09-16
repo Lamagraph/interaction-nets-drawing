@@ -3,14 +3,14 @@ import {
   useReactFlow,
   ControlButton,
   Controls,
-  Edge,
+  type Edge,
 } from '@xyflow/react';
 
 import { DownloadIcon, UploadIcon, ArrowRightIcon, ArrowLeftIcon } from '@radix-ui/react-icons'
 
 import '@xyflow/react/dist/style.css';
 
-import { type Agent, getObjectsFromFile, parseJSON } from '../nets';
+import { type Agent, getObjectsFromFile, getTargetHandle, parseJSON } from '../nets';
 
 const allowedKeys = [
   'nodes',
@@ -36,25 +36,29 @@ const mapKeys = {
   'targetHandle': 'targetPort',
 };
 
-export default ({
-  nodes,
-  edges,
-  typeEdge,
-  fileOpened,
-  rfInstance,
-  isRunning,
-  setFileOpened,
-  setIsRunning
-}: {
+interface PropsMenuControl {
   nodes: Agent[];
   edges: Edge[];
   typeEdge: string;
   fileOpened: string;
   rfInstance: any;
-  isRunning: boolean;
+  isRunningLayout: boolean;
   setFileOpened: React.Dispatch<React.SetStateAction<string>>,
-  setIsRunning: React.Dispatch<React.SetStateAction<boolean>>,
-}) => {
+  setIsRunningLayout: React.Dispatch<React.SetStateAction<boolean>>,
+}
+
+export default (props: PropsMenuControl) => {
+  const {
+    nodes,
+    edges,
+    typeEdge,
+    fileOpened,
+    rfInstance,
+    isRunningLayout,
+    setFileOpened,
+    setIsRunningLayout,
+  } = props;
+
   const { setNodes, setEdges } = useReactFlow();
   const { setViewport } = useReactFlow();
 
@@ -75,7 +79,7 @@ export default ({
             } else if (allowedKeys.includes(key)) {
               const newKey = mapKeys[key] || key;
               result[newKey] = key === 'targetHandle'
-                ? value.slice(0, -1)
+                ? getTargetHandle(value)
                 : transformObject(value);
             }
           }
@@ -105,27 +109,29 @@ export default ({
     const nets: [Agent[], Edge[], string][] = [];
 
     input.onchange = async (event) => {
-      const files = (event.target as HTMLInputElement).files;
-      if (!files || files.length === 0) return;
+      const fileList = (event.target as HTMLInputElement).files;
+      if (!fileList || fileList.length === 0) return;
 
-      const arrayFiles = Array.from(files)
+      const files = Array.from(fileList)
         .sort((a, b) => a.name.localeCompare(b.name, undefined, {
           numeric: true,
           sensitivity: 'base'
         }));
 
-      for (const file of arrayFiles) {
+      for (const file of files) {
         const net = await getObjectsFromFile(file);
         const [nds, eds] = await parseJSON(net, typeEdge);
         nets.push([nds, eds, file.name]);
       }
 
-      const indexNew = 0;
-      setIndexCur(indexNew);
-      setNetsSaved(nets);
-      setNodes(nets[indexNew][0]);
-      setEdges(nets[indexNew][1]);
-      setFileOpened(nets[indexNew][2]);
+      if (nets.length > 0) {
+        const indexNew = 0;
+        setIndexCur(indexNew);
+        setNetsSaved(nets);
+        setNodes(nets[indexNew][0]);
+        setEdges(nets[indexNew][1]);
+        setFileOpened(nets[indexNew][2]);
+      }
     };
 
     input.click();
@@ -137,9 +143,14 @@ export default ({
     const indexNew = isStepUp ? indexCur + 1 : indexCur - 1;
     const color = isStepUp ? 'lightgreen' : 'lightsalmon';
 
-    const editItems = (arr, arrOld, arrNew, isNode) => {
-      arrOld.forEach((item) => {
-        const itemExisted = arr.find(i => i.id === item.id);
+    const editItems = (
+      arrCur: (Agent | Edge)[],
+      arrSaved: (Agent | Edge)[],
+      arrNew: (Agent | Edge)[],
+      isNode: boolean
+    ) => {
+      arrSaved.forEach((item) => {
+        const itemExisted = arrCur.find(i => i.id === item.id);
         if (itemExisted) {
           arrNew.push({
             ...itemExisted,
@@ -150,8 +161,8 @@ export default ({
             ...item,
             style: {
               ...item.style,
-              backgroundColor: isNode ? color : null,
-              stroke: isNode ? null : color,
+              backgroundColor: isNode ? color : undefined,
+              stroke: isNode ? undefined : color,
             }
           });
         }
@@ -168,23 +179,30 @@ export default ({
     setFileOpened(netsSaved[indexNew][2]);
     setNodes(ndsNew);
     setEdges(edsNew);
-
-  }, [netsSaved, nodes, edges, isRunning]);
+  }, [netsSaved, nodes, edges]);
 
   return (
     <Controls>
       <ControlButton
         title='Next step'
-        disabled={indexCur == netsSaved.length - 1}
+        disabled={isRunningLayout || (indexCur === netsSaved.length - 1)}
         onClick={() => updateNetwork(true)}
       ><ArrowRightIcon /></ControlButton>
       <ControlButton
         title='Prev step'
-        disabled={indexCur <= 0}
+        disabled={isRunningLayout || (indexCur <= 0)}
         onClick={() => updateNetwork(false)}
       ><ArrowLeftIcon /></ControlButton>
-      <ControlButton title='Upload networks' onClick={onUpload}><UploadIcon /></ControlButton>
-      <ControlButton title='Download the network' onClick={onDownload}><DownloadIcon /></ControlButton>
+      <ControlButton
+        title='Upload networks'
+        disabled={isRunningLayout}
+        onClick={onUpload}
+      ><UploadIcon /></ControlButton>
+      <ControlButton
+        title='Download the network'
+        disabled={isRunningLayout}
+        onClick={onDownload}
+      ><DownloadIcon /></ControlButton>
     </Controls >
   );
 };

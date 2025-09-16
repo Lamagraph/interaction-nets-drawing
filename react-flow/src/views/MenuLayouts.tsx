@@ -62,7 +62,7 @@ export default (
   return (
     <Panel position='top-right' className='panel-layouts'>
       <div>
-        {layoutsShowed && <label className='xy-theme__label'>Layouts</label>}
+        {layoutsShowed && <label className='xy-theme__label' style={{ marginBottom: '10px' }}>Layouts</label>}
       </div>
 
       <div>

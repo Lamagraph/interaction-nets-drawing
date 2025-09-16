@@ -11,6 +11,8 @@ export type AgentData = {
 };
 export type Agent = Node<AgentData, 'agent'>;
 
+export const defPort = { id: '', label: null };
+
 export function validate(item: any, type = 'string') {
     if (item === undefined || item === null) return false;
     if (typeof item !== type) return false;
