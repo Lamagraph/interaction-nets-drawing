@@ -108,7 +108,7 @@ const Flow = () => {
     setNodePrincipalLink(defPointCon);
   }, []);
 
-  /// Add node
+  /// Add agent
 
   const addItem = (position: XYPosition) => {
     setIsRunningLayout(false);
@@ -165,7 +165,7 @@ const Flow = () => {
     cleanUpInfoNode();
   };
 
-  //// Add node with drag
+  //// Add agent with drag
 
   const { screenToFlowPosition } = useReactFlow<Agent, Edge>();
   const [type, setType] = useDnD();

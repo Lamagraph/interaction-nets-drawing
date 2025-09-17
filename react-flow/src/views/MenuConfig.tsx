@@ -246,7 +246,7 @@ export default (props: PropsMenuConfig) => {
                 className='xy-theme__button'
                 onClick={onAdd}
                 disabled={!isAllowed()}
-              >{nodeSelected && !isRunningLayout ? 'Edit node' : 'Add node'}</button>
+              >{nodeSelected && !isRunningLayout ? 'Edit agent' : 'Add agent'}</button>
             </td></tr>
 
             {/* Node preview */}
