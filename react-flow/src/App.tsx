@@ -49,7 +49,7 @@ const edgeTypes = {
 };
 
 const dirNetsSaved = '../saved-nets/';
-const nameFileStart = 'app_list_1.json'
+const nameFileStart = 'app_list_1.json';
 
 const Flow = () => {
   // Main
@@ -347,7 +347,6 @@ const Flow = () => {
               setFileOpened={setFileOpened}
               rfInstance={rfInstance}
               isRunningLayout={isRunningLayout}
-              setIsRunningLayout={setIsRunningLayout}
             />
             <MenuEdges setTypeEdge={setTypeEdge} />
             <Panel position='bottom-left' className='xy-theme__label' style={{ margin: '15px', left: '188px' }}>

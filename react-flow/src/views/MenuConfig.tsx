@@ -71,7 +71,11 @@ export default (props: PropsMenuConfig) => {
         addItem({ x: 50, y: 50 });
       }
     }
-  }, [nodeId, nodeLabel, nodeAuxiliaryPorts, nodePrincipalPort, nodeAuxiliaryLinks, nodePrincipalLink, nodeSelected]);
+  }, [
+    nodeId, nodeLabel, nodeAuxiliaryPorts,
+    nodePrincipalPort, nodeAuxiliaryLinks,
+    nodePrincipalLink, nodeSelected,
+  ]);
 
   return (
     !isRunningLayout && (
