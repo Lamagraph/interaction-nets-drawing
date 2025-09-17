@@ -21,20 +21,24 @@ import { SmartBezierEdge, SmartStraightEdge, SmartStepEdge } from '@tisoap/react
 
 import '@xyflow/react/dist/style.css';
 
-import { type Port, type Agent, getObjectsByName, parseJSON, isActivePair, getTargetHandle, validate, defPort } from './nets';
+import {
+  type Port,
+  type Agent,
+  getObjectsByName,
+  parseJSON,
+  isActivePair,
+  getTargetHandle,
+  validate,
+  defPort,
+  PointConnetion,
+  defPointCon,
+} from './nets';
 import NodeLayout from './views/NodeLayout';
 import MenuControl from './views/MenuControl';
 import MenuLayouts from './views/MenuLayouts';
 import { DnDProvider, useDnD } from './views/DnDContext';
 import MenuConfig from './views/MenuConfig';
 import MenuEdges from './views/MenuEdges';
-
-export interface PointConnetion {
-  idNode: string;
-  idPort: string;
-}
-
-export const defPointCon = { idNode: '', idPort: '' };
 
 const nodeTypes = {
   agent: NodeLayout,
@@ -120,9 +124,9 @@ const Flow = () => {
       type: 'agent'
     };
 
-    setEdges((eds) => eds.filter((e) => e.source != nodeId && e.target != nodeId));
+    setEdges((eds) => eds.filter(e => e.source !== nodeId && e.target !== nodeId));
     setNodes((nds) => {
-      const ndsNew = nds.filter((n) => n.id !== nodeId);
+      const ndsNew = nds.filter(n => n.id !== nodeId);
       ndsNew.push(ndNew);
 
       nodeAuxiliaryLinks.forEach((ids, index) => {
@@ -166,7 +170,7 @@ const Flow = () => {
   const { screenToFlowPosition } = useReactFlow<Agent, Edge>();
   const [type, setType] = useDnD();
 
-  const onDrop = useCallback((event) => {
+  const onDrop = useCallback((event: any) => {
     event.preventDefault();
     if (!type && !isAllowed()) {
       return;
@@ -180,7 +184,7 @@ const Flow = () => {
     addItem(position);
   }, [screenToFlowPosition, type]);
 
-  const onDragStart = (event, nodeType) => {
+  const onDragStart = (event: any, nodeType: any) => {
     if (setType) setType(nodeType);
     event.dataTransfer.setData('text/plain', nodeType);
     event.dataTransfer.effectAllowed = 'move';
@@ -202,7 +206,7 @@ const Flow = () => {
     );
   }, [setEdges, typeEdge, nodes]);
 
-  const onDragOver = useCallback((event) => {
+  const onDragOver = useCallback((event: any) => {
     event.preventDefault();
     event.dataTransfer.dropEffect = 'move';
   }, []);
@@ -211,7 +215,7 @@ const Flow = () => {
 
   const [nodeSelected, setNodeSelected] = useState<Agent>();
 
-  const onChange = useCallback(({ nodes, }) => {
+  const onChange = useCallback(({ nodes }: { nodes: Agent[] }) => {
     setNodeSelected(nodes[0]);
   }, []);
   useOnSelectionChange({

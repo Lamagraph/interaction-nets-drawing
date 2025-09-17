@@ -1,5 +1,9 @@
-import { type Node, type Edge, Connection } from '@xyflow/react';
+import { type Node, type Edge, type Connection } from '@xyflow/react';
 
+export interface PointConnetion {
+    idNode: string;
+    idPort: string;
+}
 export type Port = {
     id: string;
     label: string | null;
@@ -11,6 +15,7 @@ export type AgentData = {
 };
 export type Agent = Node<AgentData, 'agent'>;
 
+export const defPointCon = { idNode: '', idPort: '' };
 export const defPort = { id: '', label: null };
 
 export function validate(item: any, type = 'string') {

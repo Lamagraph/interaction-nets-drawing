@@ -1,8 +1,11 @@
 import { Handle, HandleType, Position } from '@xyflow/react';
 
+import { type AgentData } from '../nets'
 import HandleLayout from './HandleLayout';
 
-export default ({ id, data, needLimit = true }) => {
+export default ({ id, data, needLimit = true }:
+  { id: string; data: AgentData; needLimit: boolean }
+) => {
   const handle = (type: HandleType, pos: Position, id: string, style = {}) => {
     if (!needLimit) return <Handle type={type} position={pos} key={id} id={id} style={style} />
     return <HandleLayout type={type} position={pos} key={id} id={id} style={style} />

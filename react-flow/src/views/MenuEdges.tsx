@@ -1,7 +1,7 @@
 import { Panel } from '@xyflow/react';
 
 export default ({ setTypeEdge }: { setTypeEdge: React.Dispatch<React.SetStateAction<string>> }) => {
-  const onChange = (event) => {
+  const onChange = (event: any) => {
     setTypeEdge(event.target.value);
   };
 

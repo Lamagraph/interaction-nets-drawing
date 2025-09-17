@@ -1,5 +1,5 @@
-import { Handle, HandleProps, useNodeConnections } from '@xyflow/react';
 import { useEffect, useState } from 'react';
+import { Handle, HandleProps, useNodeConnections } from '@xyflow/react';
 
 export default (props: HandleProps) => {
   const connectionsS = useNodeConnections({

@@ -6,8 +6,7 @@ import '@xyflow/react/dist/style.css';
 
 import NodeLayout from './NodeLayout';
 import { useDnD } from './DnDContext';
-import { defPort, type Port, type Agent } from '../nets';
-import { PointConnetion, defPointCon } from '../App';
+import { defPort, type Port, type Agent, PointConnetion, defPointCon } from '../nets';
 
 interface PropsMenuConfig {
   addItem: (position: XYPosition) => void,
