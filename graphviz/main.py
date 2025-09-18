@@ -228,4 +228,4 @@ def main(files: list[str], need_save_dot: bool) -> None:
 
 if __name__ == "__main__":
     files = argv[1:]
-    main(files, False)
+    main(files, need_save_dot=False)

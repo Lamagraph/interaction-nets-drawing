@@ -1,0 +1,221 @@
+{
+  "nodes": [
+    {
+      "id": "N1",
+      "label": "2",
+      "auxiliaryPorts": [],
+      "principalPort": {
+        "id": "P0",
+        "label": null
+      }
+    },
+    {
+      "id": "N2",
+      "label": "Cons",
+      "auxiliaryPorts": [
+        {
+          "id": "P1",
+          "label": null
+        },
+        {
+          "id": "P2",
+          "label": "123"
+        }
+      ],
+      "principalPort": {
+        "id": "P0",
+        "label": null
+      }
+    },
+    {
+      "id": "N3",
+      "label": "1",
+      "auxiliaryPorts": [],
+      "principalPort": {
+        "id": "P0",
+        "label": null
+      }
+    },
+    {
+      "id": "N4",
+      "label": "Cons",
+      "auxiliaryPorts": [
+        {
+          "id": "P1",
+          "label": null
+        },
+        {
+          "id": "P2",
+          "label": null
+        }
+      ],
+      "principalPort": {
+        "id": "P0",
+        "label": null
+      }
+    },
+    {
+      "id": "N5",
+      "label": "Diff",
+      "auxiliaryPorts": [
+        {
+          "id": "P1",
+          "label": null
+        },
+        {
+          "id": "P2",
+          "label": null
+        }
+      ],
+      "principalPort": {
+        "id": "P0",
+        "label": "012"
+      }
+    },
+    {
+      "id": "N6",
+      "label": "3",
+      "auxiliaryPorts": [],
+      "principalPort": {
+        "id": "P0",
+        "label": null
+      }
+    },
+    {
+      "id": "N7",
+      "label": "Cons",
+      "auxiliaryPorts": [
+        {
+          "id": "P1",
+          "label": "12345"
+        },
+        {
+          "id": "P2",
+          "label": "6789"
+        }
+      ],
+      "principalPort": {
+        "id": "P0",
+        "label": null
+      }
+    },
+    {
+      "id": "N8",
+      "label": "Diff",
+      "auxiliaryPorts": [
+        {
+          "id": "P1",
+          "label": null
+        },
+        {
+          "id": "P2",
+          "label": null
+        }
+      ],
+      "principalPort": {
+        "id": "P0",
+        "label": null
+      }
+    },
+    {
+      "id": "N9",
+      "label": "Append",
+      "auxiliaryPorts": [
+        {
+          "id": "P1",
+          "label": "111"
+        },
+        {
+          "id": "P2",
+          "label": null
+        }
+      ],
+      "principalPort": {
+        "id": "P0",
+        "label": "000"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "E_N1:P0-N2:P1",
+      "source": "N1",
+      "target": "N2",
+      "sourcePort": "P0",
+      "targetPort": "P1",
+      "activePair": false
+    },
+    {
+      "id": "E_N3:P0-N4:P1",
+      "source": "N3",
+      "target": "N4",
+      "sourcePort": "P0",
+      "targetPort": "P1",
+      "activePair": false
+    },
+    {
+      "id": "E_N2:P0-N4:P2",
+      "source": "N2",
+      "target": "N4",
+      "sourcePort": "P0",
+      "targetPort": "P2",
+      "activePair": false
+    },
+    {
+      "id": "E_N4:P0-N5:P1",
+      "source": "N4",
+      "target": "N5",
+      "sourcePort": "P0",
+      "targetPort": "P1",
+      "activePair": false
+    },
+    {
+      "id": "E_N2:P2-N5:P2",
+      "source": "N2",
+      "target": "N5",
+      "sourcePort": "P2",
+      "targetPort": "P2",
+      "activePair": false
+    },
+    {
+      "id": "E_N6:P0-N7:P1",
+      "source": "N6",
+      "target": "N7",
+      "sourcePort": "P0",
+      "targetPort": "P1",
+      "activePair": false
+    },
+    {
+      "id": "E_N7:P0-N8:P1",
+      "source": "N7",
+      "target": "N8",
+      "sourcePort": "P0",
+      "targetPort": "P1",
+      "activePair": false
+    },
+    {
+      "id": "E_N7:P2-N8:P2",
+      "source": "N7",
+      "target": "N8",
+      "sourcePort": "P2",
+      "targetPort": "P2",
+      "activePair": false
+    },
+    {
+      "id": "E_N8:P0-N9:P1",
+      "source": "N8",
+      "target": "N9",
+      "sourcePort": "P0",
+      "targetPort": "P1",
+      "activePair": false
+    },
+    {
+      "id": "E_N5:P0-N9:P0",
+      "source": "N5",
+      "target": "N9",
+      "sourcePort": "P0",
+      "targetPort": "P0",
+      "activePair": true
+    }
+  ]
+}

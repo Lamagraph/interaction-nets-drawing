@@ -1,0 +1,115 @@
+graph app_list_1 {
+    node [shape=rect, style="filled, rounded", fillcolor=lightblue, margin=0, width=0.5, height=0.25];
+    edge [arrowtail=dot, arrowhead=dot, arrowsize=0.4];
+
+    N1 [
+        label=<
+<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="0" CELLPADDING="0">
+  <TR><TD BORDER="0" COLSPAN="2">2</TD></TR>
+  <TR><TD BORDER="0" COLSPAN="2" PORT="P0"></TD></TR>
+</TABLE>>
+    ];
+
+    N2 [
+        label=<
+<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="0" CELLPADDING="0">
+  <TR>
+    <TD BORDER="0" PORT="P1"></TD>
+    <TD BORDER="0" PORT="P2">123</TD>
+  </TR>
+  <TR><TD BORDER="0" COLSPAN="2">Cons</TD></TR>
+  <TR><TD BORDER="0" COLSPAN="2" PORT="P0"></TD></TR>
+</TABLE>>
+    ];
+
+    N3 [
+        label=<
+<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="0" CELLPADDING="0">
+  <TR><TD BORDER="0" COLSPAN="2">1</TD></TR>
+  <TR><TD BORDER="0" COLSPAN="2" PORT="P0"></TD></TR>
+</TABLE>>
+    ];
+
+    N4 [
+        label=<
+<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="0" CELLPADDING="0">
+  <TR>
+    <TD BORDER="0" PORT="P1"></TD>
+    <TD BORDER="0" PORT="P2"></TD>
+  </TR>
+  <TR><TD BORDER="0" COLSPAN="2">Cons</TD></TR>
+  <TR><TD BORDER="0" COLSPAN="2" PORT="P0"></TD></TR>
+</TABLE>>
+    ];
+
+    N5 [
+        label=<
+<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="0" CELLPADDING="0">
+  <TR>
+    <TD BORDER="0" PORT="P1"></TD>
+    <TD BORDER="0" PORT="P2"></TD>
+  </TR>
+  <TR><TD BORDER="0" COLSPAN="2">Diff</TD></TR>
+  <TR><TD BORDER="0" COLSPAN="2" PORT="P0">012</TD></TR>
+</TABLE>>
+    ];
+
+    N6 [
+        label=<
+<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="0" CELLPADDING="0">
+  <TR><TD BORDER="0" COLSPAN="2">3</TD></TR>
+  <TR><TD BORDER="0" COLSPAN="2" PORT="P0"></TD></TR>
+</TABLE>>
+    ];
+
+    N7 [
+        label=<
+<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="0" CELLPADDING="0">
+  <TR>
+    <TD BORDER="0" PORT="P1">12345</TD>
+    <TD BORDER="0" PORT="P2">6789</TD>
+  </TR>
+  <TR><TD BORDER="0" COLSPAN="2">Cons</TD></TR>
+  <TR><TD BORDER="0" COLSPAN="2" PORT="P0"></TD></TR>
+</TABLE>>
+    ];
+
+    N8 [
+        label=<
+<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="0" CELLPADDING="0">
+  <TR>
+    <TD BORDER="0" PORT="P1"></TD>
+    <TD BORDER="0" PORT="P2"></TD>
+  </TR>
+  <TR><TD BORDER="0" COLSPAN="2">Diff</TD></TR>
+  <TR><TD BORDER="0" COLSPAN="2" PORT="P0"></TD></TR>
+</TABLE>>
+    ];
+
+    N9 [
+        label=<
+<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="0" CELLPADDING="0">
+  <TR>
+    <TD BORDER="0" PORT="P1">111</TD>
+    <TD BORDER="0" PORT="P2"></TD>
+  </TR>
+  <TR><TD BORDER="0" COLSPAN="2">Append</TD></TR>
+  <TR><TD BORDER="0" COLSPAN="2" PORT="P0">000</TD></TR>
+</TABLE>>
+    ];
+
+    N1:P0:s -- N2:P1:n [dir=back];
+    N3:P0:s -- N4:P1:n [dir=back];
+    N2:P0:s -- N4:P2:n [dir=back];
+    N4:P0:s -- N5:P1:n [dir=back];
+    N2:P2:n -- N5:P2:n;
+    N6:P0:s -- N7:P1:n [dir=back];
+    N7:P0:s -- N8:P1:n [dir=back];
+    N7:P2:n -- N8:P2:n;
+    N8:P0:s -- N9:P1:n [dir=back];
+    N5:P0:s -- N9:P0:s [constraint=false, color="blue", dir=both];
+
+    _N_for_free_port_P2 [style=invis];
+    { rank=same; N9; _N_for_free_port_P2 };
+    N9:P2:n -- _N_for_free_port_P2;
+}
