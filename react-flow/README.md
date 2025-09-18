@@ -1,6 +1,6 @@
 # react-flow
 
-**react-flow** — a app for visualizations of interaction nets using [React Flow](https://reactflow.dev).
+**react-flow** — an interactive web application for visualizations of interaction nets using [React Flow](https://reactflow.dev).
 
 ## Install
 
@@ -10,11 +10,15 @@ npm install
 
 ## Usage
 
-When you launch the app, ["Adding to the list"](./saved-nets/app_list_1.json) net is displayed.
+When you launch the app, ["Adding to the list"](./saved-nets/list_add_1.json) net is displayed.
 
 ```shell
 npm run dev
 ```
+
+## Drawing
+
+![Adding to the list](./screens/list_add_1.png)
 
 ## Help Documentation
 
@@ -43,9 +47,11 @@ The bottom section displays a real-time preview of the agent being configured.
 |-|--|
 |![MenuConfig screen](./screens/add_agent.png)|![MenuConfig screen](./screens/edit_agent.png)|
 
+A blue port handle circle signifies the principle port. A animated blue edge indicates the active pair.
+
 > `Add/Edit agent` button becomes enabled when all required fields are properly filled.
 
-> To create edges during agent creation, you must specify the target agent ID and port ID.
+> To create edges during agent creation, you must specify the target agent id and port id.
 
 ### Basic Interactions
 
@@ -97,8 +103,8 @@ Format: JSON files containing a representation of the net
 Net switching becomes available after uploading two or more net files.
 The net elements are marked in green and orange when they appear and disappear respectively.
 
-* Next net(`→`): advance to subsequent net in loaded sequence
-* Previous net(`←`): return to previous net in loaded sequence
+* Next net (`→`): advance to subsequent net in loaded sequence
+* Previous net (`←`): return to previous net in loaded sequence
 
 ### Keyboard Shortcuts
 
