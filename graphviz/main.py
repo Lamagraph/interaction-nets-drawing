@@ -1,9 +1,8 @@
 from sys import argv
 from pathlib import Path
+from typing import Any, Set
 import subprocess
 import json
-
-from typing import Any, Set
 
 from Nets import Port, Node, Edge
 
@@ -12,11 +11,27 @@ tab = "    "
 
 
 def get_json(file: Path) -> Any:
-    with open(file, "r") as f:
-        return json.load(f)
+    try:
+        with open(file, "r") as f:
+            return json.load(f)
+    except:
+        print("Error: JSON syntax")
 
 
-def gen_label_node(label: str, auxiliary_ports: Set[Port], principal_port: Port):
+def get_type_port(node, port) -> bool:
+    if node.principal_port.id == port:
+        node.principal_port.is_used = True
+        return True
+    else:
+        for p in node.auxiliary_ports:
+            if p.id == port:
+                p.is_used = True
+                break
+
+    return False
+
+
+def gen_label_node(label: str, auxiliary_ports: Set[Port], principal_port: Port) -> str:
     lines = '<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="0" CELLPADDING="0">\n'
 
     if auxiliary_ports:
@@ -37,25 +52,28 @@ def gen_label_node(label: str, auxiliary_ports: Set[Port], principal_port: Port)
     return lines + "</TABLE>>\n"
 
 
-def gen_str_node(node_j, nodes: Set[Node]) -> str:
+def gen_str_node(node_j, nodes: Set[Node]) -> str | None:
     lines = ""
 
     node: Node
-    data = node_j.get("data")
-    if data:
-        node = Node(
-            id=node_j.get("id"),
-            label=data.get("label"),
-            auxiliary_ports={Port(**port) for port in data.get("auxiliaryPorts")},
-            principal_port=Port(**data.get("principalPort")),
-        )
-    else:
-        node = Node(
-            id=node_j.get("id"),
-            label=node_j.get("label"),
-            auxiliary_ports={Port(**port) for port in node_j.get("auxiliaryPorts")},
-            principal_port=Port(**node_j.get("principalPort")),
-        )
+    try:
+        data = node_j.get("data")
+        if data:
+            node = Node(
+                id=node_j.get("id"),
+                label=data.get("label"),
+                auxiliary_ports={Port(**port) for port in data.get("auxiliaryPorts")},
+                principal_port=Port(**data.get("principalPort")),
+            )
+        else:
+            node = Node(
+                id=node_j.get("id"),
+                label=node_j.get("label"),
+                auxiliary_ports={Port(**port) for port in node_j.get("auxiliaryPorts")},
+                principal_port=Port(**node_j.get("principalPort")),
+            )
+    except:
+        return None
 
     nodes.add(node)
 
@@ -69,30 +87,21 @@ def gen_str_node(node_j, nodes: Set[Node]) -> str:
     return lines
 
 
-def get_type_port(node, port) -> bool:
-    if node.principal_port.id == port:
-        node.principal_port.is_used = True
-        return True
-    else:
-        for p in node.auxiliary_ports:
-            if p.id == port:
-                p.is_used = True
-                break
-
-    return False
-
-
-def gen_str_edge(edge_j, nodes: Set[Node]) -> str:
+def gen_str_edge(edge_j, nodes: Set[Node]) -> str | None:
     line = ""
 
-    edge = Edge(
-        id=edge_j.get("id"),
-        source=edge_j.get("source"),
-        target=edge_j.get("target"),
-        source_port=edge_j.get("sourcePort"),
-        target_port=edge_j.get("targetPort"),
-        active_pair=edge_j.get("activePair"),
-    )
+    edge: Edge
+    try:
+        edge = Edge(
+            id=edge_j.get("id"),
+            source=edge_j.get("source"),
+            target=edge_j.get("target"),
+            source_port=edge_j.get("sourcePort"),
+            target_port=edge_j.get("targetPort"),
+            active_pair=edge_j.get("activePair"),
+        )
+    except:
+        return None
 
     is_south_node_s, is_south_node_t = False, False
     is_found_node_s, is_found_node_t = False, False
@@ -137,7 +146,7 @@ def gen_str_edge_invis(port: Port, id_node: str, is_principal_port: bool) -> str
     return lines
 
 
-def gen_str_graph(name_graph: str, data_json: Any):
+def gen_str_graph(name_graph: str, data_json: Any) -> str | None:
     lines = f"graph {name_graph}" + " {\n"
     lines += (
         tab
@@ -146,13 +155,30 @@ def gen_str_graph(name_graph: str, data_json: Any):
     lines += tab + "edge [arrowtail=dot, arrowhead=dot, arrowsize=0.4];\n\n"
 
     nodes: Set[Node] = set()
-    nodes_j = data_json.get("nodes")
-    for node_j in nodes_j:
-        lines += gen_str_node(node_j, nodes)
+    try:
+        nodes_j = data_json.get("nodes")
+        for node_j in nodes_j:
+            gen = gen_str_node(node_j, nodes)
+            if gen:
+                lines += gen
+            else:
+                raise
+    except:
+        print("Error: illegal node data")
+        return None
 
-    edges_j = data_json.get("edges")
-    for edge_j in edges_j:
-        lines += gen_str_edge(edge_j, nodes)
+    try:
+        edges_j = data_json.get("edges")
+        for edge_j in edges_j:
+            gen = gen_str_edge(edge_j, nodes)
+            if gen:
+                lines += gen
+            else:
+                raise
+    except:
+        print("Error: illegal edge data")
+        return None
+
     lines += "\n"
 
     for node in nodes:
@@ -163,16 +189,20 @@ def gen_str_graph(name_graph: str, data_json: Any):
     return lines + "}\n"
 
 
-def main(file: Path, need_save_dot: bool):
+def create_png(file: Path, need_save_dot: bool) -> None:
     name_file = file.stem
     data_json = get_json(file)
+    if not data_json:
+        return None
 
     str_dot = gen_str_graph(name_file, data_json)
+    if not str_dot:
+        return None
 
-    file_png = f"./saved-nets/{file.stem}.png"
+    file_png = f"./nets-png/{file.stem}.png"
 
     if need_save_dot:
-        file_dot = f"./{file.stem}.dot"
+        file_dot = f"./nets-dot/{file.stem}.dot"
         with open(file_dot, "w") as f:
             f.write(str_dot)
 
@@ -181,7 +211,21 @@ def main(file: Path, need_save_dot: bool):
         subprocess.run(["dot", "-Tpng", "-o", file_png], input=str_dot, text=True)
 
 
+def main(files: list[str], need_save_dot: bool) -> None:
+    paths = []
+
+    for file in files:
+        path = Path(file)
+        if path.is_dir():
+            paths.extend(path.rglob("*.json"))
+        else:
+            if path.suffix.lower() == ".json":
+                paths.append(path)
+
+    for path in paths:
+        create_png(path, need_save_dot)
+
+
 if __name__ == "__main__":
-    # file = "../example-nets/app_list.json"
-    file = argv[1]
-    main(Path(file), False)
+    files = argv[1:]
+    main(files, False)

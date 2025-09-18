@@ -5,7 +5,7 @@ from typing import Set
 @dataclass
 class Port:
     id: str
-    label: str | None
+    label: str | None = None
     is_used: bool = False
 
     def __hash__(self):
@@ -46,4 +46,4 @@ class Edge:
     target: str
     source_port: str
     target_port: str
-    active_pair: bool | None
+    active_pair: bool | None = False
