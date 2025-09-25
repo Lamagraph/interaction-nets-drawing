@@ -30,18 +30,24 @@ import {
   getTargetHandle,
   validate,
   defPort,
-  PointConnetion,
+  PointConnection,
   defPointCon,
 } from './nets';
 import NodeLayout from './views/NodeLayout';
+import NodeLayoutVert from './views/NodeLayoutVert';
+import NodeLayoutGen from './views/NodeLayoutGen';
 import MenuControl from './views/MenuControl';
 import MenuLayouts from './views/MenuLayouts';
 import { DnDProvider, useDnD } from './views/DnDContext';
 import MenuConfig from './views/MenuConfig';
+import MenuNodes from './views/MenuNodes';
 import MenuEdges from './views/MenuEdges';
+import MenuInfo from './views/MenuInfo';
 
 const nodeTypes = {
   agent: NodeLayout,
+  agentVert: NodeLayoutVert,
+  agentGen: NodeLayoutGen,
 };
 
 const edgeTypes = {
@@ -68,7 +74,7 @@ const Flow = () => {
   const loadNetStart = async (nameFile: string) => {
     try {
       const net = await getObjectsByName(nameFile);
-      const [nds, eds] = await parseJSON(net, typeEdge);
+      const [nds, eds] = await parseJSON(net, typeNode, typeEdge);
       setNodes(nds);
       setEdges(eds);
     } catch {
@@ -79,15 +85,20 @@ const Flow = () => {
 
   useEffect(() => { loadNetStart(dirNetsSaved + nameFileStart) }, []);
 
-  // Type edge
+  // Type node and edge
+
+  const [typeNode, setTypeNode] = useState<string>('agent');
 
   const [typeEdge, setTypeEdge] = useState<string>('bezier');
 
   useEffect(() => {
+    setNodes(nds =>
+      nds.map(node => ({ ...node, type: typeNode }))
+    );
     setEdges(eds =>
       eds.map(edge => ({ ...edge, type: typeEdge }))
     );
-  }, [typeEdge]);
+  }, [typeEdge, typeNode]);
 
   // Add and edit net
 
@@ -96,8 +107,8 @@ const Flow = () => {
   const [nodePrincipalPort, setNodePrincipalPort] = useState<Port>(defPort);
   const [nodeAuxiliaryPorts, setNodeAuxiliaryPorts] = useState<Port[]>([]);
 
-  const [nodePrincipalLink, setNodePrincipalLink] = useState<PointConnetion>(defPointCon);
-  const [nodeAuxiliaryLinks, setNodeAuxiliaryLinks] = useState<PointConnetion[]>([]);
+  const [nodePrincipalLink, setNodePrincipalLink] = useState<PointConnection>(defPointCon);
+  const [nodeAuxiliaryLinks, setNodeAuxiliaryLinks] = useState<PointConnection[]>([]);
 
   const cleanUpInfoNode = useCallback(() => {
     setNodeId('');
@@ -108,7 +119,7 @@ const Flow = () => {
     setNodePrincipalLink(defPointCon);
   }, []);
 
-  /// Add agent
+  /// Add node
 
   const addItem = (position: XYPosition) => {
     setIsRunningLayout(false);
@@ -121,7 +132,7 @@ const Flow = () => {
         principalPort: nodePrincipalPort
       },
       position,
-      type: 'agent'
+      type: typeNode,
     };
 
     setEdges((eds) => eds.filter(e => e.source !== nodeId && e.target !== nodeId));
@@ -165,7 +176,7 @@ const Flow = () => {
     cleanUpInfoNode();
   };
 
-  //// Add agent with drag
+  //// Add node with drag
 
   const { screenToFlowPosition } = useReactFlow<Agent, Edge>();
   const [type, setType] = useDnD();
@@ -337,6 +348,8 @@ const Flow = () => {
             setNodePrincipalLink={setNodePrincipalLink}
             nodeSelected={nodeSelected}
             isRunningLayout={isRunningLayout}
+            typeNode={typeNode}
+            typeEdge={typeEdge}
           />
           <MenuLayouts
             isRunningLayout={isRunningLayout}
@@ -346,16 +359,23 @@ const Flow = () => {
             <MenuControl
               nodes={nodes}
               edges={edges}
+              typeNode={typeNode}
               typeEdge={typeEdge}
               fileOpened={fileOpened}
               setFileOpened={setFileOpened}
               rfInstance={rfInstance}
               isRunningLayout={isRunningLayout}
             />
+            <MenuInfo
+              setTypeNode={setTypeNode}
+              setTypeEdge={setTypeEdge}
+              fileOpened={fileOpened}
+            />
+            {/* <MenuNodes setTypeNode={setTypeNode} />
             <MenuEdges setTypeEdge={setTypeEdge} />
             <Panel position='bottom-left' className='xy-theme__label' style={{ margin: '15px', left: '188px' }}>
               <label>File: {fileOpened}</label>
-            </Panel>
+            </Panel> */}
           </div>
           <Background />
           <MiniMap />

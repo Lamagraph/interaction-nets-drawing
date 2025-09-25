@@ -39,6 +39,7 @@ const mapKeys = {
 interface PropsMenuControl {
   nodes: Agent[];
   edges: Edge[];
+  typeNode: string,
   typeEdge: string;
   fileOpened: string;
   rfInstance: any;
@@ -50,6 +51,7 @@ export default (props: PropsMenuControl) => {
   const {
     nodes,
     edges,
+    typeNode,
     typeEdge,
     fileOpened,
     rfInstance,
@@ -121,7 +123,7 @@ export default (props: PropsMenuControl) => {
 
       for (const file of files) {
         const net = await getObjectsFromFile(file);
-        const [nds, eds] = await parseJSON(net, typeEdge);
+        const [nds, eds] = await parseJSON(net, typeNode, typeEdge);
         nets.push([nds, eds, file.name]);
       }
 
@@ -149,11 +151,16 @@ export default (props: PropsMenuControl) => {
     netsSaved[indexNew][0].forEach((node) => {
       const nodeExisted = nodes.find(n => n.id === node.id);
       if (nodeExisted) {
-        ndsNew.push({ ...nodeExisted, style: node.style });
+        ndsNew.push({
+          ...nodeExisted,
+          style: node.style,
+          type: typeNode,
+        });
       } else {
         ndsNew.push({
           ...node,
           style: { ...node.style, backgroundColor: color },
+          type: typeNode,
         });
       }
     });

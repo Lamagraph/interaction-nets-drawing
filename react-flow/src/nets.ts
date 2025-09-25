@@ -1,6 +1,6 @@
 import { type Node, type Edge, type Connection } from '@xyflow/react';
 
-export interface PointConnetion {
+export interface PointConnection {
     idNode: string;
     idPort: string;
 }
@@ -13,7 +13,7 @@ export type AgentData = {
     auxiliaryPorts: Port[];
     principalPort: Port;
 };
-export type Agent = Node<AgentData, 'agent'>;
+export type Agent = Node<AgentData>;
 
 export const defPointCon = { idNode: '', idPort: '' };
 export const defPort = { id: '', label: null };
@@ -77,6 +77,7 @@ export async function parseJSON(
         nodes?: { [key: string]: any };
         edges?: { [key: string]: any };
     },
+    typeNode: string,
     typeEdge: string,
 ): Promise<[Agent[], Edge[]]> {
     try {
@@ -102,7 +103,7 @@ export async function parseJSON(
                         x: 50 + 300 * Math.floor(index / 5),
                         y: 50 + 120 * (index % 5)
                     },
-                    type: 'agent',
+                    type: typeNode,
                 });
                 index += 1;
             } else {

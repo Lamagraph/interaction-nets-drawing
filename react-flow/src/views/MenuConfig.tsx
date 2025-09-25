@@ -4,9 +4,9 @@ import { Panel, useReactFlow, XYPosition } from '@xyflow/react';
 import { FaInfoCircle } from 'react-icons/fa';
 import '@xyflow/react/dist/style.css';
 
-import NodeLayout from './NodeLayout';
+import NodeLayoutGen from './NodeLayoutGen';
 import { useDnD } from './DnDContext';
-import { defPort, type Port, type Agent, PointConnetion, defPointCon } from '../nets';
+import { defPort, type Port, type Agent, PointConnection, defPointCon } from '../nets';
 
 interface PropsMenuConfig {
   addItem: (position: XYPosition) => void,
@@ -19,12 +19,14 @@ interface PropsMenuConfig {
   setNodeAuxiliaryPorts: React.Dispatch<React.SetStateAction<Port[]>>,
   nodePrincipalPort: Port,
   setNodePrincipalPort: React.Dispatch<React.SetStateAction<Port>>,
-  nodeAuxiliaryLinks: PointConnetion[],
-  setNodeAuxiliaryLinks: React.Dispatch<React.SetStateAction<PointConnetion[]>>,
-  nodePrincipalLink: PointConnetion,
-  setNodePrincipalLink: React.Dispatch<React.SetStateAction<PointConnetion>>,
+  nodeAuxiliaryLinks: PointConnection[],
+  setNodeAuxiliaryLinks: React.Dispatch<React.SetStateAction<PointConnection[]>>,
+  nodePrincipalLink: PointConnection,
+  setNodePrincipalLink: React.Dispatch<React.SetStateAction<PointConnection>>,
   nodeSelected: Agent | undefined,
   isRunningLayout: boolean,
+  typeNode: string,
+  typeEdge: string,
 }
 
 export default (props: PropsMenuConfig) => {
@@ -45,13 +47,15 @@ export default (props: PropsMenuConfig) => {
     setNodePrincipalLink,
     nodeSelected,
     isRunningLayout,
+    typeNode,
+    typeEdge,
   } = props;
 
   const [linkShowed, setLinkShowed] = useState<boolean>(false);
 
   const [_, setType] = useDnD();
 
-  const onDragStart = (event, nodeType) => {
+  const onDragStart = (event: any, nodeType: string) => {
     if (setType) setType(nodeType);
     event.dataTransfer.effectAllowed = 'move';
   };
@@ -73,20 +77,20 @@ export default (props: PropsMenuConfig) => {
   }, [
     nodeId, nodeLabel, nodeAuxiliaryPorts,
     nodePrincipalPort, nodeAuxiliaryLinks,
-    nodePrincipalLink, nodeSelected,
+    nodePrincipalLink, nodeSelected, typeNode, typeEdge,
   ]);
 
   return (
     !isRunningLayout && (
       <Panel position='top-left'>
         <div className='react-flow__node'>
-          <table style={{ borderCollapse: 'collapse' }}><tbody>
+          <table><tbody>
 
             {/* Help line */}
             <tr>
               <th>
                 Auxiliary
-                <button onClick={() => {
+                <button disabled={nodeAuxiliaryPorts.length >= 15} onClick={() => {
                   setNodeAuxiliaryPorts(ports => [...ports, defPort]);
                   setNodeAuxiliaryLinks(links => [...links, defPointCon]);
                 }}>+</button>
@@ -136,38 +140,36 @@ export default (props: PropsMenuConfig) => {
                 /></td>
 
                 {/* Auxiliary links */}
-                {linkShowed && (
-                  <>
-                    <td>
-                      <input
-                        placeholder='node id'
-                        value={nodeAuxiliaryLinks[i].idNode}
-                        onChange={(event) => {
-                          setNodeAuxiliaryLinks(links =>
-                            links.map((port, j) =>
-                              j === i ? { ...port, idNode: event.target.value } : port
-                            )
-                          );
-                        }}
-                        className='xy-theme__input input-info'
-                      />
-                    </td>
-                    <td>
-                      <input
-                        placeholder='port id'
-                        value={nodeAuxiliaryLinks[i].idPort}
-                        onChange={(event) => {
-                          setNodeAuxiliaryLinks(links =>
-                            links.map((port, j) =>
-                              j === i ? { ...port, idPort: event.target.value } : port
-                            )
-                          );
-                        }}
-                        className='xy-theme__input input-info'
-                      />
-                    </td>
-                  </>
-                )}
+                {linkShowed && <>
+                  <td>
+                    <input
+                      placeholder='node id'
+                      value={nodeAuxiliaryLinks[i].idNode}
+                      onChange={(event) => {
+                        setNodeAuxiliaryLinks(links =>
+                          links.map((port, j) =>
+                            j === i ? { ...port, idNode: event.target.value } : port
+                          )
+                        );
+                      }}
+                      className='xy-theme__input input-info'
+                    />
+                  </td>
+                  <td>
+                    <input
+                      placeholder='port id'
+                      value={nodeAuxiliaryLinks[i].idPort}
+                      onChange={(event) => {
+                        setNodeAuxiliaryLinks(links =>
+                          links.map((port, j) =>
+                            j === i ? { ...port, idPort: event.target.value } : port
+                          )
+                        );
+                      }}
+                      className='xy-theme__input input-info'
+                    />
+                  </td>
+                </>}
 
                 <td><button onClick={() => {
                   setNodeAuxiliaryPorts(ports => ports.filter((_, j) => j !== i));
@@ -214,30 +216,28 @@ export default (props: PropsMenuConfig) => {
               /></td>
 
               {/* Principle link */}
-              {linkShowed && (
-                <>
-                  <td>
-                    <input
-                      placeholder='node id'
-                      value={nodePrincipalLink.idNode}
-                      onChange={(event) => {
-                        setNodePrincipalLink(link => ({ ...link, idNode: event.target.value }));
-                      }}
-                      className='xy-theme__input input-info'
-                    />
-                  </td>
-                  <td>
-                    <input
-                      placeholder='port id'
-                      value={nodePrincipalLink.idPort}
-                      onChange={(event) => {
-                        setNodePrincipalLink(link => ({ ...link, idPort: event.target.value }));
-                      }}
-                      className='xy-theme__input input-info'
-                    />
-                  </td>
-                </>
-              )}
+              {linkShowed && <>
+                <td>
+                  <input
+                    placeholder='node id'
+                    value={nodePrincipalLink.idNode}
+                    onChange={(event) => {
+                      setNodePrincipalLink(link => ({ ...link, idNode: event.target.value }));
+                    }}
+                    className='xy-theme__input input-info'
+                  />
+                </td>
+                <td>
+                  <input
+                    placeholder='port id'
+                    value={nodePrincipalLink.idPort}
+                    onChange={(event) => {
+                      setNodePrincipalLink(link => ({ ...link, idPort: event.target.value }));
+                    }}
+                    className='xy-theme__input input-info'
+                  />
+                </td>
+              </>}
             </tr>
 
             {/* 'Add' button */}
@@ -251,26 +251,27 @@ export default (props: PropsMenuConfig) => {
 
             {/* Node preview */}
             <tr><td colSpan={2}>
-              <div
-                className='react-flow__node'
-                style={{ position: 'relative', cursor: isAllowed() ? 'grab' : 'not-allowed' }}
-                draggable={isAllowed() ? true : false}
-                onDragStart={(event) => onDragStart(event, 'agent')}
-              >
-                <NodeLayout
-                  id={nodeId}
-                  data={{
-                    label: nodeLabel,
-                    auxiliaryPorts: nodeAuxiliaryPorts,
-                    principalPort: nodePrincipalPort
-                  }}
-                  needLimit={false}
-                />
+              <div style={{ display: 'flex', justifyContent: 'center' }}>
+                <div
+                  className='react-flow__node'
+                  style={{ position: 'relative', cursor: isAllowed() ? 'grab' : 'not-allowed' }}
+                  draggable={isAllowed() ? true : false}
+                  onDragStart={(event) => onDragStart(event, typeNode)}
+                >
+                  <NodeLayoutGen
+                    id={nodeId}
+                    data={{
+                      label: nodeLabel,
+                      auxiliaryPorts: nodeAuxiliaryPorts,
+                      principalPort: nodePrincipalPort
+                    }}
+                    needLimit={false}
+                  />
+                </div>
               </div>
             </td></tr>
 
           </tbody></table>
-
         </div>
       </Panel>
     )
