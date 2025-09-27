@@ -14,7 +14,6 @@ import {
   SmoothStepEdge,
   Connection,
   XYPosition,
-  Panel,
 } from '@xyflow/react';
 
 import { SmartBezierEdge, SmartStraightEdge, SmartStepEdge } from '@tisoap/react-flow-smart-edge';
@@ -371,11 +370,6 @@ const Flow = () => {
               setTypeEdge={setTypeEdge}
               fileOpened={fileOpened}
             />
-            {/* <MenuNodes setTypeNode={setTypeNode} />
-            <MenuEdges setTypeEdge={setTypeEdge} />
-            <Panel position='bottom-left' className='xy-theme__label' style={{ margin: '15px', left: '188px' }}>
-              <label>File: {fileOpened}</label>
-            </Panel> */}
           </div>
           <Background />
           <MiniMap />

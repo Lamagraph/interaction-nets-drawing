@@ -41,11 +41,11 @@ export default ({ id, data, needLimit = true }:
       </td></tr>
 
       {/* <div className='auxiliaryPorts-gen'> */}
-        {data.auxiliaryPorts.map((port, index) => (
-          <tr key={index}>
-            {auxiliaryPortHTML(port, needLimit)}
-          </tr>
-        ))}
+      {data.auxiliaryPorts.map((port, index) => (
+        <tr key={index}>
+          {auxiliaryPortHTML(port, needLimit)}
+        </tr>
+      ))}
       {/* </div> */}
 
       <tr>

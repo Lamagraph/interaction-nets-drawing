@@ -139,7 +139,7 @@ export default (props: PropsMenuControl) => {
     };
 
     input.click();
-  }, []);
+  }, [typeNode, typeEdge]);
 
   const updateNetwork = useCallback((isStepUp: boolean) => {
     if (indexCur < 0) return
@@ -191,7 +191,7 @@ export default (props: PropsMenuControl) => {
     setNodes(ndsNew);
     setEdges(edsNew);
     fitView();
-  }, [netsSaved, nodes, edges, indexCur]);
+  }, [netsSaved, nodes, edges, indexCur, typeNode, typeEdge]);
 
   return (
     <Controls>

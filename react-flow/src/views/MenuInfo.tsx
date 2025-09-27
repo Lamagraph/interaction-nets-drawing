@@ -22,7 +22,7 @@ export default ({ setTypeNode, setTypeEdge, fileOpened }: {
           onChange={onChangeNode}
           data-testid='colormode-select'
         >
-          <option value='agent'>default</option>
+          <option value='agent'>horizontal</option>
           <option value='agentVert'>vertical</option>
           <option value='agentGen'>general</option>
         </select>
