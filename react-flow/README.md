@@ -20,6 +20,8 @@ npm run dev
 
 ![Adding to the list](./screens/list_add_1.png)
 
+> See more on [demos](<./demos>).
+
 ## Help Documentation
 
 ### Menu Configuration
