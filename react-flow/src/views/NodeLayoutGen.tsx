@@ -2,7 +2,7 @@ import { Position } from '@xyflow/react';
 import { type Port, type AgentData } from '../nets';
 import { handleAuxiliaryPort, handlePrinciplePort, labelAgentHTML } from './NodeLayout';
 
-export const auxiliaryPortHTML = (port: Port, needLimit: boolean): JSX.Element => {
+export const auxiliaryPortHTML = (port: Port, needLimit: boolean): React.JSX.Element => {
   return <>
     <td style={{ left: '-12px' }}>
       {handleAuxiliaryPort(port, Position.Left, needLimit)}
@@ -18,7 +18,7 @@ export const principalPortHTML = (
   data: AgentData,
   rowSpan: number | undefined,
   needLimit: boolean,
-): JSX.Element => {
+): React.JSX.Element => {
   return <>
     <td style={{ right: '-12px', textAlign: 'right' }} rowSpan={rowSpan}>
       <div style={{ paddingRight: '4px' }}>
@@ -31,9 +31,9 @@ export const principalPortHTML = (
   </>
 };
 
-export default ({ id, data, needLimit = true }:
-  { id: string; data: AgentData; needLimit?: boolean }
-) => {
+export default ({ id, data, needLimit = true }: {
+  id: string; data: AgentData; needLimit?: boolean
+}): React.JSX.Element => {
   return <>
     <table style={{ textAlign: 'left', margin: '2px' }}><tbody>
       <tr><td style={{ paddingBottom: '8px', textAlign: 'center' }}>

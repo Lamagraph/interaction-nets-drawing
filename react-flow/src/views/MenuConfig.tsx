@@ -5,31 +5,31 @@ import { FaInfoCircle } from 'react-icons/fa';
 import '@xyflow/react/dist/style.css';
 
 import NodeLayoutGen from './NodeLayoutGen';
-import { useDnD } from './DnDContext';
+import { useDnD } from '../utils/DnDContext';
 import { defPort, type Port, type Agent, PointConnection, defPointCon } from '../nets';
 
 interface PropsMenuConfig {
-  addItem: (position: XYPosition) => void,
-  isAllowed: () => boolean,
-  nodeId: string,
-  setNodeId: React.Dispatch<React.SetStateAction<string>>,
-  nodeLabel: string,
-  setNodeLabel: React.Dispatch<React.SetStateAction<string>>,
-  nodeAuxiliaryPorts: Port[],
-  setNodeAuxiliaryPorts: React.Dispatch<React.SetStateAction<Port[]>>,
-  nodePrincipalPort: Port,
-  setNodePrincipalPort: React.Dispatch<React.SetStateAction<Port>>,
-  nodeAuxiliaryLinks: PointConnection[],
-  setNodeAuxiliaryLinks: React.Dispatch<React.SetStateAction<PointConnection[]>>,
-  nodePrincipalLink: PointConnection,
-  setNodePrincipalLink: React.Dispatch<React.SetStateAction<PointConnection>>,
-  nodeSelected: Agent | undefined,
-  isRunningLayout: boolean,
-  typeNode: string,
-  typeEdge: string,
+  addItem: (position: XYPosition) => void;
+  isAllowed: () => boolean;
+  nodeId: string;
+  setNodeId: React.Dispatch<React.SetStateAction<string>>;
+  nodeLabel: string;
+  setNodeLabel: React.Dispatch<React.SetStateAction<string>>;
+  nodeAuxiliaryPorts: Port[];
+  setNodeAuxiliaryPorts: React.Dispatch<React.SetStateAction<Port[]>>;
+  nodePrincipalPort: Port;
+  setNodePrincipalPort: React.Dispatch<React.SetStateAction<Port>>;
+  nodeAuxiliaryLinks: PointConnection[];
+  setNodeAuxiliaryLinks: React.Dispatch<React.SetStateAction<PointConnection[]>>;
+  nodePrincipalLink: PointConnection;
+  setNodePrincipalLink: React.Dispatch<React.SetStateAction<PointConnection>>;
+  nodeSelected: Agent | undefined;
+  isRunningLayout: boolean;
+  typeNode: string;
+  typeEdge: string;
 }
 
-export default (props: PropsMenuConfig) => {
+export default (props: PropsMenuConfig): React.JSX.Element => {
   const {
     addItem,
     isAllowed,
@@ -80,8 +80,8 @@ export default (props: PropsMenuConfig) => {
     nodePrincipalLink, nodeSelected, typeNode, typeEdge,
   ]);
 
-  return (
-    !isRunningLayout && (
+  return <>
+    {!isRunningLayout && (
       <Panel position='top-left'>
         <div className='react-flow__node'>
           <table><tbody>
@@ -274,6 +274,6 @@ export default (props: PropsMenuConfig) => {
           </tbody></table>
         </div>
       </Panel>
-    )
-  );
+    )}
+  </>
 };

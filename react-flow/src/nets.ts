@@ -3,7 +3,8 @@ import { type Node, type Edge, type Connection } from '@xyflow/react';
 export interface PointConnection {
     idNode: string;
     idPort: string;
-}
+};
+
 export type Port = {
     id: string;
     label: string | null;

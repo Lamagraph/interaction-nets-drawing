@@ -4,11 +4,11 @@ import { type Port, type AgentData } from '../nets'
 import HandleLayout from './HandleLayout';
 
 interface PropsHandle {
-  type: HandleType,
-  pos: Position,
-  id: string,
-  style: {},
-  needLimit: boolean,
+  type: HandleType;
+  pos: Position;
+  id: string;
+  style: {};
+  needLimit: boolean;
 }
 
 const handle = (props: PropsHandle): React.JSX.Element => {
@@ -22,19 +22,25 @@ export const handleAuxiliaryPort = (port: Port, pos: Position, needLimit: boolea
 };
 
 export const handlePrinciplePort = (data: AgentData, pos: Position, needLimit: boolean): React.JSX.Element => {
-  return handle({ type: 'source', pos: pos, id: data.principalPort.id, style: { background: 'blue' }, needLimit: needLimit })
+  return handle({
+    type: 'source',
+    pos: pos,
+    id: data.principalPort.id,
+    style: { background: 'blue' },
+    needLimit: needLimit,
+  })
 };
 
-export const labelAgentHTML = (data: AgentData, id: string): JSX.Element => {
+export const labelAgentHTML = (data: AgentData, id: string): React.JSX.Element => {
   return <>
     {data.label}
     <span style={{ color: 'gray' }}> {data.label ? `(${id})` : 'Write the label'}</span>
   </>
 };
 
-export default ({ id, data, needLimit = true }:
-  { id: string; data: AgentData; needLimit?: boolean }
-) => {
+export default ({ id, data, needLimit = true }: {
+  id: string; data: AgentData; needLimit?: boolean
+}): React.JSX.Element => {
   return (
     <div style={{ position: 'relative' }}>
       <div className='auxiliaryPorts-def'>

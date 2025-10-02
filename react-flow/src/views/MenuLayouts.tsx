@@ -10,10 +10,10 @@ import { getLayoutedNodes as elkLayoutNodes, elkOptions } from '../layouts/elkLa
 import { getLayoutedNodes as dLayoutNodes } from '../layouts/dLayout';
 import { getLayoutedNodes as dForceLayoutNodes } from '../layouts/dForceLayout';
 
-export default (
-  { isRunningLayout, setIsRunningLayout }:
-    { isRunningLayout: boolean, setIsRunningLayout: React.Dispatch<React.SetStateAction<boolean>> }
-) => {
+export default ({ isRunningLayout, setIsRunningLayout }: {
+  isRunningLayout: boolean,
+  setIsRunningLayout: React.Dispatch<React.SetStateAction<boolean>>,
+}): React.JSX.Element => {
   const { getNodes, getEdges, setNodes, fitView } = useReactFlow<Agent, Edge>();
   const nodesInitialized = useNodesInitialized();
 
