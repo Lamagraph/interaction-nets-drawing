@@ -1,16 +1,28 @@
-import { useCallback, useState } from 'react';
+import { useCallback } from 'react';
 import {
-  useReactFlow,
   ControlButton,
   Controls,
   type Edge,
 } from '@xyflow/react';
 
-import { DownloadIcon, UploadIcon, ArrowRightIcon, ArrowLeftIcon } from '@radix-ui/react-icons'
+import {
+  DownloadIcon,
+  UploadIcon,
+  ArrowRightIcon,
+  ArrowLeftIcon,
+} from '@radix-ui/react-icons';
+import { FaEdit, FaSave } from "react-icons/fa";
+import { RiArrowGoBackLine } from "react-icons/ri";
 
 import '@xyflow/react/dist/style.css';
 
 import { type Agent, getObjectsFromFile, parseJSON } from '../nets';
+
+export enum NetMode {
+  edit = 0,
+  sequence = 1,
+  comparison = 2
+};
 
 const allowedKeys = [
   'nodes',
@@ -36,15 +48,95 @@ const mapKeys = {
   'targetHandle': 'targetPort',
 };
 
+const modeDefault = NetMode.comparison
+
+const onDownloadNets = (rfInstance: any, fileOpened: string) => {
+  const transformObject = (obj) => {
+    if (Array.isArray(obj)) {
+      return obj.map(transformObject);
+    } else if (obj && typeof obj === 'object') {
+      const result = {};
+
+      for (const [key, value] of Object.entries<string>(obj)) {
+        if (key === 'data') {
+          Object.assign(result, transformObject(value))
+        } else if (allowedKeys.includes(key)) {
+          const newKey = mapKeys[key] || key;
+          const newValue = key === 'targetHandle'
+            ? value.slice(0, -1)
+            : transformObject(value);
+          result[newKey] = newValue
+        }
+      }
+
+      return result;
+    }
+    return obj;
+  }
+
+  if (rfInstance) {
+    const flow = rfInstance.toObject();
+
+    const dataStr = JSON.stringify(transformObject(flow), null, 2);
+    const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+    const exportFileDefaultName = fileOpened.slice(0, -5) + '_edited.json';
+
+    const linkElement = document.createElement('a');
+    linkElement.setAttribute('href', dataUri);
+    linkElement.setAttribute('download', exportFileDefaultName);
+    linkElement.click();
+  }
+};
+
+interface PropsSimplifyMenuControl {
+  fileOpened: string;
+  rfInstance: any;
+  isRunningLayout: boolean;
+  goToEditNet: () => void;
+}
+
+export const SimplifyMenuControl = (props: PropsSimplifyMenuControl): React.JSX.Element => {
+  const {
+    fileOpened,
+    rfInstance,
+    isRunningLayout,
+    goToEditNet,
+  } = props;
+
+  const onDownload = useCallback(() => {
+    onDownloadNets(rfInstance, fileOpened);
+  }, [rfInstance, fileOpened]);
+
+  return (
+    <Controls>
+      <ControlButton
+        title='Edit net'
+        disabled={isRunningLayout}
+        onClick={() => goToEditNet()}
+      ><FaEdit /></ControlButton>
+      <ControlButton
+        title='Download the Net'
+        disabled={isRunningLayout}
+        onClick={onDownload}
+      ><DownloadIcon /></ControlButton>
+    </Controls >
+  );
+};
+
 interface PropsMenuControl {
   nodes: Agent[];
   edges: Edge[];
   typeNode: string,
   typeEdge: string;
-  fileOpened: string;
   rfInstance: any;
   isRunningLayout: boolean;
-  setFileOpened: React.Dispatch<React.SetStateAction<string>>,
+  filesOpened: [string, string];
+  modeNet: NetMode;
+  setModeNet: (mode: NetMode) => void;
+  netsSaved: [Agent[], Edge[], string][];
+  setNetsSaved: React.Dispatch<React.SetStateAction<[Agent[], Edge[], string][]>>;
+  indexCur: number;
+  setNetIndexCur: (index: number, net: [Agent[], Edge[], string]) => void;
 }
 
 export default (props: PropsMenuControl) => {
@@ -53,54 +145,20 @@ export default (props: PropsMenuControl) => {
     edges,
     typeNode,
     typeEdge,
-    fileOpened,
     rfInstance,
     isRunningLayout,
-    setFileOpened,
+    filesOpened,
+    modeNet,
+    setModeNet,
+    netsSaved,
+    setNetsSaved,
+    indexCur,
+    setNetIndexCur,
   } = props;
 
-  const { setNodes, setEdges, fitView } = useReactFlow<Agent, Edge>();
-
-  const [netsSaved, setNetsSaved] = useState<[Agent[], Edge[], string][]>([]);
-  const [indexCur, setIndexCur] = useState<number>(-1);
-
   const onDownload = useCallback(() => {
-    const transformObject = (obj) => {
-      if (Array.isArray(obj)) {
-        return obj.map(transformObject);
-      } else if (obj && typeof obj === 'object') {
-        const result = {};
-
-        for (const [key, value] of Object.entries<string>(obj)) {
-          if (key === 'data') {
-            Object.assign(result, transformObject(value))
-          } else if (allowedKeys.includes(key)) {
-            const newKey = mapKeys[key] || key;
-            const newValue = key === 'targetHandle'
-              ? value.slice(0, -1)
-              : transformObject(value);
-            result[newKey] = newValue
-          }
-        }
-
-        return result;
-      }
-      return obj;
-    }
-
-    if (rfInstance) {
-      const flow = rfInstance.toObject();
-
-      const dataStr = JSON.stringify(transformObject(flow), null, 2);
-      const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
-      const exportFileDefaultName = fileOpened.slice(0, -5) + '_edited.json';
-
-      const linkElement = document.createElement('a');
-      linkElement.setAttribute('href', dataUri);
-      linkElement.setAttribute('download', exportFileDefaultName);
-      linkElement.click();
-    }
-  }, [rfInstance, fileOpened]);
+    onDownloadNets(rfInstance, filesOpened[0]);
+  }, [rfInstance, filesOpened]);
 
   const onUpload = useCallback(() => {
     const input = document.createElement('input');
@@ -129,89 +187,127 @@ export default (props: PropsMenuControl) => {
 
       if (nets.length > 0) {
         const indexNew = 0;
-        setIndexCur(indexNew);
         setNetsSaved(nets);
-        setNodes(nets[indexNew][0]);
-        setEdges(nets[indexNew][1]);
-        setFileOpened(nets[indexNew][2]);
-        fitView();
+        setNetIndexCur(indexNew, nets[indexNew]);
+        setModeNet(modeDefault);
       }
     };
 
     input.click();
-  }, [typeNode, typeEdge]);
+  }, [typeNode, typeEdge, modeNet]);
 
-  const updateNetwork = useCallback((isStepUp: boolean) => {
-    if (indexCur < 0) return
+  const updateNet = useCallback((isStepUp: boolean) => {
+    if (indexCur < 0) return;
 
     const indexNew = isStepUp ? indexCur + 1 : indexCur - 1;
+    if (indexNew >= netsSaved.length) return;
+
     const color = isStepUp ? 'lightgreen' : 'lightsalmon';
 
-    const ndsNew: Agent[] = [];
-    netsSaved[indexNew][0].forEach((node) => {
+    const createNode = (node: Agent, col: string | undefined) => ({
+      ...node,
+      style: { ...node.style, backgroundColor: col },
+      type: typeNode,
+    });
+    const updateNode = (node: Agent) => {
       const nodeExisted = nodes.find(n => n.id === node.id);
-      if (nodeExisted) {
-        ndsNew.push({
-          ...nodeExisted,
-          style: node.style,
-          type: typeNode,
-        });
-      } else {
-        ndsNew.push({
-          ...node,
-          style: { ...node.style, backgroundColor: color },
-          type: typeNode,
-        });
-      }
+      return nodeExisted
+        ? { ...nodeExisted, style: node.style, type: typeNode }
+        : createNode(node, color)
+    };
+
+    const nodesNew: Agent[] = [];
+    netsSaved[indexNew][0].forEach(node => {
+      const nodeNew = modeNet === NetMode.comparison
+        ? createNode(node, undefined)
+        : updateNode(node);
+
+      nodesNew.push(nodeNew);
     });
 
-    const edsNew: Edge[] = [];
-    netsSaved[indexNew][1].forEach((edge) => {
+    const createEdge = (edge: Edge, col: string | undefined) => ({
+      ...edge,
+      style: { ...edge.style, stroke: col, },
+      type: typeEdge,
+    });
+    const updateEdge = (edge: Edge) => {
       const edgeExisted = edges.find(e => e.id === edge.id);
-      if (edgeExisted) {
-        edsNew.push({
-          ...edgeExisted,
-          style: edge.style,
-          type: typeEdge,
-        });
-      } else {
-        edsNew.push({
-          ...edge,
-          style: {
-            ...edge.style,
-            stroke: color,
-          },
-          type: typeEdge,
-        });
-      }
+      return edgeExisted
+        ? { ...edgeExisted, style: edge.style, type: typeEdge }
+        : createEdge(edge, color)
+    };
+
+    const edgesNew: Edge[] = [];
+    netsSaved[indexNew][1].forEach(edge => {
+      const edgeNew = modeNet === NetMode.comparison
+        ? createEdge(edge, undefined)
+        : updateEdge(edge);
+
+      edgesNew.push(edgeNew);
     });
 
-    setIndexCur(indexNew);
-    setFileOpened(netsSaved[indexNew][2]);
-    setNodes(ndsNew);
-    setEdges(edsNew);
-    fitView();
-  }, [netsSaved, nodes, edges, indexCur, typeNode, typeEdge]);
+    setNetIndexCur(indexNew, [nodesNew, edgesNew, netsSaved[indexNew][2]]);
+  }, [netsSaved, nodes, edges, indexCur, typeNode, typeEdge, modeNet]);
+
+  const saveEditNet = useCallback(() => {
+    const index = indexCur - (filesOpened[0] === filesOpened[1] && indexCur > 0 ? 1 : 0);
+    setNetsSaved(nets => nets.map((net, i) => i === index ? [nodes, edges, filesOpened[0]] : net));
+  }, [netsSaved, indexCur, filesOpened, nodes, edges]);
+
+  const goBackToNets = useCallback(() => {
+    const index = indexCur - (filesOpened[0] === filesOpened[1] && indexCur > 0 ? 1 : 0);
+    setNetIndexCur(index, netsSaved[index]);
+    setModeNet(modeDefault);
+  }, [netsSaved, indexCur, filesOpened]);
 
   return (
     <Controls>
+      {modeNet !== NetMode.edit && <>
+        <ControlButton
+          title='Next step'
+          disabled={
+            isRunningLayout ||
+            modeNet === NetMode.sequence && (indexCur >= netsSaved.length - 1) ||
+            modeNet === NetMode.comparison && (indexCur >= netsSaved.length - 2)
+          }
+          onClick={() => updateNet(true)}
+        ><ArrowRightIcon /></ControlButton>
+        <ControlButton
+          title='Prev step'
+          disabled={isRunningLayout || (indexCur <= 0)}
+          onClick={() => updateNet(false)}
+        ><ArrowLeftIcon /></ControlButton>
+      </>}
+
+      {netsSaved.length > 0 && <>
+        {modeNet !== NetMode.edit ? (
+          <ControlButton
+            title='Edit net'
+            disabled={isRunningLayout}
+            onClick={() => setModeNet(NetMode.edit)}
+          ><FaEdit /></ControlButton>
+        ) : <>
+          <ControlButton
+            title='Save'
+            disabled={isRunningLayout}
+            onClick={() => saveEditNet()}
+          ><FaSave /></ControlButton>
+          <ControlButton
+            title='Go back to nets without saving'
+            disabled={isRunningLayout}
+            onClick={() => goBackToNets()}
+          ><RiArrowGoBackLine /></ControlButton>
+        </>}
+      </>}
+
       <ControlButton
-        title='Next step'
-        disabled={isRunningLayout || (indexCur === netsSaved.length - 1)}
-        onClick={() => updateNetwork(true)}
-      ><ArrowRightIcon /></ControlButton>
-      <ControlButton
-        title='Prev step'
-        disabled={isRunningLayout || (indexCur <= 0)}
-        onClick={() => updateNetwork(false)}
-      ><ArrowLeftIcon /></ControlButton>
-      <ControlButton
-        title='Upload networks'
+        title='Upload Nets'
         disabled={isRunningLayout}
         onClick={onUpload}
       ><UploadIcon /></ControlButton>
+
       <ControlButton
-        title='Download the network'
+        title='Download the Net'
         disabled={isRunningLayout}
         onClick={onDownload}
       ><DownloadIcon /></ControlButton>

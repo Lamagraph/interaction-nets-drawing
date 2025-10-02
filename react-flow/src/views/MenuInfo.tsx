@@ -1,11 +1,28 @@
 
 import { Panel } from '@xyflow/react';
 
-export default ({ setTypeNode, setTypeEdge, fileOpened }: {
-  setTypeNode: React.Dispatch<React.SetStateAction<string>>,
-  setTypeEdge: React.Dispatch<React.SetStateAction<string>>,
-  fileOpened: string,
-}) => {
+import { NetMode } from './MenuControl';
+
+interface PropsMenuInfo {
+  modeNet: NetMode;
+  fileOpened: string;
+  setTypeNode: React.Dispatch<React.SetStateAction<string>>;
+  setTypeEdge: React.Dispatch<React.SetStateAction<string>>;
+  setModeNet: (mode: NetMode) => void;
+}
+
+export default (props: PropsMenuInfo): React.JSX.Element => {
+  const {
+    modeNet,
+    fileOpened,
+    setTypeNode,
+    setTypeEdge,
+    setModeNet,
+  } = props;
+
+  const onChangeMode = (event: any) => {
+    setModeNet(Number(event.target.value));
+  };
   const onChangeNode = (event: any) => {
     setTypeNode(event.target.value);
   };
@@ -15,6 +32,20 @@ export default ({ setTypeNode, setTypeEdge, fileOpened }: {
 
   return (
     <Panel position='bottom-left' className='panel-info' >
+      {modeNet !== NetMode.edit && (
+        <div className='item-info'>
+          <label className='label-info'>Mode:</label>
+          <select
+            className='xy-theme__select select-info'
+            onChange={onChangeMode}
+            data-testid='colormode-select'
+          >
+            <option value={NetMode.comparison}>comparison</option>
+            <option value={NetMode.sequence}>sequence</option>
+          </select>
+        </div>
+      )}
+
       <div className='item-info'>
         <label className='label-info'>Node:</label>
         <select
