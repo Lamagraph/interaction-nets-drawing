@@ -72,7 +72,7 @@ interface PropsFlow {
   setTypeEdge: React.Dispatch<React.SetStateAction<string>>;
 }
 
-export default (props: PropsFlow): React.JSX.Element => {
+export default (props: PropsFlow): JSX.Element => {
   const {
     filesOpened,
     setFilesOpened,
@@ -120,7 +120,7 @@ export default (props: PropsFlow): React.JSX.Element => {
     loadNetStart(dirNetsSaved + nameFileStart);
   }, []);
 
-  // Type node and edge
+  // Node and edge types
 
   useEffect(() => {
     setNodes(nds =>
@@ -326,12 +326,6 @@ export default (props: PropsFlow): React.JSX.Element => {
     return setPorts.size === nodeAuxiliaryPorts.length + 1
   }, [nodeId, nodeLabel, nodePrincipalPort, nodeAuxiliaryPorts]);
 
-  // Net edit mode
-
-  const { fitView } = useReactFlow<Agent, Edge>();
-
-  useEffect(() => { fitView() }, [modeNet]);
-
   // Several nets
 
   const setNetIndexCur = (index: number, net: [Agent[], Edge[], string]) => {
@@ -339,7 +333,6 @@ export default (props: PropsFlow): React.JSX.Element => {
     setNodes(net[0]);
     setEdges(net[1]);
     setFileOpened(net[2]);
-    fitView();
   };
 
   useEffect(() => {
@@ -350,6 +343,12 @@ export default (props: PropsFlow): React.JSX.Element => {
   }, [indexCur, netsSaved, modeNet, typeNode, typeEdge]);
 
   // Utils
+
+  const { fitView } = useReactFlow<Agent, Edge>();
+
+  useEffect(() => {
+    fitView();
+  }, [indexCur, modeNet]);
 
   const reactFlowWrapper = useRef(null);
 
@@ -432,7 +431,13 @@ export default (props: PropsFlow): React.JSX.Element => {
               fileOpened={fileOpened}
               setTypeNode={setTypeNode}
               setTypeEdge={setTypeEdge}
-              setModeNet={setModeNet}
+              setModeNet={(mode) => {
+                if (mode === NetMode.comparison && indexCur === netsSaved.length - 1 && indexCur > 0) {
+                  const indexNew = indexCur - 1
+                  setNetIndexCur(indexNew, netsSaved[indexNew]);
+                }
+                setModeNet(mode);
+              }}
             />
           </div>
           <Background />

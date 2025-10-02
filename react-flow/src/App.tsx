@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { ReactFlowProvider, type Edge } from '@xyflow/react';
 
 import '@xyflow/react/dist/style.css';
@@ -10,7 +10,7 @@ import { DnDProvider } from './utils/DnDContext';
 import Flow from './flows/Flow';
 import SubFlow from './flows/SubFlow';
 
-export default (): React.JSX.Element => {
+export default (): JSX.Element => {
   // Several nets
 
   const [netsSaved, setNetsSaved] = useState<[Agent[], Edge[], string][]>([]);
@@ -21,7 +21,7 @@ export default (): React.JSX.Element => {
 
   const [modeNet, setModeNet] = useState<NetMode>(NetMode.edit);
 
-  // Type node and edge
+  // Node and edge types
 
   const [typeNode, setTypeNode] = useState<string>('agent');
 
@@ -50,21 +50,24 @@ export default (): React.JSX.Element => {
         </ReactFlowProvider>
       </div>
 
-      <div style={{ flex: (modeNet === NetMode.comparison && netsSaved.length > 1) ? 1 : 0 }}>
-        <ReactFlowProvider>
-          <SubFlow
-            filesOpened={filesOpened}
-            setFilesOpened={setFilesOpened}
-            modeNet={modeNet}
-            setModeNet={setModeNet}
-            netsSaved={netsSaved}
-            indexCur={indexCur}
-            setIndexCur={setIndexCur}
-            typeNode={typeNode}
-            typeEdge={typeEdge}
-          />
-        </ReactFlowProvider>
-      </div>
+      {netsSaved.length > 1 && (
+        <div style={{ flex: modeNet === NetMode.comparison ? 1 : 0 }}>
+          <ReactFlowProvider>
+            <SubFlow
+              filesOpened={filesOpened}
+              setFilesOpened={setFilesOpened}
+              modeNet={modeNet}
+              setModeNet={setModeNet}
+              netsSaved={netsSaved}
+              setNetsSaved={setNetsSaved}
+              indexCur={indexCur}
+              setIndexCur={setIndexCur}
+              typeNode={typeNode}
+              typeEdge={typeEdge}
+            />
+          </ReactFlowProvider>
+        </div>
+      )}
     </div>
   );
 }

@@ -25,19 +25,21 @@ interface PropsSubFlow {
   modeNet: NetMode;
   setModeNet: React.Dispatch<React.SetStateAction<NetMode>>;
   netsSaved: [Agent[], Edge[], string][];
+  setNetsSaved: React.Dispatch<React.SetStateAction<[Agent[], Edge[], string][]>>;
   indexCur: number;
   setIndexCur: React.Dispatch<React.SetStateAction<number>>;
   typeNode: string;
   typeEdge: string;
 }
 
-export default (props: PropsSubFlow): React.JSX.Element => {
+export default (props: PropsSubFlow): JSX.Element => {
   const {
     filesOpened,
     setFilesOpened,
     modeNet,
     setModeNet,
     netsSaved,
+    setNetsSaved,
     indexCur,
     setIndexCur,
     typeNode,
@@ -57,29 +59,26 @@ export default (props: PropsSubFlow): React.JSX.Element => {
   const [isRunningLayout, setIsRunningLayout] = useState<boolean>(false);
 
   useEffect(() => {
-    setNodes(nds =>
-      nds.map(node => ({ ...node, type: typeNode }))
-    );
-    setEdges(eds =>
-      eds.map(edge => ({ ...edge, type: typeEdge }))
-    );
-    console.log("123");
-  }, [typeEdge, typeNode]);
-
-  useEffect(() => {
     const indexNew = indexCur + 1;
     if (indexNew >= netsSaved.length) return;
 
     setNodes(netsSaved[indexNew][0]);
     setEdges(netsSaved[indexNew][1]);
     setFileOpened(netsSaved[indexNew][2]);
-  }, [indexCur, netsSaved, typeNode, typeEdge]);
+  }, [indexCur, netsSaved, typeNode, typeEdge, modeNet]);
+
+  // Node and edge types
+
+  useEffect(() => {
+    setNodes(nds =>
+      nds.map(node => ({ ...node, type: typeNode }))
+    );
+    setEdges(eds =>
+      eds.map(edge => ({ ...edge, type: typeEdge }))
+    );
+  }, [typeNode, typeEdge]);
 
   // Net edit mode
-
-  const { fitView } = useReactFlow<Agent, Edge>();
-
-  useEffect(() => { fitView() }, [modeNet]);
 
   const goToEditNet = () => {
     setModeNet(NetMode.edit);
@@ -88,6 +87,12 @@ export default (props: PropsSubFlow): React.JSX.Element => {
   };
 
   // Utils
+
+  const { fitView } = useReactFlow<Agent, Edge>();
+
+  useEffect(() => {
+    fitView();
+  }, [indexCur, modeNet]);
 
   const [rfInstance, setRfInstance] = useState(null);
 
@@ -121,6 +126,11 @@ export default (props: PropsSubFlow): React.JSX.Element => {
       />
       <div>
         <SimplifyMenuControl
+          nodes={nodes}
+          edges={edges}
+          indexCur={indexCur}
+          netsSaved={netsSaved}
+          setNetsSaved={setNetsSaved}
           fileOpened={fileOpened}
           rfInstance={rfInstance}
           isRunningLayout={isRunningLayout}

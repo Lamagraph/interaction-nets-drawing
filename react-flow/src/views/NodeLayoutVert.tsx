@@ -4,8 +4,8 @@ import { auxiliaryPortHTML, principalPortHTML } from './NodeLayoutGen';
 
 export default ({ id, data, needLimit = true }: {
   id: string; data: AgentData; needLimit?: boolean
-}): React.JSX.Element => {
-  return <>
+}): JSX.Element => {
+  return (
     <table style={{ textAlign: 'left' }}><tbody>
       <tr><td colSpan={2} style={{ paddingBottom: '8px', textAlign: 'center' }}>
         {labelAgentHTML(data, id)}
@@ -20,5 +20,5 @@ export default ({ id, data, needLimit = true }: {
         ))
       ) : principalPortHTML(data, data.auxiliaryPorts.length, needLimit)}
     </tbody></table>
-  </>;
+  );
 }

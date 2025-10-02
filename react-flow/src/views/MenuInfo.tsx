@@ -11,7 +11,7 @@ interface PropsMenuInfo {
   setModeNet: (mode: NetMode) => void;
 }
 
-export default (props: PropsMenuInfo): React.JSX.Element => {
+export default (props: PropsMenuInfo): JSX.Element => {
   const {
     modeNet,
     fileOpened,

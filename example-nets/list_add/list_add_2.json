@@ -194,25 +194,28 @@
       "activePair": false
     },
     {
+      "id": "E_N10:P1-N5:P2",
       "source": "N10",
       "sourcePort": "P1",
       "target": "N5",
       "targetPort": "P2",
-      "id": "xy-edge__N10P1-N5P2t"
+      "activePair": false
     },
     {
+      "id": "E_N10:P2-N2:P2",
       "source": "N10",
       "sourcePort": "P2",
       "target": "N2",
       "targetPort": "P2",
-      "id": "xy-edge__N10P2-N2P2t"
+      "activePair": false
     },
     {
+      "id": "E_N10:P0-N8:P0",
       "source": "N10",
       "sourcePort": "P0",
       "target": "N8",
       "targetPort": "P0",
-      "id": "xy-edge__N10P0-N8P0t"
+      "activePair": true
     }
   ]
 }

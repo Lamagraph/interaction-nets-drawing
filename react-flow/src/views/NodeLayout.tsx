@@ -11,17 +11,17 @@ interface PropsHandle {
   needLimit: boolean;
 }
 
-const handle = (props: PropsHandle): React.JSX.Element => {
+const handle = (props: PropsHandle): JSX.Element => {
   const { type, pos, id, style } = props;
   if (!props.needLimit) return <Handle type={type} position={pos} key={id} id={id} style={style} />
   return <HandleLayout type={type} position={pos} key={id} id={id} style={style} />
 }
 
-export const handleAuxiliaryPort = (port: Port, pos: Position, needLimit: boolean): React.JSX.Element => {
+export const handleAuxiliaryPort = (port: Port, pos: Position, needLimit: boolean): JSX.Element => {
   return handle({ type: 'source', pos: pos, id: port.id, style: {}, needLimit: needLimit })
 };
 
-export const handlePrinciplePort = (data: AgentData, pos: Position, needLimit: boolean): React.JSX.Element => {
+export const handlePrinciplePort = (data: AgentData, pos: Position, needLimit: boolean): JSX.Element => {
   return handle({
     type: 'source',
     pos: pos,
@@ -31,7 +31,7 @@ export const handlePrinciplePort = (data: AgentData, pos: Position, needLimit: b
   })
 };
 
-export const labelAgentHTML = (data: AgentData, id: string): React.JSX.Element => {
+export const labelAgentHTML = (data: AgentData, id: string): JSX.Element => {
   return <>
     {data.label}
     <span style={{ color: 'gray' }}> {data.label ? `(${id})` : 'Write the label'}</span>
@@ -40,7 +40,7 @@ export const labelAgentHTML = (data: AgentData, id: string): React.JSX.Element =
 
 export default ({ id, data, needLimit = true }: {
   id: string; data: AgentData; needLimit?: boolean
-}): React.JSX.Element => {
+}): JSX.Element => {
   return (
     <div style={{ position: 'relative' }}>
       <div className='auxiliaryPorts-def'>

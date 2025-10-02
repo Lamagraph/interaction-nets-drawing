@@ -29,7 +29,7 @@ interface PropsMenuConfig {
   typeEdge: string;
 }
 
-export default (props: PropsMenuConfig): React.JSX.Element => {
+export default (props: PropsMenuConfig): JSX.Element => {
   const {
     addItem,
     isAllowed,

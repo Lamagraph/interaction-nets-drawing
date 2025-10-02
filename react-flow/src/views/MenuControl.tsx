@@ -89,14 +89,24 @@ const onDownloadNets = (rfInstance: any, fileOpened: string) => {
 };
 
 interface PropsSimplifyMenuControl {
+  nodes: Agent[];
+  edges: Edge[];
+  indexCur: number;
+  netsSaved: [Agent[], Edge[], string][];
+  setNetsSaved: React.Dispatch<React.SetStateAction<[Agent[], Edge[], string][]>>;
   fileOpened: string;
   rfInstance: any;
   isRunningLayout: boolean;
   goToEditNet: () => void;
 }
 
-export const SimplifyMenuControl = (props: PropsSimplifyMenuControl): React.JSX.Element => {
+export const SimplifyMenuControl = (props: PropsSimplifyMenuControl): JSX.Element => {
   const {
+    nodes,
+    edges,
+    indexCur,
+    netsSaved,
+    setNetsSaved,
     fileOpened,
     rfInstance,
     isRunningLayout,
@@ -107,8 +117,17 @@ export const SimplifyMenuControl = (props: PropsSimplifyMenuControl): React.JSX.
     onDownloadNets(rfInstance, fileOpened);
   }, [rfInstance, fileOpened]);
 
+  const saveNetEdited = useCallback(() => {
+    setNetsSaved(nets => nets.map((net, i) => i === (indexCur + 1) ? [nodes, edges, fileOpened] : net));
+  }, [netsSaved, indexCur, fileOpened, nodes, edges]);
+
   return (
     <Controls>
+      <ControlButton
+        title='Save'
+        disabled={isRunningLayout}
+        onClick={() => saveNetEdited()}
+      ><FaSave /></ControlButton>
       <ControlButton
         title='Edit net'
         disabled={isRunningLayout}
@@ -206,7 +225,7 @@ export default (props: PropsMenuControl) => {
 
     const createNode = (node: Agent, col: string | undefined) => ({
       ...node,
-      style: { ...node.style, backgroundColor: col },
+      style: col ? { ...node.style, backgroundColor: col } : node.style,
       type: typeNode,
     });
     const updateNode = (node: Agent) => {
@@ -227,7 +246,7 @@ export default (props: PropsMenuControl) => {
 
     const createEdge = (edge: Edge, col: string | undefined) => ({
       ...edge,
-      style: { ...edge.style, stroke: col, },
+      style: col ? { ...edge.style, stroke: col, } : edge.style,
       type: typeEdge,
     });
     const updateEdge = (edge: Edge) => {
@@ -249,7 +268,7 @@ export default (props: PropsMenuControl) => {
     setNetIndexCur(indexNew, [nodesNew, edgesNew, netsSaved[indexNew][2]]);
   }, [netsSaved, nodes, edges, indexCur, typeNode, typeEdge, modeNet]);
 
-  const saveEditNet = useCallback(() => {
+  const saveNetEdited = useCallback(() => {
     const index = indexCur - (filesOpened[0] === filesOpened[1] && indexCur > 0 ? 1 : 0);
     setNetsSaved(nets => nets.map((net, i) => i === index ? [nodes, edges, filesOpened[0]] : net));
   }, [netsSaved, indexCur, filesOpened, nodes, edges]);
@@ -262,6 +281,30 @@ export default (props: PropsMenuControl) => {
 
   return (
     <Controls>
+      {netsSaved.length > 0 && <>
+        {modeNet !== NetMode.sequence && (
+          <ControlButton
+            title='Save'
+            disabled={isRunningLayout}
+            onClick={() => saveNetEdited()}
+          ><FaSave /></ControlButton>
+        )}
+
+        {modeNet !== NetMode.edit ? (
+          <ControlButton
+            title='Edit net'
+            disabled={isRunningLayout}
+            onClick={() => setModeNet(NetMode.edit)}
+          ><FaEdit /></ControlButton>
+        ) : (
+          <ControlButton
+            title='Go back to nets'
+            disabled={isRunningLayout}
+            onClick={() => goBackToNets()}
+          ><RiArrowGoBackLine /></ControlButton>
+        )}
+      </>}
+
       {modeNet !== NetMode.edit && <>
         <ControlButton
           title='Next step'
@@ -277,27 +320,6 @@ export default (props: PropsMenuControl) => {
           disabled={isRunningLayout || (indexCur <= 0)}
           onClick={() => updateNet(false)}
         ><ArrowLeftIcon /></ControlButton>
-      </>}
-
-      {netsSaved.length > 0 && <>
-        {modeNet !== NetMode.edit ? (
-          <ControlButton
-            title='Edit net'
-            disabled={isRunningLayout}
-            onClick={() => setModeNet(NetMode.edit)}
-          ><FaEdit /></ControlButton>
-        ) : <>
-          <ControlButton
-            title='Save'
-            disabled={isRunningLayout}
-            onClick={() => saveEditNet()}
-          ><FaSave /></ControlButton>
-          <ControlButton
-            title='Go back to nets without saving'
-            disabled={isRunningLayout}
-            onClick={() => goBackToNets()}
-          ><RiArrowGoBackLine /></ControlButton>
-        </>}
       </>}
 
       <ControlButton

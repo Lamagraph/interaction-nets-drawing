@@ -13,7 +13,7 @@ import { getLayoutedNodes as dForceLayoutNodes } from '../layouts/dForceLayout';
 export default ({ isRunningLayout, setIsRunningLayout }: {
   isRunningLayout: boolean,
   setIsRunningLayout: React.Dispatch<React.SetStateAction<boolean>>,
-}): React.JSX.Element => {
+}): JSX.Element => {
   const { getNodes, getEdges, setNodes, fitView } = useReactFlow<Agent, Edge>();
   const nodesInitialized = useNodesInitialized();
 
