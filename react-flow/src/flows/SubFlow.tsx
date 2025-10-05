@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   ReactFlow,
   Background,
@@ -14,7 +14,7 @@ import '@xyflow/react/dist/style.css';
 
 import { type Agent } from '../nets';
 
-import { SimplifyMenuControl, NetMode } from '../views/MenuControl';
+import { SimplifyMenuControl, NetMode, compareNet } from '../views/MenuControl';
 import MenuLayouts from '../views/MenuLayouts';
 
 import { nodeTypes, edgeTypes } from './Flow';
@@ -67,6 +67,24 @@ export default (props: PropsSubFlow): JSX.Element => {
     setIsRunningLayouts(flags => [flags[0], value]);
   };
 
+  const toggleNet = useCallback(() => {
+    const setNetCur = (net: [Agent[], Edge[], string]) => {
+      setNodes(net[0]);
+      setEdges(net[1]);
+      setFileOpened(net[2]);
+    };
+
+    const netLeft = netsSaved[indexCur];
+    const netRight = netsSaved[indexCur + 1];
+    const netComp = compareNet({
+      netOne: netRight,
+      netTwo: netLeft,
+      types: [typeNode, typeEdge],
+      isStepUp: Boolean(indexNet),
+    });
+    if (netComp) setNetCur(netComp);
+  }, [indexCur, netsSaved, typeNode, typeEdge, modeNet]);
+
   useEffect(() => {
     const indexNew = indexCur + 1;
     if (indexNew >= netsSaved.length) return;
@@ -76,16 +94,23 @@ export default (props: PropsSubFlow): JSX.Element => {
     setFileOpened(netsSaved[indexNew][2]);
   }, [indexCur, netsSaved, typeNode, typeEdge, modeNet]);
 
+  useEffect(() => {
+    toggleNet();
+  }, [indexCur, modeNet]);
+
   // Node and edge types
+
+  useEffect(() => { 
+    setNodes(nds =>
+      nds.map(node => ({ ...node, type: typeNode }))
+    );
+  }, [typeNode]);
 
   useEffect(() => {
     setNodes(nds =>
       nds.map(node => ({ ...node, type: typeNode }))
     );
-    setEdges(eds =>
-      eds.map(edge => ({ ...edge, type: typeEdge }))
-    );
-  }, [typeNode, typeEdge]);
+  }, [typeEdge]);
 
   // Net edit mode
 

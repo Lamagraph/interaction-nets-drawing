@@ -32,7 +32,7 @@ export default (): JSX.Element => {
   const [isRunningLayouts, setIsRunningLayouts] = useState<[boolean, boolean]>([false, false]);
 
   return (
-    <div style={{ display: 'flex', height: '100%' }}>
+    <div style={{ display: 'flex', height: '100%', gap: 10 }}>
       <div style={{ flex: 1 }}>
         <ReactFlowProvider>
           <DnDProvider>

@@ -50,7 +50,7 @@ const mapKeys = {
 
 const modeDefault = NetMode.comparison
 
-const onDownloadNets = (rfInstance: any, fileOpened: string) => {
+const downloadNet = (rfInstance: any, fileOpened: string) => {
   const transformObject = (obj) => {
     if (Array.isArray(obj)) {
       return obj.map(transformObject);
@@ -88,6 +88,62 @@ const onDownloadNets = (rfInstance: any, fileOpened: string) => {
   }
 };
 
+interface PropsUpdateNet {
+  netOne: [Agent[], Edge[], string];
+  netTwo: [Agent[], Edge[], string];
+  types: [typeNode: string, typeEdge: string];
+  isStepUp: boolean;
+}
+
+export function compareNet(props: PropsUpdateNet): [Agent[], Edge[], string] | undefined {
+  const {
+    netOne,
+    netTwo,
+    types: [typeNode, typeEdge],
+    isStepUp,
+  } = props;
+
+  const color = isStepUp ? 'lightgreen' : 'lightsalmon';
+
+  const createNode = (node: Agent, col: string | undefined) => ({
+    ...node,
+    style: col ? { ...node.style, backgroundColor: col } : node.style,
+    type: typeNode,
+  });
+  const updateNode = (node: Agent) => {
+    const nodeExisted = netTwo[0].find(n => n.id === node.id);
+    return nodeExisted
+      ? { ...nodeExisted, style: node.style, type: typeNode }
+      : createNode(node, color)
+  };
+
+  const nodesComp: Agent[] = [];
+  netOne[0].forEach(node => {
+    const nodeComp = updateNode(node);
+    nodesComp.push(nodeComp);
+  });
+
+  const createEdge = (edge: Edge, col: string | undefined) => ({
+    ...edge,
+    style: col ? { ...edge.style, stroke: col, } : edge.style,
+    type: typeEdge,
+  });
+  const updateEdge = (edge: Edge) => {
+    const edgeExisted = netTwo[1].find(e => e.id === edge.id);
+    return edgeExisted
+      ? { ...edgeExisted, style: edge.style, type: typeEdge }
+      : createEdge(edge, color)
+  };
+
+  const edgesComp: Edge[] = [];
+  netOne[1].forEach(edge => {
+    const edgeComp = updateEdge(edge);
+    edgesComp.push(edgeComp);
+  });
+
+  return [nodesComp, edgesComp, netOne[2]];
+}
+
 interface PropsSimplifyMenuControl {
   nodes: Agent[];
   edges: Edge[];
@@ -114,12 +170,12 @@ export const SimplifyMenuControl = (props: PropsSimplifyMenuControl): JSX.Elemen
   } = props;
 
   const onDownload = useCallback(() => {
-    onDownloadNets(rfInstance, fileOpened);
+    downloadNet(rfInstance, fileOpened);
   }, [rfInstance, fileOpened]);
 
   const saveNetEdited = useCallback(() => {
     setNetsSaved(nets => nets.map((net, i) => i === (indexCur + 1) ? [nodes, edges, fileOpened] : net));
-  }, [netsSaved, indexCur, fileOpened, nodes, edges]);
+  }, [indexCur, fileOpened, nodes, edges]);
 
   return (
     <Controls>
@@ -156,6 +212,7 @@ interface PropsMenuControl {
   setNetsSaved: React.Dispatch<React.SetStateAction<[Agent[], Edge[], string][]>>;
   indexCur: number;
   setNetIndexCur: (index: number, net: [Agent[], Edge[], string]) => void;
+  indexNet: number;
 }
 
 export default (props: PropsMenuControl) => {
@@ -173,10 +230,11 @@ export default (props: PropsMenuControl) => {
     setNetsSaved,
     indexCur,
     setNetIndexCur,
+    indexNet,
   } = props;
 
   const onDownload = useCallback(() => {
-    onDownloadNets(rfInstance, filesOpened[0]);
+    downloadNet(rfInstance, filesOpened[0]);
   }, [rfInstance, filesOpened]);
 
   const onUpload = useCallback(() => {
@@ -215,63 +273,23 @@ export default (props: PropsMenuControl) => {
     input.click();
   }, [typeNode, typeEdge, modeNet]);
 
-  const updateNet = useCallback((isStepUp: boolean) => {
-    if (indexCur < 0) return;
+  const toggleNet = useCallback((flag: boolean) => {
+    const indexNew = indexCur + (flag ? 1 : -1);
 
-    const indexNew = isStepUp ? indexCur + 1 : indexCur - 1;
-    if (indexNew >= netsSaved.length) return;
+    const netOne = netsSaved[indexNew];
+    const netTwo = modeNet === NetMode.sequence
+      ? [nodes, edges, filesOpened[0]] as [Agent[], Edge[], string]
+      : netsSaved[indexCur];
+    const isStepUp = modeNet === NetMode.sequence ? flag : Boolean(indexNet);
 
-    const color = isStepUp ? 'lightgreen' : 'lightsalmon';
-
-    const createNode = (node: Agent, col: string | undefined) => ({
-      ...node,
-      style: col ? { ...node.style, backgroundColor: col } : node.style,
-      type: typeNode,
-    });
-    const updateNode = (node: Agent) => {
-      const nodeExisted = nodes.find(n => n.id === node.id);
-      return nodeExisted
-        ? { ...nodeExisted, style: node.style, type: typeNode }
-        : createNode(node, color)
-    };
-
-    const nodesNew: Agent[] = [];
-    netsSaved[indexNew][0].forEach(node => {
-      const nodeNew = modeNet === NetMode.comparison
-        ? createNode(node, undefined)
-        : updateNode(node);
-
-      nodesNew.push(nodeNew);
-    });
-
-    const createEdge = (edge: Edge, col: string | undefined) => ({
-      ...edge,
-      style: col ? { ...edge.style, stroke: col, } : edge.style,
-      type: typeEdge,
-    });
-    const updateEdge = (edge: Edge) => {
-      const edgeExisted = edges.find(e => e.id === edge.id);
-      return edgeExisted
-        ? { ...edgeExisted, style: edge.style, type: typeEdge }
-        : createEdge(edge, color)
-    };
-
-    const edgesNew: Edge[] = [];
-    netsSaved[indexNew][1].forEach(edge => {
-      const edgeNew = modeNet === NetMode.comparison
-        ? createEdge(edge, undefined)
-        : updateEdge(edge);
-
-      edgesNew.push(edgeNew);
-    });
-
-    setNetIndexCur(indexNew, [nodesNew, edgesNew, netsSaved[indexNew][2]]);
+    const netComp = compareNet({ netOne, netTwo, types: [typeNode, typeEdge], isStepUp });
+    if (netComp) setNetIndexCur(indexNew, netComp);
   }, [netsSaved, nodes, edges, indexCur, typeNode, typeEdge, modeNet]);
 
   const saveNetEdited = useCallback(() => {
     const index = indexCur - (filesOpened[0] === filesOpened[1] && indexCur > 0 ? 1 : 0);
     setNetsSaved(nets => nets.map((net, i) => i === index ? [nodes, edges, filesOpened[0]] : net));
-  }, [netsSaved, indexCur, filesOpened, nodes, edges]);
+  }, [indexCur, filesOpened, nodes, edges]);
 
   const goBackToNets = useCallback(() => {
     const index = indexCur - (filesOpened[0] === filesOpened[1] && indexCur > 0 ? 1 : 0);
@@ -286,7 +304,7 @@ export default (props: PropsMenuControl) => {
           <ControlButton
             title='Save'
             disabled={isRunningLayout}
-            onClick={() => saveNetEdited()}
+            onClick={saveNetEdited}
           ><FaSave /></ControlButton>
         )}
 
@@ -300,7 +318,7 @@ export default (props: PropsMenuControl) => {
           <ControlButton
             title='Go back to nets'
             disabled={isRunningLayout}
-            onClick={() => goBackToNets()}
+            onClick={goBackToNets}
           ><RiArrowGoBackLine /></ControlButton>
         )}
       </>}
@@ -313,12 +331,12 @@ export default (props: PropsMenuControl) => {
             modeNet === NetMode.sequence && (indexCur >= netsSaved.length - 1) ||
             modeNet === NetMode.comparison && (indexCur >= netsSaved.length - 2)
           }
-          onClick={() => updateNet(true)}
+          onClick={() => toggleNet(true)}
         ><ArrowRightIcon /></ControlButton>
         <ControlButton
           title='Prev step'
           disabled={isRunningLayout || (indexCur <= 0)}
-          onClick={() => updateNet(false)}
+          onClick={() => toggleNet(false)}
         ><ArrowLeftIcon /></ControlButton>
       </>}
 

@@ -35,7 +35,7 @@ import {
 import NodeLayout from '../views/NodeLayout';
 import NodeLayoutVert from '../views/NodeLayoutVert';
 import NodeLayoutGen from '../views/NodeLayoutGen';
-import MenuControl, { NetMode } from '../views/MenuControl';
+import MenuControl, { compareNet, NetMode } from '../views/MenuControl';
 import MenuLayouts from '../views/MenuLayouts';
 import { useDnD } from '../utils/DnDContext';
 import MenuConfig from '../views/MenuConfig';
@@ -134,10 +134,13 @@ export default (props: PropsFlow): JSX.Element => {
     setNodes(nds =>
       nds.map(node => ({ ...node, type: typeNode }))
     );
-    setEdges(eds =>
-      eds.map(edge => ({ ...edge, type: typeEdge }))
+  }, [typeNode]);
+
+  useEffect(() => {
+    setNodes(nds =>
+      nds.map(node => ({ ...node, type: typeNode }))
     );
-  }, [typeEdge, typeNode]);
+  }, [typeEdge]);
 
   // Add and edit net
 
@@ -336,17 +339,31 @@ export default (props: PropsFlow): JSX.Element => {
 
   // Several nets
 
-  const setNetIndexCur = (index: number, net: [Agent[], Edge[], string]) => {
-    setIndexCur(index);
+  const setNetCur = (net: [Agent[], Edge[], string]) => {
     setNodes(net[0]);
     setEdges(net[1]);
     setFileOpened(net[2]);
+  };
+
+  const setNetIndexCur = (index: number, net: [Agent[], Edge[], string]) => {
+    setIndexCur(index);
+    setNetCur(net);
   };
 
   useEffect(() => {
     if (indexCur < 0 || netsSaved.length === 0) return;
     if (modeNet === NetMode.edit) {
       setNetIndexCur(indexCur, netsSaved[indexCur]);
+    } else if (modeNet === NetMode.comparison) {
+      const netLeft = netsSaved[indexCur];
+      const netRight = netsSaved[indexCur + 1];
+      const netComp = compareNet({
+        netOne: netLeft,
+        netTwo: netRight,
+        types: [typeNode, typeEdge],
+        isStepUp: Boolean(indexNet),
+      });
+      if (netComp) setNetCur(netComp);
     }
   }, [indexCur, netsSaved, modeNet, typeNode, typeEdge]);
 
@@ -434,6 +451,7 @@ export default (props: PropsFlow): JSX.Element => {
               setNetsSaved={setNetsSaved}
               indexCur={indexCur}
               setNetIndexCur={setNetIndexCur}
+              indexNet={indexNet}
             />
             <MenuInfo
               modeNet={modeNet}
@@ -442,7 +460,7 @@ export default (props: PropsFlow): JSX.Element => {
               setTypeEdge={setTypeEdge}
               setModeNet={(mode) => {
                 if (mode === NetMode.comparison && indexCur === netsSaved.length - 1 && indexCur > 0) {
-                  const indexNew = indexCur - 1
+                  const indexNew = indexCur - 1;
                   setNetIndexCur(indexNew, netsSaved[indexNew]);
                 }
                 setModeNet(mode);
