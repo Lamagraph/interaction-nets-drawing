@@ -124,7 +124,6 @@ td {
   align-items: center;
   text-align: center;
   padding: 10px;
-  /* font-size: 12px; */
   flex-direction: column;
   border: var(--xy-node-border-default);
   color: var(--xy-node-color, var(--xy-node-color-default));
@@ -148,6 +147,13 @@ td {
 .select-info {
   height: 25px;
   width: 100%;
+}
+
+.select-info:disabled {
+  color: var(--color-disabled);
+  opacity: 0.8;
+  cursor: not-allowed;
+  border: 1px solid var(--color-disabled);
 }
 
 .label-info {

@@ -27,6 +27,10 @@ export default (): JSX.Element => {
 
   const [typeEdge, setTypeEdge] = useState<string>('bezier');
 
+  // Layout
+
+  const [isRunningLayouts, setIsRunningLayouts] = useState<[boolean, boolean]>([false, false]);
+
   return (
     <div style={{ display: 'flex', height: '100%' }}>
       <div style={{ flex: 1 }}>
@@ -45,6 +49,8 @@ export default (): JSX.Element => {
               setTypeNode={setTypeNode}
               typeEdge={typeEdge}
               setTypeEdge={setTypeEdge}
+              isRunningLayouts={isRunningLayouts}
+              setIsRunningLayouts={setIsRunningLayouts}
             />
           </DnDProvider>
         </ReactFlowProvider>
@@ -64,6 +70,8 @@ export default (): JSX.Element => {
               setIndexCur={setIndexCur}
               typeNode={typeNode}
               typeEdge={typeEdge}
+              isRunningLayouts={isRunningLayouts}
+              setIsRunningLayouts={setIsRunningLayouts}
             />
           </ReactFlowProvider>
         </div>

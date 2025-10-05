@@ -19,6 +19,8 @@ import MenuLayouts from '../views/MenuLayouts';
 
 import { nodeTypes, edgeTypes } from './Flow';
 
+const indexNet = 1;
+
 interface PropsSubFlow {
   filesOpened: [string, string];
   setFilesOpened: React.Dispatch<React.SetStateAction<[string, string]>>;
@@ -30,6 +32,8 @@ interface PropsSubFlow {
   setIndexCur: React.Dispatch<React.SetStateAction<number>>;
   typeNode: string;
   typeEdge: string;
+  isRunningLayouts: [boolean, boolean];
+  setIsRunningLayouts: React.Dispatch<React.SetStateAction<[boolean, boolean]>>;
 }
 
 export default (props: PropsSubFlow): JSX.Element => {
@@ -44,6 +48,8 @@ export default (props: PropsSubFlow): JSX.Element => {
     setIndexCur,
     typeNode,
     typeEdge,
+    isRunningLayouts,
+    setIsRunningLayouts,
   } = props;
 
   // Main
@@ -51,12 +57,15 @@ export default (props: PropsSubFlow): JSX.Element => {
   const [nodes, setNodes, onNodesChange] = useNodesState<Agent>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
 
-  const fileOpened = filesOpened[1];
+  const fileOpened = filesOpened[indexNet];
   const setFileOpened = (nameFile: string) => {
     setFilesOpened(files => [files[0], nameFile]);
   };
 
-  const [isRunningLayout, setIsRunningLayout] = useState<boolean>(false);
+  const isRunningLayout = isRunningLayouts[indexNet];
+  const setIsRunningLayout = (value: boolean) => {
+    setIsRunningLayouts(flags => [flags[0], value]);
+  };
 
   useEffect(() => {
     const indexNew = indexCur + 1;
@@ -121,7 +130,8 @@ export default (props: PropsSubFlow): JSX.Element => {
       deleteKeyCode={modeNet === NetMode.edit && !isRunningLayout ? ['Delete', 'Backspace'] : null}
     >
       <MenuLayouts
-        isRunningLayout={isRunningLayout}
+        isRunningLayouts={isRunningLayouts}
+        indexLayout={indexNet}
         setIsRunningLayout={setIsRunningLayout}
       />
       <div>
@@ -133,7 +143,7 @@ export default (props: PropsSubFlow): JSX.Element => {
           setNetsSaved={setNetsSaved}
           fileOpened={fileOpened}
           rfInstance={rfInstance}
-          isRunningLayout={isRunningLayout}
+          isRunningLayout={isRunningLayouts[0] || isRunningLayouts[1]}
           goToEditNet={goToEditNet}
         />
         <Panel position='bottom-left' className='panel-info' >

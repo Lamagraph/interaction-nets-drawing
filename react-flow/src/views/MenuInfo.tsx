@@ -9,6 +9,7 @@ interface PropsMenuInfo {
   setTypeNode: React.Dispatch<React.SetStateAction<string>>;
   setTypeEdge: React.Dispatch<React.SetStateAction<string>>;
   setModeNet: (mode: NetMode) => void;
+  isRunningLayout: boolean;
 }
 
 export default (props: PropsMenuInfo): JSX.Element => {
@@ -18,6 +19,7 @@ export default (props: PropsMenuInfo): JSX.Element => {
     setTypeNode,
     setTypeEdge,
     setModeNet,
+    isRunningLayout,
   } = props;
 
   const onChangeMode = (event: any) => {
@@ -39,6 +41,7 @@ export default (props: PropsMenuInfo): JSX.Element => {
             className='xy-theme__select select-info'
             onChange={onChangeMode}
             data-testid='colormode-select'
+            disabled={isRunningLayout}
           >
             <option value={NetMode.comparison}>comparison</option>
             <option value={NetMode.sequence}>sequence</option>
@@ -52,6 +55,7 @@ export default (props: PropsMenuInfo): JSX.Element => {
           className='xy-theme__select select-info'
           onChange={onChangeNode}
           data-testid='colormode-select'
+          disabled={isRunningLayout}
         >
           <option value='agent'>horizontal</option>
           <option value='agentVert'>vertical</option>
@@ -65,6 +69,7 @@ export default (props: PropsMenuInfo): JSX.Element => {
           className='xy-theme__select select-info'
           onChange={onChangeEdge}
           data-testid='colormode-select'
+          disabled={isRunningLayout}
         >
           <option value='bezier'>bezier</option>
           <option value='smoothstep'>smoothstep</option>

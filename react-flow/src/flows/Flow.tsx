@@ -43,6 +43,7 @@ import MenuInfo from '../views/MenuInfo';
 
 const dirNetsSaved = '../../saved-nets/';
 const nameFileStart = 'list_add_1.json';
+const indexNet = 0;
 
 export const nodeTypes = {
   agent: NodeLayout,
@@ -70,6 +71,8 @@ interface PropsFlow {
   setTypeNode: React.Dispatch<React.SetStateAction<string>>;
   typeEdge: string;
   setTypeEdge: React.Dispatch<React.SetStateAction<string>>;
+  isRunningLayouts: [boolean, boolean];
+  setIsRunningLayouts: React.Dispatch<React.SetStateAction<[boolean, boolean]>>;
 }
 
 export default (props: PropsFlow): JSX.Element => {
@@ -86,6 +89,8 @@ export default (props: PropsFlow): JSX.Element => {
     setTypeNode,
     typeEdge,
     setTypeEdge,
+    isRunningLayouts,
+    setIsRunningLayouts,
   } = props;
 
   // Main
@@ -93,12 +98,15 @@ export default (props: PropsFlow): JSX.Element => {
   const [nodes, setNodes, onNodesChange] = useNodesState<Agent>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
 
-  const fileOpened = filesOpened[0];
+  const fileOpened = filesOpened[indexNet];
   const setFileOpened = (nameFile: string) => {
     setFilesOpened(files => [nameFile, files[1]]);
   };
 
-  const [isRunningLayout, setIsRunningLayout] = useState<boolean>(false);
+  const isRunningLayout = isRunningLayouts[indexNet];
+  const setIsRunningLayout = (value: boolean) => {
+    setIsRunningLayouts(flags => [value, flags[1]]);
+  };
 
   // Start
 
@@ -302,7 +310,7 @@ export default (props: PropsFlow): JSX.Element => {
         }
       }
     });
-  }, [nodeSelected, isRunningLayout]);
+  }, [nodeSelected]);
 
   useEffect(() => {
     if (isRunningLayout && nodeSelected) {
@@ -407,7 +415,8 @@ export default (props: PropsFlow): JSX.Element => {
             />
           )}
           <MenuLayouts
-            isRunningLayout={isRunningLayout}
+            isRunningLayouts={isRunningLayouts}
+            indexLayout={indexNet}
             setIsRunningLayout={setIsRunningLayout}
           />
           <div>
@@ -418,7 +427,7 @@ export default (props: PropsFlow): JSX.Element => {
               typeEdge={typeEdge}
               filesOpened={filesOpened}
               rfInstance={rfInstance}
-              isRunningLayout={isRunningLayout}
+              isRunningLayout={isRunningLayouts[0] || isRunningLayouts[1]}
               modeNet={modeNet}
               setModeNet={setModeNet}
               netsSaved={netsSaved}
@@ -438,6 +447,7 @@ export default (props: PropsFlow): JSX.Element => {
                 }
                 setModeNet(mode);
               }}
+              isRunningLayout={isRunningLayouts[0] || isRunningLayouts[1]}
             />
           </div>
           <Background />
