@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react';
 import {
   ControlButton,
   Controls,
+  Position,
   type Edge,
 } from '@xyflow/react';
 
@@ -93,6 +94,7 @@ interface PropsUpdateNet {
   netTwo: [Agent[], Edge[], string];
   types: [typeNode: string, typeEdge: string];
   isStepUp: boolean;
+  isPinPos: boolean;
 }
 
 export function compareNet(props: PropsUpdateNet): [Agent[], Edge[], string] | undefined {
@@ -101,20 +103,16 @@ export function compareNet(props: PropsUpdateNet): [Agent[], Edge[], string] | u
     netTwo,
     types: [typeNode, typeEdge],
     isStepUp,
+    isPinPos,
   } = props;
 
   const color = isStepUp ? 'lightgreen' : 'lightsalmon';
 
-  const createNode = (node: Agent, col: string | undefined) => ({
-    ...node,
-    style: col ? { ...node.style, backgroundColor: col } : node.style,
-    type: typeNode,
-  });
   const updateNode = (node: Agent) => {
     const nodeExisted = netTwo[0].find(n => n.id === node.id);
     return nodeExisted
-      ? { ...nodeExisted, style: node.style, type: typeNode }
-      : createNode(node, color)
+      ? { ...nodeExisted, style: node.style, type: typeNode, position: isPinPos ? node.position : nodeExisted.position }
+      : { ...node, style: { ...node.style, backgroundColor: color }, type: typeNode }
   };
 
   const nodesComp: Agent[] = [];
@@ -123,16 +121,11 @@ export function compareNet(props: PropsUpdateNet): [Agent[], Edge[], string] | u
     nodesComp.push(nodeComp);
   });
 
-  const createEdge = (edge: Edge, col: string | undefined) => ({
-    ...edge,
-    style: col ? { ...edge.style, stroke: col, } : edge.style,
-    type: typeEdge,
-  });
   const updateEdge = (edge: Edge) => {
     const edgeExisted = netTwo[1].find(e => e.id === edge.id);
     return edgeExisted
       ? { ...edgeExisted, style: edge.style, type: typeEdge }
-      : createEdge(edge, color)
+      : { ...edge, style: { ...edge.style, stroke: color, }, type: typeEdge }
   };
 
   const edgesComp: Edge[] = [];
@@ -145,10 +138,6 @@ export function compareNet(props: PropsUpdateNet): [Agent[], Edge[], string] | u
 }
 
 interface PropsSimplifyMenuControl {
-  nodes: Agent[];
-  edges: Edge[];
-  indexCur: number;
-  setNetsSaved: React.Dispatch<React.SetStateAction<[Agent[], Edge[], string][]>>;
   fileOpened: string;
   rfInstance: any;
   isRunningLayout: boolean;
@@ -157,10 +146,6 @@ interface PropsSimplifyMenuControl {
 
 export const SimplifyMenuControl = (props: PropsSimplifyMenuControl): JSX.Element => {
   const {
-    nodes,
-    edges,
-    indexCur,
-    setNetsSaved,
     fileOpened,
     rfInstance,
     isRunningLayout,
@@ -171,17 +156,8 @@ export const SimplifyMenuControl = (props: PropsSimplifyMenuControl): JSX.Elemen
     downloadNet(rfInstance, fileOpened);
   }, [rfInstance, fileOpened]);
 
-  const saveNetEdited = useCallback(() => {
-    setNetsSaved(nets => nets.map((net, i) => i === (indexCur + 1) ? [nodes, edges, fileOpened] : net));
-  }, [indexCur, nodes, edges, fileOpened]);
-
   return (
     <Controls>
-      <ControlButton
-        title='Save'
-        disabled={isRunningLayout}
-        onClick={saveNetEdited}
-      ><FaSave /></ControlButton>
       <ControlButton
         title='Edit net'
         disabled={isRunningLayout}
@@ -280,7 +256,7 @@ export default (props: PropsMenuControl) => {
       : netsSaved[indexCur];
     const isStepUp = modeNet === NetMode.sequence ? flag : Boolean(indexNet);
 
-    const netComp = compareNet({ netOne, netTwo, types: [typeNode, typeEdge], isStepUp });
+    const netComp = compareNet({ netOne, netTwo, types: [typeNode, typeEdge], isStepUp, isPinPos: false });
     if (netComp) setNetIndexCur(indexNew, netComp);
   }, [netsSaved, indexCur, nodes, edges, typeNode, typeEdge, modeNet, filesOpened, indexNet]);
 
@@ -298,27 +274,25 @@ export default (props: PropsMenuControl) => {
   return (
     <Controls>
       {netsSaved.length > 0 && <>
-        {modeNet !== NetMode.sequence && (
-          <ControlButton
-            title='Save'
-            disabled={isRunningLayout}
-            onClick={saveNetEdited}
-          ><FaSave /></ControlButton>
-        )}
-
         {modeNet !== NetMode.edit ? (
           <ControlButton
             title='Edit net'
             disabled={isRunningLayout}
             onClick={() => setModeNet(NetMode.edit)}
           ><FaEdit /></ControlButton>
-        ) : (
+        ) : <>
+          <ControlButton
+            title='Save'
+            disabled={isRunningLayout}
+            onClick={saveNetEdited}
+          ><FaSave /></ControlButton>
+
           <ControlButton
             title='Go back to nets'
             disabled={isRunningLayout}
             onClick={goBackToNets}
           ><RiArrowGoBackLine /></ControlButton>
-        )}
+        </>}
       </>}
 
       {modeNet !== NetMode.edit && <>

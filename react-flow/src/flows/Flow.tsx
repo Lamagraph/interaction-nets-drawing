@@ -338,6 +338,7 @@ export default (props: PropsFlow): JSX.Element => {
       netTwo: netRight,
       types: [typeNode, typeEdge],
       isStepUp: Boolean(indexNet),
+      isPinPos: true,
     });
     if (netComp) setNetCur(netComp);
   }, [netsSaved, indexCur, typeNode, typeEdge]);
@@ -355,7 +356,9 @@ export default (props: PropsFlow): JSX.Element => {
     loadNetStart(dirNetsSaved + nameFileStart);
   }, []);
 
-  useEffect(unselectNode, [unselectNode]);
+  useEffect(() => {
+    if (isRunningLayout) unselectNode();
+  }, [unselectNode]);
 
   useEffect(setNodeInfoBySelect, [setNodeInfoBySelect]);
 

@@ -27,7 +27,6 @@ interface PropsSubFlow {
   modeNet: NetMode;
   setModeNet: React.Dispatch<React.SetStateAction<NetMode>>;
   netsSaved: [Agent[], Edge[], string][];
-  setNetsSaved: React.Dispatch<React.SetStateAction<[Agent[], Edge[], string][]>>;
   indexCur: number;
   setIndexCur: React.Dispatch<React.SetStateAction<number>>;
   typeNode: string;
@@ -43,7 +42,6 @@ export default (props: PropsSubFlow): JSX.Element => {
     modeNet,
     setModeNet,
     netsSaved,
-    setNetsSaved,
     indexCur,
     setIndexCur,
     typeNode,
@@ -84,6 +82,7 @@ export default (props: PropsSubFlow): JSX.Element => {
       netTwo: netLeft,
       types: [typeNode, typeEdge],
       isStepUp: Boolean(indexNet),
+      isPinPos: false,
     });
     if (netComp) setNetCur(netComp);
   }, [netsSaved, indexCur, typeNode, typeEdge]);
@@ -152,10 +151,6 @@ export default (props: PropsSubFlow): JSX.Element => {
       />
       <div>
         <SimplifyMenuControl
-          nodes={nodes}
-          edges={edges}
-          indexCur={indexCur}
-          setNetsSaved={setNetsSaved}
           fileOpened={fileOpened}
           rfInstance={rfInstance}
           isRunningLayout={isRunningLayouts[0] || isRunningLayouts[1]}

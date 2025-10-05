@@ -63,7 +63,6 @@ export default (): JSX.Element => {
               modeNet={modeNet}
               setModeNet={setModeNet}
               netsSaved={netsSaved}
-              setNetsSaved={setNetsSaved}
               indexCur={indexCur}
               setIndexCur={setIndexCur}
               typeNode={typeNode}
