@@ -1,6 +1,6 @@
 import { type AgentData } from '../nets'
 import { labelAgentHTML } from './NodeLayout';
-import { auxiliaryPortHTML, principalPortHTML } from './NodeLayoutGen';
+import { auxiliaryPortTD, principalPortTD } from './NodeLayoutGen';
 
 export default ({ id, data, needLimit = true }: {
   id: string; data: AgentData; needLimit?: boolean
@@ -14,11 +14,11 @@ export default ({ id, data, needLimit = true }: {
       {data.auxiliaryPorts.length ? (
         data.auxiliaryPorts.map((port, index) => (
           <tr key={index}>
-            {auxiliaryPortHTML(port, needLimit)}
-            {index === 0 && principalPortHTML(data, data.auxiliaryPorts.length, needLimit)}
+            {auxiliaryPortTD(port, needLimit)}
+            {index === 0 && principalPortTD(data, data.auxiliaryPorts.length, needLimit)}
           </tr>
         ))
-      ) : principalPortHTML(data, data.auxiliaryPorts.length, needLimit)}
+      ) : <tr>{principalPortTD(data, data.auxiliaryPorts.length, needLimit)}</tr>}
     </tbody></table>
   );
 }

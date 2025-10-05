@@ -18,7 +18,6 @@ export default (): JSX.Element => {
   const [filesOpened, setFilesOpened] = useState<[string, string]>(['', '']);
 
   // Net mode
-
   const [modeNet, setModeNet] = useState<NetMode>(NetMode.edit);
 
   // Node and edge types
@@ -28,7 +27,6 @@ export default (): JSX.Element => {
   const [typeEdge, setTypeEdge] = useState<string>('bezier');
 
   // Layout
-
   const [isRunningLayouts, setIsRunningLayouts] = useState<[boolean, boolean]>([false, false]);
 
   return (
@@ -56,8 +54,8 @@ export default (): JSX.Element => {
         </ReactFlowProvider>
       </div>
 
-      {netsSaved.length > 1 && (
-        <div style={{ flex: modeNet === NetMode.comparison ? 1 : 0 }}>
+      {netsSaved.length > 1 && modeNet === NetMode.comparison && (
+        <div style={{ flex: 1 }}>
           <ReactFlowProvider>
             <SubFlow
               filesOpened={filesOpened}

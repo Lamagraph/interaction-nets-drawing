@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import {
   ControlButton,
   Controls,
@@ -148,7 +148,6 @@ interface PropsSimplifyMenuControl {
   nodes: Agent[];
   edges: Edge[];
   indexCur: number;
-  netsSaved: [Agent[], Edge[], string][];
   setNetsSaved: React.Dispatch<React.SetStateAction<[Agent[], Edge[], string][]>>;
   fileOpened: string;
   rfInstance: any;
@@ -161,7 +160,6 @@ export const SimplifyMenuControl = (props: PropsSimplifyMenuControl): JSX.Elemen
     nodes,
     edges,
     indexCur,
-    netsSaved,
     setNetsSaved,
     fileOpened,
     rfInstance,
@@ -175,19 +173,19 @@ export const SimplifyMenuControl = (props: PropsSimplifyMenuControl): JSX.Elemen
 
   const saveNetEdited = useCallback(() => {
     setNetsSaved(nets => nets.map((net, i) => i === (indexCur + 1) ? [nodes, edges, fileOpened] : net));
-  }, [indexCur, fileOpened, nodes, edges]);
+  }, [indexCur, nodes, edges, fileOpened]);
 
   return (
     <Controls>
       <ControlButton
         title='Save'
         disabled={isRunningLayout}
-        onClick={() => saveNetEdited()}
+        onClick={saveNetEdited}
       ><FaSave /></ControlButton>
       <ControlButton
         title='Edit net'
         disabled={isRunningLayout}
-        onClick={() => goToEditNet()}
+        onClick={goToEditNet}
       ><FaEdit /></ControlButton>
       <ControlButton
         title='Download the Net'
@@ -284,12 +282,12 @@ export default (props: PropsMenuControl) => {
 
     const netComp = compareNet({ netOne, netTwo, types: [typeNode, typeEdge], isStepUp });
     if (netComp) setNetIndexCur(indexNew, netComp);
-  }, [netsSaved, nodes, edges, indexCur, typeNode, typeEdge, modeNet]);
+  }, [netsSaved, indexCur, nodes, edges, typeNode, typeEdge, modeNet, filesOpened, indexNet]);
 
   const saveNetEdited = useCallback(() => {
     const index = indexCur - (filesOpened[0] === filesOpened[1] && indexCur > 0 ? 1 : 0);
     setNetsSaved(nets => nets.map((net, i) => i === index ? [nodes, edges, filesOpened[0]] : net));
-  }, [indexCur, filesOpened, nodes, edges]);
+  }, [indexCur, nodes, edges, filesOpened]);
 
   const goBackToNets = useCallback(() => {
     const index = indexCur - (filesOpened[0] === filesOpened[1] && indexCur > 0 ? 1 : 0);

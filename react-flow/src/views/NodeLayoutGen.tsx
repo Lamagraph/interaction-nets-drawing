@@ -2,8 +2,8 @@ import { Position } from '@xyflow/react';
 import { type Port, type AgentData } from '../nets';
 import { handleAuxiliaryPort, handlePrinciplePort, labelAgentHTML } from './NodeLayout';
 
-export const auxiliaryPortHTML = (port: Port, needLimit: boolean): JSX.Element => {
-  return <>
+export const auxiliaryPortTD = (port: Port, needLimit: boolean): JSX.Element => {
+  return (
     <td style={{ left: '-12px' }}>
       {handleAuxiliaryPort(port, Position.Left, needLimit)}
       <div style={{ paddingLeft: '4px' }}>
@@ -11,10 +11,10 @@ export const auxiliaryPortHTML = (port: Port, needLimit: boolean): JSX.Element =
         {port.label}
       </div>
     </td>
-  </>
+  );
 };
 
-export const principalPortHTML = (
+export const principalPortTD = (
   data: AgentData,
   rowSpan: number | undefined,
   needLimit: boolean,
@@ -42,15 +42,11 @@ export default ({ id, data, needLimit = true }: {
 
       {/* <div className='auxiliaryPorts-gen'> */}
       {data.auxiliaryPorts.map((port, index) => (
-        <tr key={index}>
-          {auxiliaryPortHTML(port, needLimit)}
-        </tr>
+        <tr key={index}>{auxiliaryPortTD(port, needLimit)}</tr>
       ))}
       {/* </div> */}
 
-      <tr>
-        {principalPortHTML(data, undefined, needLimit)}
-      </tr>
+      <tr>{principalPortTD(data, undefined, needLimit)}</tr>
     </tbody></table>
   );
 }

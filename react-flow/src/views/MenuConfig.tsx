@@ -26,7 +26,6 @@ interface PropsMenuConfig {
   nodeSelected: Agent | undefined;
   isRunningLayout: boolean;
   typeNode: string;
-  typeEdge: string;
 }
 
 export default (props: PropsMenuConfig): JSX.Element => {
@@ -48,7 +47,6 @@ export default (props: PropsMenuConfig): JSX.Element => {
     nodeSelected,
     isRunningLayout,
     typeNode,
-    typeEdge,
   } = props;
 
   const [linkShowed, setLinkShowed] = useState<boolean>(false);
@@ -74,11 +72,7 @@ export default (props: PropsMenuConfig): JSX.Element => {
         addItem({ x: 50, y: 50 });
       }
     }
-  }, [
-    nodeId, nodeLabel, nodeAuxiliaryPorts,
-    nodePrincipalPort, nodeAuxiliaryLinks,
-    nodePrincipalLink, nodeSelected, typeNode, typeEdge,
-  ]);
+  }, [getInternalNode, addItem, nodeSelected]);
 
   return <>
     {!isRunningLayout && (

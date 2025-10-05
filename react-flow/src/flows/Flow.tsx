@@ -95,6 +95,8 @@ export default (props: PropsFlow): JSX.Element => {
 
   // Main
 
+  const { fitView } = useReactFlow<Agent, Edge>();
+
   const [nodes, setNodes, onNodesChange] = useNodesState<Agent>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
 
@@ -109,7 +111,6 @@ export default (props: PropsFlow): JSX.Element => {
   };
 
   // Start
-
   const loadNetStart = async (nameFile: string) => {
     try {
       const net = await getObjectsByName(nameFile);
@@ -123,25 +124,6 @@ export default (props: PropsFlow): JSX.Element => {
     }
   };
 
-  useEffect(() => {
-    setFileOpened(nameFileStart);
-    loadNetStart(dirNetsSaved + nameFileStart);
-  }, []);
-
-  // Node and edge types
-
-  useEffect(() => {
-    setNodes(nds =>
-      nds.map(node => ({ ...node, type: typeNode }))
-    );
-  }, [typeNode]);
-
-  useEffect(() => {
-    setNodes(nds =>
-      nds.map(node => ({ ...node, type: typeNode }))
-    );
-  }, [typeEdge]);
-
   // Add and edit net
 
   const [nodeId, setNodeId] = useState<string>('');
@@ -152,14 +134,14 @@ export default (props: PropsFlow): JSX.Element => {
   const [nodePrincipalLink, setNodePrincipalLink] = useState<PointConnection>(defPointCon);
   const [nodeAuxiliaryLinks, setNodeAuxiliaryLinks] = useState<PointConnection[]>([]);
 
-  const cleanUpInfoNode = useCallback(() => {
+  const cleanUpInfoNode = () => {
     setNodeId('');
     setNodeLabel('');
     setNodeAuxiliaryPorts([]);
     setNodePrincipalPort(defPort);
     setNodeAuxiliaryLinks([]);
     setNodePrincipalLink(defPointCon);
-  }, []);
+  };
 
   /// Add node
 
@@ -223,6 +205,12 @@ export default (props: PropsFlow): JSX.Element => {
   const { screenToFlowPosition } = useReactFlow<Agent, Edge>();
   const [type, setType] = useDnD();
 
+  const onDragStart = (event: any, nodeType: any) => {
+    if (setType) setType(nodeType);
+    event.dataTransfer.setData('text/plain', nodeType);
+    event.dataTransfer.effectAllowed = 'move';
+  };
+
   const onDrop = useCallback((event: any) => {
     event.preventDefault();
     if (!type && !isAllowed()) {
@@ -237,14 +225,7 @@ export default (props: PropsFlow): JSX.Element => {
     addItem(position);
   }, [screenToFlowPosition, type]);
 
-  const onDragStart = (event: any, nodeType: any) => {
-    if (setType) setType(nodeType);
-    event.dataTransfer.setData('text/plain', nodeType);
-    event.dataTransfer.effectAllowed = 'move';
-  };
-
   /// Add edge with drag
-
   const onConnect = useCallback((params: Connection) => {
     const isActPair = isActivePair(params, nodes);
     setIsRunningLayout(false);
@@ -257,28 +238,47 @@ export default (props: PropsFlow): JSX.Element => {
         style: isActPair ? { stroke: 'blue' } : {}
       }, eds)
     );
-  }, [setEdges, typeEdge, nodes]);
+  }, [typeEdge, nodes]);
 
   const onDragOver = useCallback((event: any) => {
     event.preventDefault();
     event.dataTransfer.dropEffect = 'move';
   }, []);
 
-  /// Selected node
+  /// Adding button
+  const isAllowed = useCallback(() => {
+    if (!validate(nodeId) || !validate(nodeLabel) || !validate(nodePrincipalPort.id)) return false;
+
+    const setPorts = new Set([nodePrincipalPort.id]);
+
+    for (const port of nodeAuxiliaryPorts) {
+      if (!validate(port.id)) return false;
+      setPorts.add(port.id.trim());
+    }
+
+    return setPorts.size === nodeAuxiliaryPorts.length + 1
+  }, [nodeId, nodeLabel, nodePrincipalPort, nodeAuxiliaryPorts]);
+
+  // Selected node
 
   const [nodeSelected, setNodeSelected] = useState<Agent>();
+
+  const unselectNode = useCallback(() => {
+    if (!nodeSelected) return;
+    nodeSelected.selected = false;
+    cleanUpInfoNode();
+  }, [nodeSelected]);
 
   const onChange = useCallback(({ nodes }: { nodes: Agent[] }) => {
     setNodeSelected(nodes[0]);
   }, []);
-  useOnSelectionChange({
-    onChange
-  });
 
-  useEffect(() => {
+  useOnSelectionChange({ onChange });
+
+  const setNodeInfoBySelect = useCallback(() => {
     if (!nodeSelected) {
       cleanUpInfoNode();
-      return
+      return;
     }
 
     setNodeId(nodeSelected.id);
@@ -315,28 +315,6 @@ export default (props: PropsFlow): JSX.Element => {
     });
   }, [nodeSelected]);
 
-  useEffect(() => {
-    if (isRunningLayout && nodeSelected) {
-      nodeSelected.selected = false;
-      cleanUpInfoNode();
-    }
-  }, [isRunningLayout, nodeSelected]);
-
-  // Adding button
-
-  const isAllowed = useCallback(() => {
-    if (!validate(nodeId) || !validate(nodeLabel) || !validate(nodePrincipalPort.id)) return false;
-
-    const setPorts = new Set([nodePrincipalPort.id]);
-
-    for (const port of nodeAuxiliaryPorts) {
-      if (!validate(port.id)) return false;
-      setPorts.add(port.id.trim());
-    }
-
-    return setPorts.size === nodeAuxiliaryPorts.length + 1
-  }, [nodeId, nodeLabel, nodePrincipalPort, nodeAuxiliaryPorts]);
-
   // Several nets
 
   const setNetCur = (net: [Agent[], Edge[], string]) => {
@@ -350,34 +328,56 @@ export default (props: PropsFlow): JSX.Element => {
     setNetCur(net);
   };
 
-  useEffect(() => {
-    if (indexCur < 0 || netsSaved.length === 0) return;
-    if (modeNet === NetMode.edit) {
-      setNetIndexCur(indexCur, netsSaved[indexCur]);
-    } else if (modeNet === NetMode.comparison) {
-      const netLeft = netsSaved[indexCur];
-      const netRight = netsSaved[indexCur + 1];
-      const netComp = compareNet({
-        netOne: netLeft,
-        netTwo: netRight,
-        types: [typeNode, typeEdge],
-        isStepUp: Boolean(indexNet),
-      });
-      if (netComp) setNetCur(netComp);
-    }
-  }, [indexCur, netsSaved, modeNet, typeNode, typeEdge]);
+  const resetNet = useCallback(() => setNetCur(netsSaved[indexCur]), [netsSaved, indexCur]);
+
+  const setNetFirst = useCallback(() => {
+    const netLeft = netsSaved[indexCur];
+    const netRight = netsSaved[indexCur + 1];
+    const netComp = compareNet({
+      netOne: netLeft,
+      netTwo: netRight,
+      types: [typeNode, typeEdge],
+      isStepUp: Boolean(indexNet),
+    });
+    if (netComp) setNetCur(netComp);
+  }, [netsSaved, indexCur, typeNode, typeEdge]);
 
   // Utils
-
-  const { fitView } = useReactFlow<Agent, Edge>();
-
-  useEffect(() => {
-    fitView();
-  }, [indexCur, modeNet]);
 
   const reactFlowWrapper = useRef(null);
 
   const [rfInstance, setRfInstance] = useState(null);
+
+  // Effects
+
+  useEffect(() => {
+    setFileOpened(nameFileStart);
+    loadNetStart(dirNetsSaved + nameFileStart);
+  }, []);
+
+  useEffect(unselectNode, [unselectNode]);
+
+  useEffect(setNodeInfoBySelect, [setNodeInfoBySelect]);
+
+  useEffect(() => {
+    if (indexCur < 0 || netsSaved.length === 0) return;
+    if (modeNet === NetMode.edit) resetNet();
+    else if (modeNet === NetMode.comparison) setNetFirst();
+  }, [resetNet, setNetFirst, netsSaved, indexCur, modeNet]);
+
+  useEffect(() => {
+    setNodes(nds =>
+      nds.map(node => ({ ...node, type: typeNode }))
+    );
+  }, [typeNode]);
+
+  useEffect(() => {
+    setNodes(nds =>
+      nds.map(node => ({ ...node, type: typeNode }))
+    );
+  }, [typeEdge]);
+
+  useEffect(() => { fitView() }, [indexCur, modeNet]);
 
   return (
     <div className='dndflow'>
@@ -428,7 +428,6 @@ export default (props: PropsFlow): JSX.Element => {
               nodeSelected={nodeSelected}
               isRunningLayout={isRunningLayout}
               typeNode={typeNode}
-              typeEdge={typeEdge}
             />
           )}
           <MenuLayouts

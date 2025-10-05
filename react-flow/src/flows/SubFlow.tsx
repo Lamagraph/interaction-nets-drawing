@@ -54,6 +54,8 @@ export default (props: PropsSubFlow): JSX.Element => {
 
   // Main
 
+  const { fitView } = useReactFlow<Agent, Edge>();
+
   const [nodes, setNodes, onNodesChange] = useNodesState<Agent>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
 
@@ -67,13 +69,14 @@ export default (props: PropsSubFlow): JSX.Element => {
     setIsRunningLayouts(flags => [flags[0], value]);
   };
 
-  const toggleNet = useCallback(() => {
-    const setNetCur = (net: [Agent[], Edge[], string]) => {
-      setNodes(net[0]);
-      setEdges(net[1]);
-      setFileOpened(net[2]);
-    };
+  // Several nets
+  const setNetCur = (net: [Agent[], Edge[], string]) => {
+    setNodes(net[0]);
+    setEdges(net[1]);
+    setFileOpened(net[2]);
+  };
 
+  const toggleNet = useCallback(() => {
     const netLeft = netsSaved[indexCur];
     const netRight = netsSaved[indexCur + 1];
     const netComp = compareNet({
@@ -83,24 +86,28 @@ export default (props: PropsSubFlow): JSX.Element => {
       isStepUp: Boolean(indexNet),
     });
     if (netComp) setNetCur(netComp);
-  }, [indexCur, netsSaved, typeNode, typeEdge, modeNet]);
+  }, [netsSaved, indexCur, typeNode, typeEdge]);
+
+  // Net mode
+  const goToEditNet = () => {
+    setModeNet(NetMode.edit);
+    setIndexCur(index => index + 1);
+  };
+
+  // Utils
+  const [rfInstance, setRfInstance] = useState(null);
+
+  // Effects
 
   useEffect(() => {
     const indexNew = indexCur + 1;
     if (indexNew >= netsSaved.length) return;
+    setNetCur(netsSaved[indexNew]);
+  }, [netsSaved, modeNet]);
 
-    setNodes(netsSaved[indexNew][0]);
-    setEdges(netsSaved[indexNew][1]);
-    setFileOpened(netsSaved[indexNew][2]);
-  }, [indexCur, netsSaved, typeNode, typeEdge, modeNet]);
+  useEffect(() => { toggleNet() }, [toggleNet, indexCur]);
 
   useEffect(() => {
-    toggleNet();
-  }, [indexCur, modeNet]);
-
-  // Node and edge types
-
-  useEffect(() => { 
     setNodes(nds =>
       nds.map(node => ({ ...node, type: typeNode }))
     );
@@ -112,23 +119,7 @@ export default (props: PropsSubFlow): JSX.Element => {
     );
   }, [typeEdge]);
 
-  // Net edit mode
-
-  const goToEditNet = () => {
-    setModeNet(NetMode.edit);
-    setIndexCur(index => index + 1);
-    setFilesOpened(files => [files[1], files[1]]);
-  };
-
-  // Utils
-
-  const { fitView } = useReactFlow<Agent, Edge>();
-
-  useEffect(() => {
-    fitView();
-  }, [indexCur, modeNet]);
-
-  const [rfInstance, setRfInstance] = useState(null);
+  useEffect(() => { fitView() }, [indexCur, modeNet]);
 
   return (
     <ReactFlow
@@ -164,7 +155,6 @@ export default (props: PropsSubFlow): JSX.Element => {
           nodes={nodes}
           edges={edges}
           indexCur={indexCur}
-          netsSaved={netsSaved}
           setNetsSaved={setNetsSaved}
           fileOpened={fileOpened}
           rfInstance={rfInstance}
