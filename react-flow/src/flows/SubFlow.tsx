@@ -113,8 +113,8 @@ export default (props: PropsSubFlow): JSX.Element => {
   }, [typeNode]);
 
   useEffect(() => {
-    setNodes(nds =>
-      nds.map(node => ({ ...node, type: typeNode }))
+    setEdges(eds =>
+      eds.map(edge => ({ ...edge, type: typeEdge }))
     );
   }, [typeEdge]);
 

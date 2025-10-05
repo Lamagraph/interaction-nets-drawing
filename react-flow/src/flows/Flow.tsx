@@ -159,8 +159,8 @@ export default (props: PropsFlow): JSX.Element => {
       type: typeNode,
     };
 
-    setEdges((eds) => eds.filter(e => e.source !== nodeId && e.target !== nodeId));
-    setNodes((nds) => {
+    setEdges(eds => eds.filter(e => e.source !== nodeId && e.target !== nodeId));
+    setNodes(nds => {
       const ndsNew = nds.filter(n => n.id !== nodeId);
       ndsNew.push(ndNew);
 
@@ -174,7 +174,7 @@ export default (props: PropsFlow): JSX.Element => {
             targetHandle: `${nodeAuxiliaryPorts[index].id}t`,
             type: typeEdge,
           }
-          setEdges((es) => [...es, edNew]);
+          setEdges(es => addEdge(edNew, es));
         }
       });
 
@@ -191,7 +191,7 @@ export default (props: PropsFlow): JSX.Element => {
           style: isAuxPort ? { stroke: 'blue' } : {},
           type: typeEdge,
         }
-        setEdges((es) => [...es, edNew]);
+        setEdges(es => addEdge(edNew, es));
       }
 
       return ndsNew;
@@ -233,6 +233,7 @@ export default (props: PropsFlow): JSX.Element => {
     setEdges(eds =>
       addEdge({
         ...params,
+        id: `E_${params.source}:${params.sourceHandle}-${params.target}:${params.targetHandle?.slice(0, -1)}`,
         type: typeEdge,
         animated: isActPair,
         style: isActPair ? { stroke: 'blue' } : {}
@@ -375,8 +376,8 @@ export default (props: PropsFlow): JSX.Element => {
   }, [typeNode]);
 
   useEffect(() => {
-    setNodes(nds =>
-      nds.map(node => ({ ...node, type: typeNode }))
+    setEdges(eds =>
+      eds.map(edge => ({ ...edge, type: typeEdge }))
     );
   }, [typeEdge]);
 
