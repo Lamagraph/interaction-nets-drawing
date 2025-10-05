@@ -51,6 +51,6 @@ export default ({ id, data, needLimit = true }: {
       <tr>
         {principalPortHTML(data, undefined, needLimit)}
       </tr>
-    </tbody></table >
+    </tbody></table>
   );
 }

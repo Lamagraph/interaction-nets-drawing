@@ -42,7 +42,6 @@ export const getLayoutedNodes = (): (
     );
 
     let isRunning = false;
-    let edges = getEdges().map((edge) => edge);
 
     return useMemo(() => {
         const tick = (nodes: Agent[]) => {
@@ -73,13 +72,14 @@ export const getLayoutedNodes = (): (
         };
 
         const toggle = () => {
-            let nodes = getNodes().map((node) => ({
+            const nodes = getNodes().map((node) => ({
                 ...node,
                 x: node.position.x,
                 y: node.position.y,
             }));
             if (!nodesInitialized || nodes.length === 0) return {};
 
+            const edges = getEdges().map((edge) => edge);
             simulation.nodes(nodes).force(
                 'link',
                 forceLink(edges)

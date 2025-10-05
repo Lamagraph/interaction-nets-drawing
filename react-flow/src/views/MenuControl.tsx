@@ -138,7 +138,7 @@ export const SimplifyMenuControl = (props: PropsSimplifyMenuControl): JSX.Elemen
         disabled={isRunningLayout}
         onClick={onDownload}
       ><DownloadIcon /></ControlButton>
-    </Controls >
+    </Controls>
   );
 };
 
@@ -333,6 +333,6 @@ export default (props: PropsMenuControl) => {
         disabled={isRunningLayout}
         onClick={onDownload}
       ><DownloadIcon /></ControlButton>
-    </Controls >
+    </Controls>
   );
 };
