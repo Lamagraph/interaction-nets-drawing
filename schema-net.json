@@ -31,7 +31,10 @@
           "minLength": 1
         },
         "label": {
-          "type": "string",
+          "type": [
+            "string",
+            "null"
+          ],
           "default": null
         }
       }
