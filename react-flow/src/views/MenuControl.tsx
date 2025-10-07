@@ -41,8 +41,8 @@ const mapKeys = {
 
 const modeDefault = NetMode.comparison;
 
-const downloadNet = (rfInstance: unknown, fileOpened: string) => {
-  const transformObject = obj => {
+const downloadNet = (rfInstance: any, fileOpened: string) => {
+  const transformObject: any = (obj: any) => {
     if (Array.isArray(obj)) {
       return obj.map(transformObject);
     } else if (obj && typeof obj === 'object') {
@@ -132,7 +132,7 @@ export function compareNet(props: PropsUpdateNet): [Agent[], Edge[], string] | u
 
 interface PropsSimplifyMenuControl {
   fileOpened: string;
-  rfInstance: unknown;
+  rfInstance: any;
   isRunningLayout: boolean;
   goToEditNet: () => void;
 }
@@ -161,7 +161,7 @@ interface PropsMenuControl {
   edges: Edge[];
   typeNode: string;
   typeEdge: string;
-  rfInstance: unknown;
+  rfInstance: any;
   isRunningLayout: boolean;
   filesOpened: [string, string];
   modeNet: NetMode;

@@ -16,7 +16,6 @@ export const getLayoutedNodes = (nodes: Agent[], edges: Edge[]): Agent[] => {
         .querySelector(`[data-id='${nodes[0].id}']`)
         .getBoundingClientRect();
 
-    const sourceNodes = new Set(edges.map(edge => edge.source));
     const potentialRoots = nodes.filter(node => !edges.some(edge => edge.target === node.id));
 
     // Creation hidden root

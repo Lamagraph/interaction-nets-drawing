@@ -9,13 +9,9 @@ import {
   addEdge,
   type Edge,
   useOnSelectionChange,
-  BezierEdge,
-  SmoothStepEdge,
   Connection,
   XYPosition,
 } from '@xyflow/react';
-
-import { SmartBezierEdge, SmartStraightEdge, SmartStepEdge } from '@tisoap/react-flow-smart-edge';
 
 import '@xyflow/react/dist/style.css';
 
@@ -32,9 +28,8 @@ import {
   defPointCon,
 } from '../nets';
 
-import NodeLayout from '../views/NodeLayout';
-import NodeLayoutVert from '../views/NodeLayoutVert';
-import NodeLayoutGen from '../views/NodeLayoutGen';
+import { nodeTypes, edgeTypes } from '../utils/typesElements';
+
 import MenuControl, { compareNet, NetMode } from '../views/MenuControl';
 import MenuLayouts from '../views/MenuLayouts';
 import { useDnD } from '../utils/DnDContext';
@@ -44,19 +39,6 @@ import MenuInfo from '../views/MenuInfo';
 const dirNetsSaved = '../../saved-nets/';
 const nameFileStart = 'list_add_1.json';
 const indexNet = 0;
-
-export const nodeTypes = {
-  agent: NodeLayout,
-  agentVert: NodeLayoutVert,
-  agentGen: NodeLayoutGen,
-};
-export const edgeTypes = {
-  bezier: BezierEdge,
-  smoothstep: SmoothStepEdge,
-  smartBezier: SmartBezierEdge,
-  smartStraight: SmartStraightEdge,
-  smartStep: SmartStepEdge,
-};
 
 interface PropsFlow {
   filesOpened: [string, string];
@@ -153,7 +135,7 @@ export default (props: PropsFlow): JSX.Element => {
       data: {
         label: nodeLabel,
         auxiliaryPorts: nodeAuxiliaryPorts,
-        principalPort: nodePrincipalPort
+        principalPort: nodePrincipalPort,
       },
       position,
       type: typeNode,
@@ -173,7 +155,7 @@ export default (props: PropsFlow): JSX.Element => {
             sourceHandle: ids.idPort,
             targetHandle: `${nodeAuxiliaryPorts[index].id}t`,
             type: typeEdge,
-          }
+          };
           setEdges(es => addEdge(edNew, es));
         }
       });
@@ -190,7 +172,7 @@ export default (props: PropsFlow): JSX.Element => {
           animated: isAuxPort ? true : false,
           style: isAuxPort ? { stroke: 'blue' } : {},
           type: typeEdge,
-        }
+        };
         setEdges(es => addEdge(edNew, es));
       }
 
@@ -205,41 +187,52 @@ export default (props: PropsFlow): JSX.Element => {
   const { screenToFlowPosition } = useReactFlow<Agent, Edge>();
   const [type, setType] = useDnD();
 
-  const onDragStart = (event: any, nodeType: any) => {
+  const onDragStart = (event: React.DragEvent<HTMLDivElement>, nodeType: string) => {
     if (setType) setType(nodeType);
     event.dataTransfer.setData('text/plain', nodeType);
     event.dataTransfer.effectAllowed = 'move';
   };
 
-  const onDrop = useCallback((event: any) => {
-    event.preventDefault();
-    if (!type && !isAllowed()) {
-      return;
-    }
+  const onDrop = useCallback(
+    (event: any) => {
+      event.preventDefault();
+      if (!type && !isAllowed()) {
+        return;
+      }
 
-    const position = screenToFlowPosition({
-      x: event.clientX,
-      y: event.clientY,
-    });
+      const position = screenToFlowPosition({
+        x: event.clientX,
+        y: event.clientY,
+      });
 
-    addItem(position);
-  }, [screenToFlowPosition, type]);
+      addItem(position);
+    },
+    [screenToFlowPosition, type],
+  );
 
   /// Add edge with drag
-  const onConnect = useCallback((params: Connection) => {
-    const isActPair = isActivePair(params, nodes);
-    setIsRunningLayout(false);
+  const onConnect = useCallback(
+    (params: Connection) => {
+      const isActPair = isActivePair(params, nodes);
+      setIsRunningLayout(false);
 
-    setEdges(eds =>
-      addEdge({
-        ...params,
-        id: `E_${params.source}:${params.sourceHandle}-${params.target}:${params.targetHandle?.slice(0, -1)}`,
-        type: typeEdge,
-        animated: isActPair,
-        style: isActPair ? { stroke: 'blue' } : {}
-      }, eds)
-    );
-  }, [typeEdge, nodes]);
+      setEdges(eds =>
+        addEdge(
+          {
+            ...params,
+            id: `E_${params.source}:${params.sourceHandle}-${
+              params.target
+            }:${params.targetHandle?.slice(0, -1)}`,
+            type: typeEdge,
+            animated: isActPair,
+            style: isActPair ? { stroke: 'blue' } : {},
+          },
+          eds,
+        ),
+      );
+    },
+    [typeEdge, nodes],
+  );
 
   const onDragOver = useCallback((event: any) => {
     event.preventDefault();
@@ -257,7 +250,7 @@ export default (props: PropsFlow): JSX.Element => {
       setPorts.add(port.id.trim());
     }
 
-    return setPorts.size === nodeAuxiliaryPorts.length + 1
+    return setPorts.size === nodeAuxiliaryPorts.length + 1;
   }, [nodeId, nodeLabel, nodePrincipalPort, nodeAuxiliaryPorts]);
 
   // Selected node
@@ -289,27 +282,31 @@ export default (props: PropsFlow): JSX.Element => {
     setNodePrincipalPort(nodeSelected.data.principalPort);
     setNodeAuxiliaryLinks(Array(auxPorts.length).fill(defPointCon));
 
-    edges.forEach((edge) => {
+    edges.forEach(edge => {
       if (edge.source === nodeSelected.id) {
         if (nodeSelected.data.principalPort.id === edge.sourceHandle) {
-          setNodePrincipalLink({ idNode: edge.target, idPort: getTargetHandle(edge) })
+          setNodePrincipalLink({ idNode: edge.target, idPort: getTargetHandle(edge) });
         } else {
           const indexAuxPort = auxPorts.findIndex(port => port.id === edge.sourceHandle);
           setNodeAuxiliaryLinks(links =>
             links.map((port, i) =>
-              i === indexAuxPort ? { ...port, idNode: edge.target, idPort: getTargetHandle(edge) } : port
-            )
+              i === indexAuxPort
+                ? { ...port, idNode: edge.target, idPort: getTargetHandle(edge) }
+                : port,
+            ),
           );
         }
       } else if (edge.target === nodeSelected.id) {
         if (nodeSelected.data.principalPort.id === getTargetHandle(edge)) {
-          setNodePrincipalLink({ idNode: edge.source, idPort: edge.sourceHandle! })
+          setNodePrincipalLink({ idNode: edge.source, idPort: edge.sourceHandle ?? '' });
         } else {
           const indexAuxPort = auxPorts.findIndex(port => port.id === getTargetHandle(edge));
           setNodeAuxiliaryLinks(links =>
             links.map((port, i) =>
-              i === indexAuxPort ? { ...port, idNode: edge.source, idPort: edge.sourceHandle! } : port
-            )
+              i === indexAuxPort
+                ? { ...port, idNode: edge.source, idPort: edge.sourceHandle ?? '' }
+                : port,
+            ),
           );
         }
       }
@@ -370,22 +367,20 @@ export default (props: PropsFlow): JSX.Element => {
   }, [resetNet, setNetFirst, netsSaved, indexCur, modeNet]);
 
   useEffect(() => {
-    setNodes(nds =>
-      nds.map(node => ({ ...node, type: typeNode }))
-    );
+    setNodes(nds => nds.map(node => ({ ...node, type: typeNode })));
   }, [typeNode]);
 
   useEffect(() => {
-    setEdges(eds =>
-      eds.map(edge => ({ ...edge, type: typeEdge }))
-    );
+    setEdges(eds => eds.map(edge => ({ ...edge, type: typeEdge })));
   }, [typeEdge]);
 
-  useEffect(() => { fitView() }, [indexCur, modeNet]);
+  useEffect(() => {
+    fitView();
+  }, [indexCur, modeNet]);
 
   return (
-    <div className='dndflow'>
-      <div className='reactflow-wrapper' ref={reactFlowWrapper}>
+    <div className="dndflow">
+      <div className="reactflow-wrapper" ref={reactFlowWrapper}>
         <ReactFlow
           nodes={nodes}
           edges={edges}
@@ -398,7 +393,7 @@ export default (props: PropsFlow): JSX.Element => {
           onDrop={onDrop}
           onDragStart={onDragStart}
           onDragOver={onDragOver}
-          attributionPosition='bottom-left'
+          attributionPosition="bottom-left"
           fitView
           // If layout is running
           nodesDraggable={!isRunningLayout}
@@ -411,7 +406,9 @@ export default (props: PropsFlow): JSX.Element => {
           zoomOnPinch={!isRunningLayout}
           zoomOnDoubleClick={!isRunningLayout}
           connectOnClick={modeNet === NetMode.edit && !isRunningLayout}
-          deleteKeyCode={modeNet === NetMode.edit && !isRunningLayout ? ['Delete', 'Backspace'] : null}
+          deleteKeyCode={
+            modeNet === NetMode.edit && !isRunningLayout ? ['Delete', 'Backspace'] : null
+          }
         >
           {modeNet == NetMode.edit && (
             <MenuConfig
@@ -461,8 +458,12 @@ export default (props: PropsFlow): JSX.Element => {
               fileOpened={fileOpened}
               setTypeNode={setTypeNode}
               setTypeEdge={setTypeEdge}
-              setModeNet={(mode) => {
-                if (mode === NetMode.comparison && indexCur === netsSaved.length - 1 && indexCur > 0) {
+              setModeNet={mode => {
+                if (
+                  mode === NetMode.comparison &&
+                  indexCur === netsSaved.length - 1 &&
+                  indexCur > 0
+                ) {
                   const indexNew = indexCur - 1;
                   setNetIndexCur(indexNew, netsSaved[indexNew]);
                 }
@@ -477,4 +478,4 @@ export default (props: PropsFlow): JSX.Element => {
       </div>
     </div>
   );
-}
+};

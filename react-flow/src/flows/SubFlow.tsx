@@ -14,10 +14,10 @@ import '@xyflow/react/dist/style.css';
 
 import { type Agent } from '../nets';
 
+import { nodeTypes, edgeTypes } from '../utils/typesElements';
+
 import { SimplifyMenuControl, NetMode, compareNet } from '../views/MenuControl';
 import MenuLayouts from '../views/MenuLayouts';
-
-import { nodeTypes, edgeTypes } from './Flow';
 
 const indexNet = 1;
 
@@ -104,21 +104,21 @@ export default (props: PropsSubFlow): JSX.Element => {
     setNetCur(netsSaved[indexNew]);
   }, [netsSaved, modeNet]);
 
-  useEffect(() => { toggleNet() }, [toggleNet, indexCur]);
+  useEffect(() => {
+    toggleNet();
+  }, [toggleNet, indexCur]);
 
   useEffect(() => {
-    setNodes(nds =>
-      nds.map(node => ({ ...node, type: typeNode }))
-    );
+    setNodes(nds => nds.map(node => ({ ...node, type: typeNode })));
   }, [typeNode]);
 
   useEffect(() => {
-    setEdges(eds =>
-      eds.map(edge => ({ ...edge, type: typeEdge }))
-    );
+    setEdges(eds => eds.map(edge => ({ ...edge, type: typeEdge })));
   }, [typeEdge]);
 
-  useEffect(() => { fitView() }, [indexCur, modeNet]);
+  useEffect(() => {
+    fitView();
+  }, [indexCur, modeNet]);
 
   return (
     <ReactFlow
@@ -129,7 +129,7 @@ export default (props: PropsSubFlow): JSX.Element => {
       onInit={setRfInstance}
       onNodesChange={onNodesChange}
       onEdgesChange={onEdgesChange}
-      attributionPosition='bottom-left'
+      attributionPosition="bottom-left"
       fitView
       // If layout is running
       nodesDraggable={!isRunningLayout}
@@ -156,10 +156,10 @@ export default (props: PropsSubFlow): JSX.Element => {
           isRunningLayout={isRunningLayouts[0] || isRunningLayouts[1]}
           goToEditNet={goToEditNet}
         />
-        <Panel position='bottom-left' className='panel-info' >
-          <div className='item-info'>
-            <label className='label-info'>File:</label>
-            <label className='label-info'>{fileOpened}</label>
+        <Panel position="bottom-left" className="panel-info">
+          <div className="item-info">
+            <label className="label-info">File:</label>
+            <label className="label-info">{fileOpened}</label>
           </div>
         </Panel>
       </div>
@@ -167,4 +167,4 @@ export default (props: PropsSubFlow): JSX.Element => {
       <MiniMap />
     </ReactFlow>
   );
-}
+};

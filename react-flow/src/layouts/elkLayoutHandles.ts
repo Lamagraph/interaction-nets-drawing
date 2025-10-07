@@ -1,9 +1,20 @@
 // https://reactflow.dev/examples/layout/elkjs-multiple-handles
 
-import { type Edge } from '@xyflow/react';
+import { Position, type Edge } from '@xyflow/react';
 import ELK from 'elkjs/lib/elk.bundled.js';
 
+import { mapTypePos, nodeTypes } from '../utils/typesElements';
+
 import { type Agent } from '../nets';
+
+type NodeType = keyof typeof nodeTypes;
+
+const mapPosSide = {
+    [Position.Top]: 'NORTH',
+    [Position.Bottom]: 'SOUTH',
+    [Position.Left]: 'WEST',
+    [Position.Right]: 'EAST',
+};
 
 // elk layouting options can be found here:
 // https://www.eclipse.org/elk/reference/algorithms/org-eclipse-elk-layered.html
@@ -18,6 +29,12 @@ const layoutOptions = {
 const elk = new ELK();
 
 export const getLayoutedNodes = async (nodes: Agent[], edges: Edge[]): Promise<Agent[]> => {
+    if (nodes.length === 0) return [];
+
+    const typeNode = (nodes[0].type as NodeType) ?? 'agent';
+    const posAuxP = mapPosSide[mapTypePos[typeNode][0]];
+    const posPrP = mapPosSide[mapTypePos[typeNode][1]];
+
     const graph = {
         id: 'root',
         layoutOptions,
@@ -26,13 +43,13 @@ export const getLayoutedNodes = async (nodes: Agent[], edges: Edge[]): Promise<A
                 {
                     id: port.id,
                     properties: {
-                        side: 'NORTH',
+                        side: posAuxP,
                     },
                 },
                 {
                     id: `${port.id}t`,
                     properties: {
-                        side: 'NORTH',
+                        side: posAuxP,
                     },
                 },
             ]);
@@ -41,13 +58,13 @@ export const getLayoutedNodes = async (nodes: Agent[], edges: Edge[]): Promise<A
                 {
                     id: n.data.principalPort.id,
                     properties: {
-                        side: 'SOUTH',
+                        side: posPrP,
                     },
                 },
                 {
                     id: `${n.data.principalPort.id}t`,
                     properties: {
-                        side: 'SOUTH',
+                        side: posPrP,
                     },
                 },
             ];

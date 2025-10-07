@@ -3,7 +3,7 @@ import { type Node, type Edge, type Connection } from '@xyflow/react';
 export interface PointConnection {
     idNode: string;
     idPort: string;
-};
+}
 
 export type Port = {
     id: string;
@@ -35,19 +35,22 @@ export function isActivePair(params: Edge | Connection, nodes: Agent[]): boolean
     for (const node of nodes) {
         if (node.id === params.source && node.data.principalPort.id === params.sourceHandle) {
             countPrPort++;
-        } else if (node.id === params.target && node.data.principalPort.id === getTargetHandle(params)) {
+        } else if (
+            node.id === params.target &&
+            node.data.principalPort.id === getTargetHandle(params)
+        ) {
             countPrPort++;
         }
         if (countPrPort === 2) return true;
     }
     return false;
-};
+}
 
 export async function getObjectsFromFile(file: File): Promise<any> {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
 
-        reader.onload = (event) => {
+        reader.onload = event => {
             try {
                 const dataJson = JSON.parse(event.target?.result as string);
                 resolve(dataJson);
@@ -90,7 +93,8 @@ export async function parseJSON(
             if (
                 validate(nodeObj.id) &&
                 (validate(nodeObj.data?.label) || validate(nodeObj.label)) &&
-                (Array.isArray(nodeObj.data?.auxiliaryPorts) || Array.isArray(nodeObj.auxiliaryPorts)) &&
+                (Array.isArray(nodeObj.data?.auxiliaryPorts) ||
+                    Array.isArray(nodeObj.auxiliaryPorts)) &&
                 (validate(nodeObj.data?.principalPort.id) || validate(nodeObj.principalPort.id))
             ) {
                 nodes.push({
@@ -98,11 +102,11 @@ export async function parseJSON(
                     data: nodeObj.data ?? {
                         label: nodeObj.label,
                         auxiliaryPorts: nodeObj.auxiliaryPorts,
-                        principalPort: nodeObj.principalPort
+                        principalPort: nodeObj.principalPort,
                     },
                     position: nodeObj.position || {
                         x: 50 + 300 * Math.floor(index / 5),
-                        y: 50 + 120 * (index % 5)
+                        y: 50 + 120 * (index % 5),
                     },
                     type: typeNode,
                 });
@@ -117,20 +121,23 @@ export async function parseJSON(
 
         for (const [, edgeObj] of edgesObj) {
             if (
-                validate(edgeObj.source) && validate(edgeObj.target) &&
+                validate(edgeObj.source) &&
+                validate(edgeObj.target) &&
                 (validate(edgeObj.sourcePort) || validate(edgeObj.sourceHandle)) &&
                 (validate(edgeObj.targetPort) || validate(edgeObj.targetHandle))
             ) {
                 const sourceHandle = edgeObj.sourcePort || edgeObj.sourceHandle;
                 const targetHandle = edgeObj.targetPort || edgeObj.targetHandle;
                 edges.push({
-                    id: edgeObj.id || `E_${edgeObj.source}:${sourceHandle}-${edgeObj.target}:${targetHandle}`,
+                    id:
+                        edgeObj.id ||
+                        `E_${edgeObj.source}:${sourceHandle}-${edgeObj.target}:${targetHandle}`,
                     source: edgeObj.source,
                     target: edgeObj.target,
                     sourceHandle: sourceHandle,
                     targetHandle: `${targetHandle}t`,
                     animated: edgeObj.activePair ?? edgeObj.animated ?? false,
-                    style: (edgeObj.activePair || edgeObj.animated) ? { stroke: 'blue' } : {},
+                    style: edgeObj.activePair || edgeObj.animated ? { stroke: 'blue' } : {},
                     type: typeEdge,
                 });
             } else {

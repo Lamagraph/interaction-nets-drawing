@@ -22,8 +22,8 @@ export const getLayoutedNodes = (): { toggle: () => void } => {
     const draggingNodeRef = useRef(null);
     const dragEvents = useMemo(
         () => ({
-            start: (_event, node) => (draggingNodeRef.current = node),
-            drag: (_event, node) => (draggingNodeRef.current = node),
+            start: (_event: any, node: any) => (draggingNodeRef.current = node),
+            drag: (_event: any, node: any) => (draggingNodeRef.current = node),
             stop: () => (draggingNodeRef.current = null),
         }),
         [],
@@ -87,7 +87,9 @@ export const getLayoutedNodes = (): { toggle: () => void } => {
             }
 
             isRunning = !isRunning;
-            isRunning && window.requestAnimationFrame(() => tick(nodes));
+            if (isRunning) {
+                window.requestAnimationFrame(() => tick(nodes));
+            }
         };
 
         return { toggle };
