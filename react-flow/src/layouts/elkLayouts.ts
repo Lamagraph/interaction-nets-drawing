@@ -19,12 +19,16 @@ export const elkOptions = {
     'elk.spacing.nodeNode': '80',
 };
 
-export const getLayoutedNodes = async (nodes: Agent[], edges: Edge[], options = {}): Promise<Agent[]> => {
+export const getLayoutedNodes = async (
+    nodes: Agent[],
+    edges: Edge[],
+    options = {},
+): Promise<Agent[]> => {
     const isHorizontal = options?.['elk.direction'] === 'RIGHT';
     const graph = {
         id: 'root',
         layoutOptions: options,
-        children: nodes.map((node) => ({
+        children: nodes.map(node => ({
             ...node,
             targetPosition: isHorizontal ? 'left' : 'top',
             sourcePosition: isHorizontal ? 'right' : 'bottom',
@@ -37,8 +41,8 @@ export const getLayoutedNodes = async (nodes: Agent[], edges: Edge[], options = 
 
     const layoutedGraph = await elk.layout(graph);
 
-    const layoutedNodes: Agent[] = nodes.map((node) => {
-        const layoutedNode = layoutedGraph.children?.find((lgNode) => lgNode.id === node.id);
+    const layoutedNodes: Agent[] = nodes.map(node => {
+        const layoutedNode = layoutedGraph.children?.find(lgNode => lgNode.id === node.id);
 
         return {
             ...node,

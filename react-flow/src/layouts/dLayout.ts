@@ -29,12 +29,12 @@ export const getLayoutedNodes = (nodes: Agent[], edges: Edge[]): Agent[] => {
             id: rootId,
             data: { label: '' },
             position: { x: 0, y: 0 },
-            style: { visibility: 'hidden' }
+            style: { visibility: 'hidden' },
         };
 
         const newEdges = potentialRoots.map(node => ({
             source: rootId,
-            target: node.id
+            target: node.id,
         }));
 
         nodesToLayout = [artificialRoot, ...nodes];
@@ -42,15 +42,15 @@ export const getLayoutedNodes = (nodes: Agent[], edges: Edge[]): Agent[] => {
     }
 
     const hierarchy = stratify()
-        .id((node) => node.id)
-        .parentId((node) => edgesToLayout.find((edge) => edge.target === node.id)?.source);
+        .id(node => node.id)
+        .parentId(node => edgesToLayout.find(edge => edge.target === node.id)?.source);
 
     const root: HierarchyNode<Agent> = hierarchy(nodesToLayout);
     const layout = g.nodeSize([width * 2, height * 2])(root);
 
     const resultNodes: Agent[] = layout
         .descendants()
-        .map((node) => ({ ...node.data, position: { x: node.x, y: node.y } }))
+        .map(node => ({ ...node.data, position: { x: node.x, y: node.y } }))
         .filter(node => node.id !== 'artificial-root');
 
     return resultNodes;

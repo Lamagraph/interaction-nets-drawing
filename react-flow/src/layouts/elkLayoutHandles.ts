@@ -21,7 +21,7 @@ export const getLayoutedNodes = async (nodes: Agent[], edges: Edge[]): Promise<A
     const graph = {
         id: 'root',
         layoutOptions,
-        children: nodes.map((n) => {
+        children: nodes.map(n => {
             const targetPorts = n.data.auxiliaryPorts.flatMap(port => [
                 {
                     id: port.id,
@@ -34,7 +34,7 @@ export const getLayoutedNodes = async (nodes: Agent[], edges: Edge[]): Promise<A
                     properties: {
                         side: 'NORTH',
                     },
-                }
+                },
             ]);
 
             const sourcePorts = [
@@ -42,14 +42,14 @@ export const getLayoutedNodes = async (nodes: Agent[], edges: Edge[]): Promise<A
                     id: n.data.principalPort.id,
                     properties: {
                         side: 'SOUTH',
-                    }
+                    },
                 },
                 {
                     id: `${n.data.principalPort.id}t`,
                     properties: {
                         side: 'SOUTH',
-                    }
-                }
+                    },
+                },
             ];
 
             return {
@@ -62,7 +62,7 @@ export const getLayoutedNodes = async (nodes: Agent[], edges: Edge[]): Promise<A
                 ports: [{ id: n.id }, ...targetPorts, ...sourcePorts],
             };
         }),
-        edges: edges.map((e) => ({
+        edges: edges.map(e => ({
             id: e.id,
             sources: [e.sourceHandle || e.source],
             targets: [e.targetHandle || e.target],
@@ -71,8 +71,8 @@ export const getLayoutedNodes = async (nodes: Agent[], edges: Edge[]): Promise<A
 
     const layoutedGraph = await elk.layout(graph);
 
-    const layoutedNodes: Agent[] = nodes.map((node) => {
-        const layoutedNode = layoutedGraph.children?.find((lgNode) => lgNode.id === node.id);
+    const layoutedNodes: Agent[] = nodes.map(node => {
+        const layoutedNode = layoutedGraph.children?.find(lgNode => lgNode.id === node.id);
 
         return {
             ...node,

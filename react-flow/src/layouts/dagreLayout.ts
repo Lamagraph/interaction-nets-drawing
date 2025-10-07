@@ -14,17 +14,17 @@ export const getLayoutedNodes = (nodes: Agent[], edges: Edge[], direction = 'TB'
     const isHorizontal = direction === 'LR';
     dagreGraph.setGraph({ rankdir: direction });
 
-    nodes.forEach((node) => {
+    nodes.forEach(node => {
         dagreGraph.setNode(node.id, { width: nodeWidth, height: nodeHeight });
     });
 
-    edges.forEach((edge) => {
+    edges.forEach(edge => {
         dagreGraph.setEdge(edge.source, edge.target);
     });
 
     dagre.layout(dagreGraph);
 
-    const newNodes = nodes.map((node) => {
+    const newNodes = nodes.map(node => {
         const nodeWithPosition = dagreGraph.node(node.id);
         const newNode: Agent = {
             ...node,

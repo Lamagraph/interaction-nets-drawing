@@ -29,7 +29,7 @@ export default (props: HandleProps): JSX.Element => {
     const idsEdgeInvalid: string[] = [];
     const connects = [...connectionsS, ...connectionsT];
     connects.forEach(ed => {
-      if (ed.source === ed.target) idsEdgeInvalid.push(ed.edgeId)
+      if (ed.source === ed.target) idsEdgeInvalid.push(ed.edgeId);
     });
 
     if (idsEdge.length > 1) {
@@ -44,13 +44,10 @@ export default (props: HandleProps): JSX.Element => {
 
   return (
     <div>
+      <Handle {...props} isConnectable={!isNotConnectable} />
       <Handle
         {...props}
-        isConnectable={!isNotConnectable}
-      />
-      <Handle
-        {...props}
-        type='target'
+        type="target"
         key={`${props.id}t`}
         id={`${props.id}t`}
         isConnectable={!isNotConnectable}

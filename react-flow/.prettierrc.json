@@ -1,0 +1,25 @@
+{
+  "tabWidth": 4,
+  "semi": true,
+  "singleQuote": true,
+  "trailingComma": "all",
+  "bracketSpacing": true,
+  "bracketSameLine": false,
+  "arrowParens": "avoid",
+  "printWidth": 100,
+  "endOfLine": "crlf",
+  "overrides": [
+    {
+      "files": ["*.tsx", "*.jsx", "*.css", "*.html", "*.json"],
+      "options": {
+        "tabWidth": 2
+      }
+    },
+    {
+      "files": ["tsconfig.json"],
+      "options": {
+        "parser": "json"
+      }
+    }
+  ]
+}

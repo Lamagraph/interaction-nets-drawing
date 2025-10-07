@@ -1,4 +1,3 @@
-
 import { Panel } from '@xyflow/react';
 
 import { NetMode } from './MenuControl';
@@ -13,14 +12,7 @@ interface PropsMenuInfo {
 }
 
 export default (props: PropsMenuInfo): JSX.Element => {
-  const {
-    modeNet,
-    fileOpened,
-    setTypeNode,
-    setTypeEdge,
-    setModeNet,
-    isRunningLayout,
-  } = props;
+  const { modeNet, fileOpened, setTypeNode, setTypeEdge, setModeNet, isRunningLayout } = props;
 
   const onChangeMode = (event: any) => {
     setModeNet(Number(event.target.value));
@@ -33,14 +25,14 @@ export default (props: PropsMenuInfo): JSX.Element => {
   };
 
   return (
-    <Panel position='bottom-left' className='panel-info' >
+    <Panel position="bottom-left" className="panel-info">
       {modeNet !== NetMode.edit && (
-        <div className='item-info'>
-          <label className='label-info'>Mode:</label>
+        <div className="item-info">
+          <label className="label-info">Mode:</label>
           <select
-            className='xy-theme__select select-info'
+            className="xy-theme__select select-info"
             onChange={onChangeMode}
-            data-testid='colormode-select'
+            data-testid="colormode-select"
             disabled={isRunningLayout}
           >
             <option value={NetMode.comparison}>comparison</option>
@@ -49,39 +41,39 @@ export default (props: PropsMenuInfo): JSX.Element => {
         </div>
       )}
 
-      <div className='item-info'>
-        <label className='label-info'>Node:</label>
+      <div className="item-info">
+        <label className="label-info">Node:</label>
         <select
-          className='xy-theme__select select-info'
+          className="xy-theme__select select-info"
           onChange={onChangeNode}
-          data-testid='colormode-select'
+          data-testid="colormode-select"
           disabled={isRunningLayout}
         >
-          <option value='agent'>horizontal</option>
-          <option value='agentVert'>vertical</option>
-          <option value='agentGen'>general</option>
+          <option value="agent">horizontal</option>
+          <option value="agentVert">vertical</option>
+          <option value="agentGen">general</option>
         </select>
       </div>
 
-      <div className='item-info'>
-        <label className='label-info'>Edge:</label>
+      <div className="item-info">
+        <label className="label-info">Edge:</label>
         <select
-          className='xy-theme__select select-info'
+          className="xy-theme__select select-info"
           onChange={onChangeEdge}
-          data-testid='colormode-select'
+          data-testid="colormode-select"
           disabled={isRunningLayout}
         >
-          <option value='bezier'>bezier</option>
-          <option value='smoothstep'>smoothstep</option>
-          <option value='smartBezier'>smart bezier</option>
-          <option value='smartStraight'>smart straight</option>
-          <option value='smartStep'>smart step</option>
+          <option value="bezier">bezier</option>
+          <option value="smoothstep">smoothstep</option>
+          <option value="smartBezier">smart bezier</option>
+          <option value="smartStraight">smart straight</option>
+          <option value="smartStep">smart step</option>
         </select>
       </div>
 
-      <div className='item-info'>
-        <label className='label-info'>File:</label>
-        <label className='label-info'>{fileOpened}</label>
+      <div className="item-info">
+        <label className="label-info">File:</label>
+        <label className="label-info">{fileOpened}</label>
       </div>
     </Panel>
   );

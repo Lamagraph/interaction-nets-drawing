@@ -1,19 +1,9 @@
-import { useCallback, useState } from 'react';
-import {
-  ControlButton,
-  Controls,
-  Position,
-  type Edge,
-} from '@xyflow/react';
+import { useCallback } from 'react';
+import { ControlButton, Controls, type Edge } from '@xyflow/react';
 
-import {
-  DownloadIcon,
-  UploadIcon,
-  ArrowRightIcon,
-  ArrowLeftIcon,
-} from '@radix-ui/react-icons';
-import { FaEdit, FaSave } from "react-icons/fa";
-import { RiArrowGoBackLine } from "react-icons/ri";
+import { DownloadIcon, UploadIcon, ArrowRightIcon, ArrowLeftIcon } from '@radix-ui/react-icons';
+import { FaEdit, FaSave } from 'react-icons/fa';
+import { RiArrowGoBackLine } from 'react-icons/ri';
 
 import '@xyflow/react/dist/style.css';
 
@@ -22,8 +12,8 @@ import { type Agent, getObjectsFromFile, parseJSON } from '../nets';
 export enum NetMode {
   edit = 0,
   sequence = 1,
-  comparison = 2
-};
+  comparison = 2,
+}
 
 const allowedKeys = [
   'nodes',
@@ -44,15 +34,15 @@ const allowedKeys = [
 ];
 
 const mapKeys = {
-  'animated': 'activePair',
-  'sourceHandle': 'sourcePort',
-  'targetHandle': 'targetPort',
+  animated: 'activePair',
+  sourceHandle: 'sourcePort',
+  targetHandle: 'targetPort',
 };
 
-const modeDefault = NetMode.comparison
+const modeDefault = NetMode.comparison;
 
-const downloadNet = (rfInstance: any, fileOpened: string) => {
-  const transformObject = (obj) => {
+const downloadNet = (rfInstance: unknown, fileOpened: string) => {
+  const transformObject = obj => {
     if (Array.isArray(obj)) {
       return obj.map(transformObject);
     } else if (obj && typeof obj === 'object') {
@@ -60,20 +50,18 @@ const downloadNet = (rfInstance: any, fileOpened: string) => {
 
       for (const [key, value] of Object.entries<string>(obj)) {
         if (key === 'data') {
-          Object.assign(result, transformObject(value))
+          Object.assign(result, transformObject(value));
         } else if (allowedKeys.includes(key)) {
           const newKey = mapKeys[key] || key;
-          const newValue = key === 'targetHandle'
-            ? value.slice(0, -1)
-            : transformObject(value);
-          result[newKey] = newValue
+          const newValue = key === 'targetHandle' ? value.slice(0, -1) : transformObject(value);
+          result[newKey] = newValue;
         }
       }
 
       return result;
     }
     return obj;
-  }
+  };
 
   if (rfInstance) {
     const flow = rfInstance.toObject();
@@ -111,8 +99,13 @@ export function compareNet(props: PropsUpdateNet): [Agent[], Edge[], string] | u
   const updateNode = (node: Agent) => {
     const nodeExisted = netTwo[0].find(n => n.id === node.id);
     return nodeExisted
-      ? { ...nodeExisted, style: node.style, type: typeNode, position: isPinPos ? node.position : nodeExisted.position }
-      : { ...node, style: { ...node.style, backgroundColor: color }, type: typeNode }
+      ? {
+          ...nodeExisted,
+          style: node.style,
+          type: typeNode,
+          position: isPinPos ? node.position : nodeExisted.position,
+        }
+      : { ...node, style: { ...node.style, backgroundColor: color }, type: typeNode };
   };
 
   const nodesComp: Agent[] = [];
@@ -125,7 +118,7 @@ export function compareNet(props: PropsUpdateNet): [Agent[], Edge[], string] | u
     const edgeExisted = netTwo[1].find(e => e.id === edge.id);
     return edgeExisted
       ? { ...edgeExisted, style: edge.style, type: typeEdge }
-      : { ...edge, style: { ...edge.style, stroke: color, }, type: typeEdge }
+      : { ...edge, style: { ...edge.style, stroke: color }, type: typeEdge };
   };
 
   const edgesComp: Edge[] = [];
@@ -139,18 +132,13 @@ export function compareNet(props: PropsUpdateNet): [Agent[], Edge[], string] | u
 
 interface PropsSimplifyMenuControl {
   fileOpened: string;
-  rfInstance: any;
+  rfInstance: unknown;
   isRunningLayout: boolean;
   goToEditNet: () => void;
 }
 
 export const SimplifyMenuControl = (props: PropsSimplifyMenuControl): JSX.Element => {
-  const {
-    fileOpened,
-    rfInstance,
-    isRunningLayout,
-    goToEditNet,
-  } = props;
+  const { fileOpened, rfInstance, isRunningLayout, goToEditNet } = props;
 
   const onDownload = useCallback(() => {
     downloadNet(rfInstance, fileOpened);
@@ -158,16 +146,12 @@ export const SimplifyMenuControl = (props: PropsSimplifyMenuControl): JSX.Elemen
 
   return (
     <Controls>
-      <ControlButton
-        title='Edit net'
-        disabled={isRunningLayout}
-        onClick={goToEditNet}
-      ><FaEdit /></ControlButton>
-      <ControlButton
-        title='Download the Net'
-        disabled={isRunningLayout}
-        onClick={onDownload}
-      ><DownloadIcon /></ControlButton>
+      <ControlButton title="Edit net" disabled={isRunningLayout} onClick={goToEditNet}>
+        <FaEdit />
+      </ControlButton>
+      <ControlButton title="Download the Net" disabled={isRunningLayout} onClick={onDownload}>
+        <DownloadIcon />
+      </ControlButton>
     </Controls>
   );
 };
@@ -175,9 +159,9 @@ export const SimplifyMenuControl = (props: PropsSimplifyMenuControl): JSX.Elemen
 interface PropsMenuControl {
   nodes: Agent[];
   edges: Edge[];
-  typeNode: string,
+  typeNode: string;
   typeEdge: string;
-  rfInstance: any;
+  rfInstance: unknown;
   isRunningLayout: boolean;
   filesOpened: [string, string];
   modeNet: NetMode;
@@ -220,15 +204,16 @@ export default (props: PropsMenuControl) => {
 
     const nets: [Agent[], Edge[], string][] = [];
 
-    input.onchange = async (event) => {
+    input.onchange = async event => {
       const fileList = (event.target as HTMLInputElement).files;
       if (!fileList || fileList.length === 0) return;
 
-      const files = Array.from(fileList)
-        .sort((a, b) => a.name.localeCompare(b.name, undefined, {
+      const files = Array.from(fileList).sort((a, b) =>
+        a.name.localeCompare(b.name, undefined, {
           numeric: true,
-          sensitivity: 'base'
-        }));
+          sensitivity: 'base',
+        }),
+      );
 
       for (const file of files) {
         const net = await getObjectsFromFile(file);
@@ -247,22 +232,34 @@ export default (props: PropsMenuControl) => {
     input.click();
   }, [typeNode, typeEdge, modeNet]);
 
-  const toggleNet = useCallback((flag: boolean) => {
-    const indexNew = indexCur + (flag ? 1 : -1);
+  const toggleNet = useCallback(
+    (flag: boolean) => {
+      const indexNew = indexCur + (flag ? 1 : -1);
 
-    const netOne = netsSaved[indexNew];
-    const netTwo = modeNet === NetMode.sequence
-      ? [nodes, edges, filesOpened[0]] as [Agent[], Edge[], string]
-      : netsSaved[indexCur];
-    const isStepUp = modeNet === NetMode.sequence ? flag : Boolean(indexNet);
+      const netOne = netsSaved[indexNew];
+      const netTwo =
+        modeNet === NetMode.sequence
+          ? ([nodes, edges, filesOpened[0]] as [Agent[], Edge[], string])
+          : netsSaved[indexCur];
+      const isStepUp = modeNet === NetMode.sequence ? flag : Boolean(indexNet);
 
-    const netComp = compareNet({ netOne, netTwo, types: [typeNode, typeEdge], isStepUp, isPinPos: false });
-    if (netComp) setNetIndexCur(indexNew, netComp);
-  }, [netsSaved, indexCur, nodes, edges, typeNode, typeEdge, modeNet, filesOpened, indexNet]);
+      const netComp = compareNet({
+        netOne,
+        netTwo,
+        types: [typeNode, typeEdge],
+        isStepUp,
+        isPinPos: false,
+      });
+      if (netComp) setNetIndexCur(indexNew, netComp);
+    },
+    [netsSaved, indexCur, nodes, edges, typeNode, typeEdge, modeNet, filesOpened, indexNet],
+  );
 
   const saveNetEdited = useCallback(() => {
     const index = indexCur - (filesOpened[0] === filesOpened[1] && indexCur > 0 ? 1 : 0);
-    setNetsSaved(nets => nets.map((net, i) => i === index ? [nodes, edges, filesOpened[0]] : net));
+    setNetsSaved(nets =>
+      nets.map((net, i) => (i === index ? [nodes, edges, filesOpened[0]] : net)),
+    );
   }, [indexCur, nodes, edges, filesOpened]);
 
   const goBackToNets = useCallback(() => {
@@ -273,56 +270,64 @@ export default (props: PropsMenuControl) => {
 
   return (
     <Controls>
-      {netsSaved.length > 0 && <>
-        {modeNet !== NetMode.edit ? (
+      {netsSaved.length > 0 && (
+        <>
+          {modeNet !== NetMode.edit ? (
+            <ControlButton
+              title="Edit net"
+              disabled={isRunningLayout}
+              onClick={() => setModeNet(NetMode.edit)}
+            >
+              <FaEdit />
+            </ControlButton>
+          ) : (
+            <>
+              <ControlButton title="Save" disabled={isRunningLayout} onClick={saveNetEdited}>
+                <FaSave />
+              </ControlButton>
+
+              <ControlButton
+                title="Go back to nets"
+                disabled={isRunningLayout}
+                onClick={goBackToNets}
+              >
+                <RiArrowGoBackLine />
+              </ControlButton>
+            </>
+          )}
+        </>
+      )}
+
+      {modeNet !== NetMode.edit && (
+        <>
           <ControlButton
-            title='Edit net'
-            disabled={isRunningLayout}
-            onClick={() => setModeNet(NetMode.edit)}
-          ><FaEdit /></ControlButton>
-        ) : <>
+            title="Next step"
+            disabled={
+              isRunningLayout ||
+              (modeNet === NetMode.sequence && indexCur >= netsSaved.length - 1) ||
+              (modeNet === NetMode.comparison && indexCur >= netsSaved.length - 2)
+            }
+            onClick={() => toggleNet(true)}
+          >
+            <ArrowRightIcon />
+          </ControlButton>
           <ControlButton
-            title='Save'
-            disabled={isRunningLayout}
-            onClick={saveNetEdited}
-          ><FaSave /></ControlButton>
+            title="Prev step"
+            disabled={isRunningLayout || indexCur <= 0}
+            onClick={() => toggleNet(false)}
+          >
+            <ArrowLeftIcon />
+          </ControlButton>
+        </>
+      )}
 
-          <ControlButton
-            title='Go back to nets'
-            disabled={isRunningLayout}
-            onClick={goBackToNets}
-          ><RiArrowGoBackLine /></ControlButton>
-        </>}
-      </>}
+      <ControlButton title="Upload Nets" disabled={isRunningLayout} onClick={onUpload}>
+        <UploadIcon />
+      </ControlButton>
 
-      {modeNet !== NetMode.edit && <>
-        <ControlButton
-          title='Next step'
-          disabled={
-            isRunningLayout ||
-            modeNet === NetMode.sequence && (indexCur >= netsSaved.length - 1) ||
-            modeNet === NetMode.comparison && (indexCur >= netsSaved.length - 2)
-          }
-          onClick={() => toggleNet(true)}
-        ><ArrowRightIcon /></ControlButton>
-        <ControlButton
-          title='Prev step'
-          disabled={isRunningLayout || (indexCur <= 0)}
-          onClick={() => toggleNet(false)}
-        ><ArrowLeftIcon /></ControlButton>
-      </>}
-
-      <ControlButton
-        title='Upload Nets'
-        disabled={isRunningLayout}
-        onClick={onUpload}
-      ><UploadIcon /></ControlButton>
-
-      <ControlButton
-        title='Download the Net'
-        disabled={isRunningLayout}
-        onClick={onDownload}
-      ><DownloadIcon /></ControlButton>
+      <ControlButton title="Download the Net" disabled={isRunningLayout} onClick={onDownload}>
+        <DownloadIcon />
+      </ControlButton>
     </Controls>
   );
 };

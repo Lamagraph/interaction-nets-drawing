@@ -1,18 +1,8 @@
 // https://reactflow.dev/learn/layouting/layouting#d3-force
 
 import { useMemo, useRef } from 'react';
-import {
-    useReactFlow,
-    useNodesInitialized,
-    type Edge
-} from '@xyflow/react';
-import {
-    forceSimulation,
-    forceLink,
-    forceManyBody,
-    forceX,
-    forceY,
-} from 'd3-force';
+import { useReactFlow, useNodesInitialized, type Edge } from '@xyflow/react';
+import { forceSimulation, forceLink, forceManyBody, forceX, forceY } from 'd3-force';
 
 import collide from './collide.js';
 import { type Agent } from '../nets';
@@ -25,9 +15,7 @@ const simulation = forceSimulation()
     .alphaTarget(0.05)
     .stop();
 
-export const getLayoutedNodes = (): (
-    { toggle: () => void }
-) => {
+export const getLayoutedNodes = (): { toggle: () => void } => {
     const { getNodes, getEdges, setNodes, fitView } = useReactFlow<Agent, Edge>();
     const nodesInitialized = useNodesInitialized();
 
@@ -59,7 +47,7 @@ export const getLayoutedNodes = (): (
 
             simulation.tick();
             setNodes(
-                nodes.map((node) => ({
+                nodes.map(node => ({
                     ...node,
                     position: { x: node.fx ?? node.x, y: node.fy ?? node.y },
                 })),
@@ -72,18 +60,18 @@ export const getLayoutedNodes = (): (
         };
 
         const toggle = () => {
-            const nodes = getNodes().map((node) => ({
+            const nodes = getNodes().map(node => ({
                 ...node,
                 x: node.position.x,
                 y: node.position.y,
             }));
             if (!nodesInitialized || nodes.length === 0) return {};
 
-            const edges = getEdges().map((edge) => edge);
+            const edges = getEdges().map(edge => edge);
             simulation.nodes(nodes).force(
                 'link',
                 forceLink(edges)
-                    .id((d) => d.id)
+                    .id(d => d.id)
                     .strength(0.05)
                     .distance(100),
             );
@@ -91,7 +79,7 @@ export const getLayoutedNodes = (): (
             if (!isRunning) {
                 const nds = getNodes();
                 nds.forEach((node, index) => {
-                    let simNode = nodes[index];
+                    const simNode = nodes[index];
                     Object.assign(simNode, node);
                     simNode.x = node.position.x;
                     simNode.y = node.position.y;

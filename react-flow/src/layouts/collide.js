@@ -4,11 +4,11 @@ import { quadtree } from 'd3-quadtree';
 
 export default () => {
     let nodes = [];
-    let force = (alpha) => {
+    let force = alpha => {
         const tree = quadtree(
             nodes,
-            (d) => d.x,
-            (d) => d.y,
+            d => d.x,
+            d => d.y,
         );
 
         for (const node of nodes) {
@@ -43,7 +43,7 @@ export default () => {
         }
     };
 
-    force.initialize = (newNodes) => (nodes = newNodes);
+    force.initialize = newNodes => (nodes = newNodes);
 
     return force;
-}
+};
