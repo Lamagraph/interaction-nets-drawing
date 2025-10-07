@@ -6,8 +6,10 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "lint": "eslint --fix .",
-    "format": "prettier --write './**/*.{js,jsx,ts,tsx,css,html,json}'"
+    "lint": "eslint .",
+    "lint:fix": "eslint --fix .",
+    "format": "prettier --check .",
+    "format:fix": "prettier --write ."
   },
   "dependencies": {
     "@dagrejs/dagre": "^1.1.5",

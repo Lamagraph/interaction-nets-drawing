@@ -24,4 +24,3 @@ export const mapTypePos = {
     agentVert: [Position.Left, Position.Right],
     agentGen: [Position.Left, Position.Right],
 };
-
