@@ -1,0 +1,55 @@
+name: Project react-flow
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ['react-flow', 'main']
+    paths: [react-flow/**]
+  pull_request:
+    branches: ['**']
+    paths: [react-flow/**]
+
+jobs:
+  formatter:
+    name: Formatter
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clone project
+        uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+
+      - name: Run Prettier
+        working-directory: ./react-flow
+        run: npm run format
+
+  linter:
+    name: Linter
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clone project
+        uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+
+      - name: Run ESlint
+        working-directory: ./react-flow
+        run: npm run lint
+
+  tests:
+    name: Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clone project
+        uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+
+      - name: Run Cypress
+        uses: cypress-io/github-action@v6
+        with:
+          working-directory: ./react-flow
+          build: npm run build
+          start: npm run dev
+          wait-on: 'http://localhost:5173'
+
