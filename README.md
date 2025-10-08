@@ -2,7 +2,7 @@
 
 **interaction-nets-drawing** — a tool for visualizations of [Interaction Nets](https://en.m.wikipedia.org/wiki/Interaction_nets). It has two different ways to show these nets:
 
-* [graphviz](./graphviz) is a script/utility that makes static representation of nets
+* [INviz](./INviz) is a script/utility that makes static representation of nets
 * [react-flow](./react-flow) is an interactive web application that enables real-time visualization, editing, and manipulation of nets
 
 ## Format

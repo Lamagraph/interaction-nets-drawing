@@ -1,13 +1,13 @@
-name: Project graphviz
+name: Project INviz
 
 on:
   workflow_dispatch:
   push:
     branches: ['graphviz', 'main']
-    paths: [graphviz/**]
+    paths: [INviz/**]
   pull_request:
     branches: ['**']
-    paths: [graphviz/**]
+    paths: [INviz/**]
 
 
 
@@ -22,7 +22,7 @@ jobs:
       - uses: ./.github/actions/setup-python
 
       - name: Run Ruff
-        working-directory: ./graphviz
+        working-directory: ./INviz
         run: ruff format --check .
 
   linter:
@@ -35,7 +35,7 @@ jobs:
       - uses: ./.github/actions/setup-python
 
       - name: Run Ruff
-        working-directory: ./graphviz
+        working-directory: ./INviz
         run: ruff check .
 
   tests:
@@ -48,5 +48,5 @@ jobs:
       - uses: ./.github/actions/setup-python
 
       - name: Run Pytest
-        working-directory: ./graphviz
+        working-directory: ./INviz
         run: python -m pytest -vv

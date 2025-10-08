@@ -1,6 +1,6 @@
-# graphviz
+# INviz
 
-**graphviz** — a script/utility for visualizations of interaction nets using [Graphviz](https://graphviz.org).
+**INviz** — a script/utility for visualizations of interaction nets using [Graphviz](https://graphviz.org).
 The utility creates a PNG file from a network in JSON-format using DOT.
 
 ## Usage
