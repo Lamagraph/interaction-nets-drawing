@@ -4,18 +4,19 @@ from typing import Any, Set
 import subprocess
 import json
 
-from Nets import Port, Node, Edge
+from graphviz.net import Port, Node, Edge
 
 ds = "  "
 tab = "    "
 
 
-def get_json(file: Path) -> Any:
+def get_json(file: Path) -> Any | None:
     try:
         with open(file, "r") as f:
             return json.load(f)
-    except:
-        print("Error: JSON syntax")
+    except Exception as e:
+        print(f"Error (JSON syntax): {e}")
+        return None
 
 
 def get_type_port(node, port) -> bool:
@@ -46,7 +47,8 @@ def gen_label_node(label: str, auxiliary_ports: Set[Port], principal_port: Port)
 
     lines += (
         ds
-        + f'<TR><TD BORDER="0" COLSPAN="2" PORT="{principal_port.id}">{principal_port.label  or ""}</TD></TR>\n'
+        + f'<TR><TD BORDER="0" COLSPAN="2" PORT="{principal_port.id}">'
+        + f"{principal_port.label or ''}</TD></TR>\n"
     )
 
     return lines + "</TABLE>>\n"
@@ -72,7 +74,8 @@ def gen_str_node(node_j, nodes: Set[Node]) -> str | None:
                 auxiliary_ports={Port(**port) for port in node_j.get("auxiliaryPorts")},
                 principal_port=Port(**node_j.get("principalPort")),
             )
-    except:
+    except Exception as e:
+        print(f"Error (node properties): {e}")
         return None
 
     nodes.add(node)
@@ -100,7 +103,8 @@ def gen_str_edge(edge_j, nodes: Set[Node]) -> str | None:
             target_port=edge_j.get("targetPort"),
             active_pair=edge_j.get("activePair"),
         )
-    except:
+    except Exception as e:
+        print(f"Error (edge properties): {e}")
         return None
 
     is_south_node_s, is_south_node_t = False, False
@@ -150,7 +154,8 @@ def gen_str_graph(name_graph: str, data_json: Any) -> str | None:
     lines = f"graph {name_graph}" + " {\n"
     lines += (
         tab
-        + 'node [shape=rect, style="filled, rounded", fillcolor=lightblue, margin=0, width=0.5, height=0.25];\n'
+        + 'node [shape=rect, style="filled, rounded", '
+        + "fillcolor=lightblue, margin=0, width=0.5, height=0.25];\n"
     )
     lines += tab + "edge [arrowtail=dot, arrowhead=dot, arrowsize=0.4];\n\n"
 
@@ -163,8 +168,7 @@ def gen_str_graph(name_graph: str, data_json: Any) -> str | None:
                 lines += gen
             else:
                 raise
-    except:
-        print("Error: illegal node data")
+    except Exception:
         return None
 
     try:
@@ -175,8 +179,7 @@ def gen_str_graph(name_graph: str, data_json: Any) -> str | None:
                 lines += gen
             else:
                 raise
-    except:
-        print("Error: illegal edge data")
+    except Exception:
         return None
 
     lines += "\n"
