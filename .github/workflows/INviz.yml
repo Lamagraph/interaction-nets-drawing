@@ -9,8 +9,6 @@ on:
     branches: ['**']
     paths: [INviz/**]
 
-
-
 jobs:
   formatter:
     name: Formatter
