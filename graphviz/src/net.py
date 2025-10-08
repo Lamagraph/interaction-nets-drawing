@@ -12,7 +12,7 @@ class Port:
         return hash(self.id)
 
     def __eq__(self, other):
-        if isinstance(other, Node):
+        if isinstance(other, Agent):
             return self.id == other.id
         return False
 
@@ -21,7 +21,7 @@ class Port:
 
 
 @dataclass
-class Node:
+class Agent:
     id: str
     label: str
     auxiliary_ports: Set[Port]
@@ -31,7 +31,7 @@ class Node:
         return hash(self.id)
 
     def __eq__(self, other):
-        if isinstance(other, Node):
+        if isinstance(other, Agent):
             return self.id == other.id
         return False
 
