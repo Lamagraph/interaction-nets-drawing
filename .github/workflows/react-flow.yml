@@ -1,13 +1,13 @@
-name: Project react-flow
+name: Project INflow
 
 on:
   workflow_dispatch:
   push:
     branches: ['react-flow', 'main']
-    paths: [react-flow/**]
+    paths: [INflow/**]
   pull_request:
     branches: ['**']
-    paths: [react-flow/**]
+    paths: [INflow/**]
 
 jobs:
   formatter:
@@ -20,7 +20,7 @@ jobs:
       - uses: ./.github/actions/setup-node
 
       - name: Run Prettier
-        working-directory: ./react-flow
+        working-directory: ./INflow
         run: npm run format
 
   linter:
@@ -33,7 +33,7 @@ jobs:
       - uses: ./.github/actions/setup-node
 
       - name: Run ESlint
-        working-directory: ./react-flow
+        working-directory: ./INflow
         run: npm run lint
 
   tests:
@@ -48,7 +48,7 @@ jobs:
       - name: Run Cypress
         uses: cypress-io/github-action@v6
         with:
-          working-directory: ./react-flow
+          working-directory: ./INflow
           build: npm run build
           start: npm run dev
           wait-on: 'http://localhost:5173'

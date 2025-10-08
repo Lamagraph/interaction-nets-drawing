@@ -1,5 +1,5 @@
 name: 'Setup Node.js'
-description: 'Setup Node.js environment for react-flow'
+description: 'Setup Node.js environment for INflow'
 
 runs:
   using: composite
@@ -9,9 +9,9 @@ runs:
       with:
         node-version: '20'
         cache: 'npm'
-        cache-dependency-path: './react-flow/package-lock.json'
+        cache-dependency-path: './INflow/package-lock.json'
 
     - name: Install dependencies
-      working-directory: ./react-flow
+      working-directory: ./INflow
       run: npm ci
       shell: bash

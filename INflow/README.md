@@ -1,6 +1,6 @@
-# react-flow
+# INflow
 
-**react-flow** — an interactive web application for visualizations of interaction nets using [React Flow](https://reactflow.dev).
+**INflow** — an interactive web application for visualizations of interaction nets using [React Flow](https://reactflow.dev).
 
 ## Install
 
@@ -14,6 +14,12 @@ When you launch the app, ["Adding to the list"](./saved-nets/list_add_1.json) ne
 
 ```shell
 npm run dev
+```
+
+### Run tests
+
+```shell
+npx cypress run  
 ```
 
 ## Drawing

@@ -107,7 +107,7 @@ export default (props: PropsMenuConfig): JSX.Element => {
                   {linkShowed && <th colSpan={2}></th>}
                   <th>
                     <a
-                      href="https://github.com/Friend-zva/interaction-nets-drawing/blob/main/react-flow/README.md"
+                      href="https://github.com/Friend-zva/interaction-nets-drawing/blob/main/INflow/README.md"
                       target="_blank"
                       className="xy-theme__label"
                       style={{ color: 'inherit' }}
