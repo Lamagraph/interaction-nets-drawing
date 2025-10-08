@@ -1,0 +1,23 @@
+{
+  "nodes": [
+    {
+      "id": "N1",
+      "label": "2",
+      "auxiliaryPorts": [],
+      "principalPort": {
+        "id": "P0",
+        "label": nul
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "E_N1:P0-N2:P1",
+      "source": "N1",
+      "target": "N2",
+      "sourcePort": "P0",
+      "targetPort": "P1",
+      "activePair": false
+    }
+  ]
+}

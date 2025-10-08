@@ -13,6 +13,12 @@ python3 main.py ../example-nets/list_add/list_add_1.json
 python3 main.py ../example-nets/list_add
 ```
 
+### Run tests
+
+```shell
+python3 -m pytest
+```
+
 ## Drawing
 
 ![Adding to the list](./nets-png/list_add_1.png)
