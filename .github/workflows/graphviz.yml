@@ -1,0 +1,52 @@
+name: Project graphviz
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ['graphviz', 'main']
+    paths: [graphviz/**]
+  pull_request:
+    branches: ['**']
+    paths: [graphviz/**]
+
+
+
+jobs:
+  formatter:
+    name: Formatter
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clone project
+        uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-python
+
+      - name: Run Ruff
+        working-directory: ./graphviz
+        run: ruff format --check .
+
+  linter:
+    name: Linter
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clone project
+        uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-python
+
+      - name: Run Ruff
+        working-directory: ./graphviz
+        run: ruff check .
+
+  tests:
+    name: Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clone project
+        uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-python
+
+      - name: Run Pytest
+        working-directory: ./graphviz
+        run: python -m pytest -vv

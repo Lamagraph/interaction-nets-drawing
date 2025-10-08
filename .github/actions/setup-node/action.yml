@@ -1,4 +1,4 @@
-name: 'Setup Node.js '
+name: 'Setup Node.js'
 description: 'Setup Node.js environment for react-flow'
 
 runs:
@@ -12,7 +12,6 @@ runs:
         cache-dependency-path: './react-flow/package-lock.json'
 
     - name: Install dependencies
-    - run: npm ci
       working-directory: ./react-flow
+      run: npm ci
       shell: bash
-
