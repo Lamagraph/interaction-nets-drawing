@@ -10,7 +10,7 @@
   "endOfLine": "crlf",
   "overrides": [
     {
-      "files": ["*.tsx", "*.jsx", "*.css", "*.html", "*.json"],
+      "files": ["*.tsx", "*.jsx", "*.css", "*.html", "*.json", "*.yml"],
       "options": {
         "tabWidth": 2
       }
