@@ -84,6 +84,7 @@ jobs:
       - name: Run Cypress
         uses: cypress-io/github-action@v6
         with:
+          working-directory: ./react-flow
           build: npm run build
           start: npm run dev
           wait-on: 'http://localhost:5173'
