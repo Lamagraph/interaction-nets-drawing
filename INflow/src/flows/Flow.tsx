@@ -331,6 +331,11 @@ export default (props: PropsFlow): JSX.Element => {
   const setNetFirst = useCallback(() => {
     const netLeft = netsSaved[indexCur];
     const netRight = netsSaved[indexCur + 1];
+    if (!netRight) {
+      setNetCur(netLeft);
+      return;
+    }
+
     const netComp = compareNet({
       netOne: netLeft,
       netTwo: netRight,

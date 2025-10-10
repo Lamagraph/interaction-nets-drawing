@@ -77,6 +77,8 @@ export default (props: PropsSubFlow): JSX.Element => {
   const toggleNet = useCallback(() => {
     const netLeft = netsSaved[indexCur];
     const netRight = netsSaved[indexCur + 1];
+    if (!netRight) return;
+
     const netComp = compareNet({
       netOne: netRight,
       netTwo: netLeft,
