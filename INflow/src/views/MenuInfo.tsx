@@ -1,6 +1,6 @@
 import { Panel } from '@xyflow/react';
 
-import { useApp } from '../utils/AppContext';
+import { useFlowState } from '../utils/FlowContext';
 
 import { NetMode } from './MenuControl';
 
@@ -11,7 +11,7 @@ interface PropsMenuInfo {
 }
 
 export default (props: PropsMenuInfo): JSX.Element => {
-  const { modeNet, setTypeNode, setTypeEdge } = useApp();
+  const { modeNet, setTypeNode, setTypeEdge } = useFlowState();
   const { fileOpened, setModeNet, isRunningLayout } = props;
 
   const onChangeMode = (event: any) => {

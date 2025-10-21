@@ -12,7 +12,7 @@ import {
 
 import '@xyflow/react/dist/style.css';
 
-import { useApp } from '../utils/AppContext';
+import { useFlowState } from '../utils/FlowContext';
 import { nodeTypes, edgeTypes } from '../utils/typesElements';
 
 import { type Agent } from '../nets';
@@ -34,7 +34,7 @@ export default (): JSX.Element => {
     typeEdge,
     filesOpened,
     setFilesOpened,
-  } = useApp();
+  } = useFlowState();
 
   // Main
 

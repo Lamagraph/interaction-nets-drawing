@@ -4,7 +4,7 @@ import { type Edge } from '@xyflow/react';
 import { NetMode } from '../views/MenuControl';
 import { type Agent } from '../nets';
 
-interface AppContextType {
+interface FlowContextType {
   netsSaved: [Agent[], Edge[], string][];
   setNetsSaved: React.Dispatch<React.SetStateAction<[Agent[], Edge[], string][]>>;
   indexCur: number;
@@ -21,9 +21,9 @@ interface AppContextType {
   setFilesOpened: React.Dispatch<React.SetStateAction<[string, string]>>;
 }
 
-export const AppContext = createContext<AppContextType | null>(null);
+export const FlowContext = createContext<FlowContextType | null>(null);
 
-export const AppProvider = ({ children }: { children: JSX.Element }): JSX.Element => {
+export const FlowProvider = ({ children }: { children: JSX.Element }): JSX.Element => {
   // Several nets
 
   const [netsSaved, setNetsSaved] = useState<[Agent[], Edge[], string][]>([]);
@@ -43,7 +43,7 @@ export const AppProvider = ({ children }: { children: JSX.Element }): JSX.Elemen
   const [isRunningLayouts, setIsRunningLayouts] = useState<[boolean, boolean]>([false, false]);
 
   return (
-    <AppContext.Provider
+    <FlowContext.Provider
       value={{
         netsSaved,
         setNetsSaved,
@@ -62,16 +62,16 @@ export const AppProvider = ({ children }: { children: JSX.Element }): JSX.Elemen
       }}
     >
       {children}
-    </AppContext.Provider>
+    </FlowContext.Provider>
   );
 };
 
-export const useApp = () => {
-  const appContext = useContext(AppContext);
+export const useFlowState = (): FlowContextType => {
+  const flowContext = useContext(FlowContext);
 
-  if (!appContext) {
-    throw new Error('useApp must be used within AppProvider');
+  if (!flowContext) {
+    throw new Error('useFlowState must be used within FlowProvider');
   }
 
-  return appContext;
+  return flowContext;
 };

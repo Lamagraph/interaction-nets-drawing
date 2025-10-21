@@ -15,20 +15,18 @@ import {
 
 import '@xyflow/react/dist/style.css';
 
-import { useApp } from '../utils/AppContext';
+import { useFlowState } from '../utils/FlowContext';
 import { useDnD } from '../utils/DnDContext';
+import { useMC } from '../utils/MCContext';
 import { nodeTypes, edgeTypes } from '../utils/typesElements';
 
 import {
-  type Port,
   type Agent,
   getObjectsByName,
   parseJSON,
   isActivePair,
   getTargetHandle,
   validate,
-  defPort,
-  PointConnection,
   defPointCon,
 } from '../nets';
 import MenuControl, { compareNet, NetMode } from '../views/MenuControl';
@@ -53,7 +51,7 @@ export default (): JSX.Element => {
     typeEdge,
     filesOpened,
     setFilesOpened,
-  } = useApp();
+  } = useFlowState();
 
   // Main
 
@@ -87,23 +85,21 @@ export default (): JSX.Element => {
   };
 
   // Add and edit net
-
-  const [nodeId, setNodeId] = useState<string>('');
-  const [nodeLabel, setNodeLabel] = useState<string>('');
-  const [nodePrincipalPort, setNodePrincipalPort] = useState<Port>(defPort);
-  const [nodeAuxiliaryPorts, setNodeAuxiliaryPorts] = useState<Port[]>([]);
-
-  const [nodePrincipalLink, setNodePrincipalLink] = useState<PointConnection>(defPointCon);
-  const [nodeAuxiliaryLinks, setNodeAuxiliaryLinks] = useState<PointConnection[]>([]);
-
-  const cleanUpInfoNode = () => {
-    setNodeId('');
-    setNodeLabel('');
-    setNodeAuxiliaryPorts([]);
-    setNodePrincipalPort(defPort);
-    setNodeAuxiliaryLinks([]);
-    setNodePrincipalLink(defPointCon);
-  };
+  const {
+    nodeId,
+    setNodeId,
+    nodeLabel,
+    setNodeLabel,
+    nodeAuxiliaryPorts,
+    setNodeAuxiliaryPorts,
+    nodePrincipalPort,
+    setNodePrincipalPort,
+    nodeAuxiliaryLinks,
+    setNodeAuxiliaryLinks,
+    nodePrincipalLink,
+    setNodePrincipalLink,
+    cleanUpInfoNode,
+  } = useMC();
 
   /// Add node
 
@@ -401,18 +397,6 @@ export default (): JSX.Element => {
             <MenuConfig
               addItem={addItem}
               isAllowed={isAllowed}
-              nodeId={nodeId}
-              setNodeId={setNodeId}
-              nodeLabel={nodeLabel}
-              setNodeLabel={setNodeLabel}
-              nodeAuxiliaryPorts={nodeAuxiliaryPorts}
-              setNodeAuxiliaryPorts={setNodeAuxiliaryPorts}
-              nodePrincipalPort={nodePrincipalPort}
-              setNodePrincipalPort={setNodePrincipalPort}
-              nodeAuxiliaryLinks={nodeAuxiliaryLinks}
-              setNodeAuxiliaryLinks={setNodeAuxiliaryLinks}
-              nodePrincipalLink={nodePrincipalLink}
-              setNodePrincipalLink={setNodePrincipalLink}
               nodeSelected={nodeSelected}
               isRunningLayout={isRunningLayout}
               typeNode={typeNode}

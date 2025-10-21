@@ -6,7 +6,7 @@ import { FaEdit, FaSave } from 'react-icons/fa';
 import { RiArrowGoBackLine } from 'react-icons/ri';
 import '@xyflow/react/dist/style.css';
 
-import { useApp } from '../utils/AppContext';
+import { useFlowState } from '../utils/FlowContext';
 
 import { type Agent, getObjectsFromFile, parseJSON } from '../nets';
 
@@ -160,18 +160,10 @@ export const SimplifyMenuControl = (props: PropsSimplifyMenuControl): JSX.Elemen
 interface PropsMenuControl {
   nodes: Agent[];
   edges: Edge[];
-  typeNode: string;
-  typeEdge: string;
   rfInstance: any;
   isRunningLayout: boolean;
-  filesOpened: [string, string];
-  modeNet: NetMode;
-  setModeNet: (mode: NetMode) => void;
-  netsSaved: [Agent[], Edge[], string][];
-  setNetsSaved: React.Dispatch<React.SetStateAction<[Agent[], Edge[], string][]>>;
-  indexCur: number;
-  setNetIndexCur: (index: number, net: [Agent[], Edge[], string]) => void;
   indexNet: number;
+  setNetIndexCur: (index: number, net: [Agent[], Edge[], string]) => void;
 }
 
 export default (props: PropsMenuControl) => {
@@ -184,7 +176,7 @@ export default (props: PropsMenuControl) => {
     typeNode,
     typeEdge,
     filesOpened,
-  } = useApp();
+  } = useFlowState();
   const { nodes, edges, rfInstance, isRunningLayout, indexNet, setNetIndexCur } = props;
 
   const onDownload = useCallback(() => {

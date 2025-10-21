@@ -6,24 +6,13 @@ import '@xyflow/react/dist/style.css';
 
 import { useDnD } from '../utils/DnDContext';
 
-import { defPort, type Port, type Agent, PointConnection, defPointCon } from '../nets';
+import { defPort, type Agent, defPointCon } from '../nets';
 import NodeLayoutGen from './NodeLayoutGen';
+import { useMC } from '../utils/MCContext';
 
 interface PropsMenuConfig {
   addItem: (position: XYPosition) => void;
   isAllowed: () => boolean;
-  nodeId: string;
-  setNodeId: React.Dispatch<React.SetStateAction<string>>;
-  nodeLabel: string;
-  setNodeLabel: React.Dispatch<React.SetStateAction<string>>;
-  nodeAuxiliaryPorts: Port[];
-  setNodeAuxiliaryPorts: React.Dispatch<React.SetStateAction<Port[]>>;
-  nodePrincipalPort: Port;
-  setNodePrincipalPort: React.Dispatch<React.SetStateAction<Port>>;
-  nodeAuxiliaryLinks: PointConnection[];
-  setNodeAuxiliaryLinks: React.Dispatch<React.SetStateAction<PointConnection[]>>;
-  nodePrincipalLink: PointConnection;
-  setNodePrincipalLink: React.Dispatch<React.SetStateAction<PointConnection>>;
   nodeSelected: Agent | undefined;
   isRunningLayout: boolean;
   typeNode: string;
@@ -31,8 +20,6 @@ interface PropsMenuConfig {
 
 export default (props: PropsMenuConfig): JSX.Element => {
   const {
-    addItem,
-    isAllowed,
     nodeId,
     setNodeId,
     nodeLabel,
@@ -45,10 +32,8 @@ export default (props: PropsMenuConfig): JSX.Element => {
     setNodeAuxiliaryLinks,
     nodePrincipalLink,
     setNodePrincipalLink,
-    nodeSelected,
-    isRunningLayout,
-    typeNode,
-  } = props;
+  } = useMC();
+  const { addItem, isAllowed, nodeSelected, isRunningLayout, typeNode } = props;
 
   const [linkShowed, setLinkShowed] = useState<boolean>(false);
 
