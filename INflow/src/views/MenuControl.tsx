@@ -4,8 +4,9 @@ import { ControlButton, Controls, type Edge } from '@xyflow/react';
 import { DownloadIcon, UploadIcon, ArrowRightIcon, ArrowLeftIcon } from '@radix-ui/react-icons';
 import { FaEdit, FaSave } from 'react-icons/fa';
 import { RiArrowGoBackLine } from 'react-icons/ri';
-
 import '@xyflow/react/dist/style.css';
+
+import { useApp } from '../utils/AppContext';
 
 import { type Agent, getObjectsFromFile, parseJSON } from '../nets';
 
@@ -175,21 +176,16 @@ interface PropsMenuControl {
 
 export default (props: PropsMenuControl) => {
   const {
-    nodes,
-    edges,
-    typeNode,
-    typeEdge,
-    rfInstance,
-    isRunningLayout,
-    filesOpened,
-    modeNet,
-    setModeNet,
     netsSaved,
     setNetsSaved,
     indexCur,
-    setNetIndexCur,
-    indexNet,
-  } = props;
+    modeNet,
+    setModeNet,
+    typeNode,
+    typeEdge,
+    filesOpened,
+  } = useApp();
+  const { nodes, edges, rfInstance, isRunningLayout, indexNet, setNetIndexCur } = props;
 
   const onDownload = useCallback(() => {
     downloadNet(rfInstance, filesOpened[0]);

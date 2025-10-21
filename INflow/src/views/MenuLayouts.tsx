@@ -3,6 +3,8 @@ import { type Edge, Panel, useNodesInitialized, useReactFlow } from '@xyflow/rea
 
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
+import { useApp } from '../utils/AppContext';
+
 import { type Agent } from '../nets';
 import { getLayoutedNodes as dagreLayoutNodes } from '../layouts/dagreLayout';
 import { getLayoutedNodes as elkHLayoutNodes } from '../layouts/elkLayoutHandles';
@@ -11,14 +13,13 @@ import { getLayoutedNodes as dLayoutNodes } from '../layouts/dLayout';
 import { getLayoutedNodes as dForceLayoutNodes } from '../layouts/dForceLayout';
 
 export default ({
-  isRunningLayouts,
   indexLayout,
   setIsRunningLayout,
 }: {
-  isRunningLayouts: [boolean, boolean];
   indexLayout: number;
   setIsRunningLayout: (value: boolean) => void;
 }): JSX.Element => {
+  const { isRunningLayouts } = useApp();
   const { getNodes, getEdges, setNodes, fitView } = useReactFlow<Agent, Edge>();
   const nodesInitialized = useNodesInitialized();
 

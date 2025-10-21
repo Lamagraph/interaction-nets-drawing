@@ -12,43 +12,29 @@ import {
 
 import '@xyflow/react/dist/style.css';
 
-import { type Agent } from '../nets';
-
+import { useApp } from '../utils/AppContext';
 import { nodeTypes, edgeTypes } from '../utils/typesElements';
 
+import { type Agent } from '../nets';
 import { SimplifyMenuControl, NetMode, compareNet } from '../views/MenuControl';
 import MenuLayouts from '../views/MenuLayouts';
 
 const indexNet = 1;
 
-interface PropsSubFlow {
-  filesOpened: [string, string];
-  setFilesOpened: React.Dispatch<React.SetStateAction<[string, string]>>;
-  modeNet: NetMode;
-  setModeNet: React.Dispatch<React.SetStateAction<NetMode>>;
-  netsSaved: [Agent[], Edge[], string][];
-  indexCur: number;
-  setIndexCur: React.Dispatch<React.SetStateAction<number>>;
-  typeNode: string;
-  typeEdge: string;
-  isRunningLayouts: [boolean, boolean];
-  setIsRunningLayouts: React.Dispatch<React.SetStateAction<[boolean, boolean]>>;
-}
-
-export default (props: PropsSubFlow): JSX.Element => {
+export default (): JSX.Element => {
   const {
-    filesOpened,
-    setFilesOpened,
-    modeNet,
-    setModeNet,
     netsSaved,
     indexCur,
     setIndexCur,
-    typeNode,
-    typeEdge,
+    modeNet,
+    setModeNet,
     isRunningLayouts,
     setIsRunningLayouts,
-  } = props;
+    typeNode,
+    typeEdge,
+    filesOpened,
+    setFilesOpened,
+  } = useApp();
 
   // Main
 
@@ -96,7 +82,10 @@ export default (props: PropsSubFlow): JSX.Element => {
   };
 
   // Utils
+
   const [rfInstance, setRfInstance] = useState(null);
+
+  const inabilityInteract = !isRunningLayout;
 
   // Effects
 
@@ -134,23 +123,19 @@ export default (props: PropsSubFlow): JSX.Element => {
       attributionPosition="bottom-left"
       fitView
       // If layout is running
-      nodesDraggable={!isRunningLayout}
-      nodesConnectable={modeNet === NetMode.edit && !isRunningLayout}
-      nodesFocusable={!isRunningLayout}
-      edgesFocusable={!isRunningLayout}
-      elementsSelectable={modeNet === NetMode.edit && !isRunningLayout}
-      panOnDrag={!isRunningLayout}
-      zoomOnScroll={!isRunningLayout}
-      zoomOnPinch={!isRunningLayout}
-      zoomOnDoubleClick={!isRunningLayout}
-      connectOnClick={modeNet === NetMode.edit && !isRunningLayout}
-      deleteKeyCode={modeNet === NetMode.edit && !isRunningLayout ? ['Delete', 'Backspace'] : null}
+      nodesDraggable={inabilityInteract}
+      nodesConnectable={modeNet === NetMode.edit && inabilityInteract}
+      nodesFocusable={inabilityInteract}
+      edgesFocusable={inabilityInteract}
+      elementsSelectable={modeNet === NetMode.edit && inabilityInteract}
+      panOnDrag={inabilityInteract}
+      zoomOnScroll={inabilityInteract}
+      zoomOnPinch={inabilityInteract}
+      zoomOnDoubleClick={inabilityInteract}
+      connectOnClick={modeNet === NetMode.edit && inabilityInteract}
+      deleteKeyCode={modeNet === NetMode.edit && inabilityInteract ? ['Delete', 'Backspace'] : null}
     >
-      <MenuLayouts
-        isRunningLayouts={isRunningLayouts}
-        indexLayout={indexNet}
-        setIsRunningLayout={setIsRunningLayout}
-      />
+      <MenuLayouts indexLayout={indexNet} setIsRunningLayout={setIsRunningLayout} />
       <div>
         <SimplifyMenuControl
           fileOpened={fileOpened}

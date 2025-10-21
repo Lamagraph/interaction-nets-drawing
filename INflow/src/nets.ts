@@ -70,7 +70,7 @@ export async function getObjectsFromFile(file: File): Promise<any> {
 export async function getObjectsByName(file: string): Promise<any> {
     const response = await fetch(file);
     if (!response.ok) {
-        throw new Error(`response.status: ${response.status}`);
+        throw new Error(`Response.status: ${response.status}`);
     }
     const objects = await response.json();
     return objects;

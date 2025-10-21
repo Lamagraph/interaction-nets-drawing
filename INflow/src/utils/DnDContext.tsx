@@ -2,12 +2,17 @@
 
 import { createContext, useContext, useState } from 'react';
 
-export const DnDContext = createContext([null, () => {}]);
+interface DnDContextType {
+  type: string;
+  setType: React.Dispatch<React.SetStateAction<string>>;
+}
 
-export const DnDProvider = ({ children }: { children: any }) => {
-  const [type, setType] = useState(null);
+export const DnDContext = createContext<DnDContextType | null>(null);
 
-  return <DnDContext.Provider value={[type, setType]}>{children}</DnDContext.Provider>;
+export const DnDProvider = ({ children }: { children: JSX.Element }): JSX.Element => {
+  const [type, setType] = useState('agentHor');
+
+  return <DnDContext.Provider value={{ type, setType }}>{children}</DnDContext.Provider>;
 };
 
 export const useDnD = () => {

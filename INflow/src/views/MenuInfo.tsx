@@ -1,18 +1,18 @@
 import { Panel } from '@xyflow/react';
 
+import { useApp } from '../utils/AppContext';
+
 import { NetMode } from './MenuControl';
 
 interface PropsMenuInfo {
-  modeNet: NetMode;
   fileOpened: string;
-  setTypeNode: React.Dispatch<React.SetStateAction<string>>;
-  setTypeEdge: React.Dispatch<React.SetStateAction<string>>;
   setModeNet: (mode: NetMode) => void;
   isRunningLayout: boolean;
 }
 
 export default (props: PropsMenuInfo): JSX.Element => {
-  const { modeNet, fileOpened, setTypeNode, setTypeEdge, setModeNet, isRunningLayout } = props;
+  const { modeNet, setTypeNode, setTypeEdge } = useApp();
+  const { fileOpened, setModeNet, isRunningLayout } = props;
 
   const onChangeMode = (event: any) => {
     setModeNet(Number(event.target.value));

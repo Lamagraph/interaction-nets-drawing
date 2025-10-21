@@ -4,9 +4,10 @@ import { Panel, useReactFlow, XYPosition } from '@xyflow/react';
 import { FaInfoCircle } from 'react-icons/fa';
 import '@xyflow/react/dist/style.css';
 
-import NodeLayoutGen from './NodeLayoutGen';
 import { useDnD } from '../utils/DnDContext';
+
 import { defPort, type Port, type Agent, PointConnection, defPointCon } from '../nets';
+import NodeLayoutGen from './NodeLayoutGen';
 
 interface PropsMenuConfig {
   addItem: (position: XYPosition) => void;
@@ -51,10 +52,10 @@ export default (props: PropsMenuConfig): JSX.Element => {
 
   const [linkShowed, setLinkShowed] = useState<boolean>(false);
 
-  const [setType] = useDnD();
+  const dndContext = useDnD();
 
   const onDragStart = (event: React.DragEvent<HTMLDivElement>, nodeType: string) => {
-    if (setType) setType(nodeType);
+    if (dndContext) dndContext.setType(nodeType);
     event.dataTransfer.effectAllowed = 'move';
   };
 

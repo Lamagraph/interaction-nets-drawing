@@ -15,6 +15,10 @@ import {
 
 import '@xyflow/react/dist/style.css';
 
+import { useApp } from '../utils/AppContext';
+import { useDnD } from '../utils/DnDContext';
+import { nodeTypes, edgeTypes } from '../utils/typesElements';
+
 import {
   type Port,
   type Agent,
@@ -27,12 +31,8 @@ import {
   PointConnection,
   defPointCon,
 } from '../nets';
-
-import { nodeTypes, edgeTypes } from '../utils/typesElements';
-
 import MenuControl, { compareNet, NetMode } from '../views/MenuControl';
 import MenuLayouts from '../views/MenuLayouts';
-import { useDnD } from '../utils/DnDContext';
 import MenuConfig from '../views/MenuConfig';
 import MenuInfo from '../views/MenuInfo';
 
@@ -40,40 +40,20 @@ const dirNetsSaved = '../../saved-nets/';
 const nameFileStart = 'list_add_1.json';
 const indexNet = 0;
 
-interface PropsFlow {
-  filesOpened: [string, string];
-  setFilesOpened: React.Dispatch<React.SetStateAction<[string, string]>>;
-  modeNet: NetMode;
-  setModeNet: React.Dispatch<React.SetStateAction<NetMode>>;
-  netsSaved: [Agent[], Edge[], string][];
-  setNetsSaved: React.Dispatch<React.SetStateAction<[Agent[], Edge[], string][]>>;
-  indexCur: number;
-  setIndexCur: React.Dispatch<React.SetStateAction<number>>;
-  typeNode: string;
-  setTypeNode: React.Dispatch<React.SetStateAction<string>>;
-  typeEdge: string;
-  setTypeEdge: React.Dispatch<React.SetStateAction<string>>;
-  isRunningLayouts: [boolean, boolean];
-  setIsRunningLayouts: React.Dispatch<React.SetStateAction<[boolean, boolean]>>;
-}
-
-export default (props: PropsFlow): JSX.Element => {
+export default (): JSX.Element => {
   const {
-    filesOpened,
-    setFilesOpened,
-    modeNet,
-    setModeNet,
     netsSaved,
-    setNetsSaved,
     indexCur,
     setIndexCur,
-    typeNode,
-    setTypeNode,
-    typeEdge,
-    setTypeEdge,
+    modeNet,
+    setModeNet,
     isRunningLayouts,
     setIsRunningLayouts,
-  } = props;
+    typeNode,
+    typeEdge,
+    filesOpened,
+    setFilesOpened,
+  } = useApp();
 
   // Main
 
@@ -185,10 +165,10 @@ export default (props: PropsFlow): JSX.Element => {
   //// Add node with drag
 
   const { screenToFlowPosition } = useReactFlow<Agent, Edge>();
-  const [type, setType] = useDnD();
+  const dndContext = useDnD();
 
   const onDragStart = (event: React.DragEvent<HTMLDivElement>, nodeType: string) => {
-    if (setType) setType(nodeType);
+    if (dndContext) dndContext.setType(nodeType);
     event.dataTransfer.setData('text/plain', nodeType);
     event.dataTransfer.effectAllowed = 'move';
   };
@@ -196,7 +176,7 @@ export default (props: PropsFlow): JSX.Element => {
   const onDrop = useCallback(
     (event: any) => {
       event.preventDefault();
-      if (!type && !isAllowed()) {
+      if (!dndContext?.type && !isAllowed()) {
         return;
       }
 
@@ -207,7 +187,7 @@ export default (props: PropsFlow): JSX.Element => {
 
       addItem(position);
     },
-    [screenToFlowPosition, type],
+    [screenToFlowPosition, addItem, dndContext?.type],
   );
 
   /// Add edge with drag
@@ -352,6 +332,8 @@ export default (props: PropsFlow): JSX.Element => {
 
   const [rfInstance, setRfInstance] = useState(null);
 
+  const inabilityInteract = !isRunningLayout;
+
   // Effects
 
   useEffect(() => {
@@ -401,18 +383,18 @@ export default (props: PropsFlow): JSX.Element => {
           attributionPosition="bottom-left"
           fitView
           // If layout is running
-          nodesDraggable={!isRunningLayout}
-          nodesConnectable={modeNet === NetMode.edit && !isRunningLayout}
-          nodesFocusable={!isRunningLayout}
-          edgesFocusable={!isRunningLayout}
-          elementsSelectable={modeNet === NetMode.edit && !isRunningLayout}
-          panOnDrag={!isRunningLayout}
-          zoomOnScroll={!isRunningLayout}
-          zoomOnPinch={!isRunningLayout}
-          zoomOnDoubleClick={!isRunningLayout}
-          connectOnClick={modeNet === NetMode.edit && !isRunningLayout}
+          nodesDraggable={inabilityInteract}
+          nodesConnectable={modeNet === NetMode.edit && inabilityInteract}
+          nodesFocusable={inabilityInteract}
+          edgesFocusable={inabilityInteract}
+          elementsSelectable={modeNet === NetMode.edit && inabilityInteract}
+          panOnDrag={inabilityInteract}
+          zoomOnScroll={inabilityInteract}
+          zoomOnPinch={inabilityInteract}
+          zoomOnDoubleClick={inabilityInteract}
+          connectOnClick={modeNet === NetMode.edit && inabilityInteract}
           deleteKeyCode={
-            modeNet === NetMode.edit && !isRunningLayout ? ['Delete', 'Backspace'] : null
+            modeNet === NetMode.edit && inabilityInteract ? ['Delete', 'Backspace'] : null
           }
         >
           {modeNet == NetMode.edit && (
@@ -436,33 +418,18 @@ export default (props: PropsFlow): JSX.Element => {
               typeNode={typeNode}
             />
           )}
-          <MenuLayouts
-            isRunningLayouts={isRunningLayouts}
-            indexLayout={indexNet}
-            setIsRunningLayout={setIsRunningLayout}
-          />
+          <MenuLayouts indexLayout={indexNet} setIsRunningLayout={setIsRunningLayout} />
           <div>
             <MenuControl
               nodes={nodes}
               edges={edges}
-              typeNode={typeNode}
-              typeEdge={typeEdge}
-              filesOpened={filesOpened}
               rfInstance={rfInstance}
               isRunningLayout={isRunningLayouts[0] || isRunningLayouts[1]}
-              modeNet={modeNet}
-              setModeNet={setModeNet}
-              netsSaved={netsSaved}
-              setNetsSaved={setNetsSaved}
-              indexCur={indexCur}
-              setNetIndexCur={setNetIndexCur}
               indexNet={indexNet}
+              setNetIndexCur={setNetIndexCur}
             />
             <MenuInfo
-              modeNet={modeNet}
               fileOpened={fileOpened}
-              setTypeNode={setTypeNode}
-              setTypeEdge={setTypeEdge}
               setModeNet={mode => {
                 if (
                   mode === NetMode.comparison &&
