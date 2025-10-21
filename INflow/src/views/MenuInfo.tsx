@@ -49,7 +49,7 @@ export default (props: PropsMenuInfo): JSX.Element => {
           data-testid="colormode-select"
           disabled={isRunningLayout}
         >
-          <option value="agent">horizontal</option>
+          <option value="agentHor">horizontal</option>
           <option value="agentVert">vertical</option>
           <option value="agentGen">general</option>
         </select>

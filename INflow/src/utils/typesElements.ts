@@ -6,7 +6,7 @@ import NodeLayoutVert from '../views/NodeLayoutVert';
 import NodeLayoutGen from '../views/NodeLayoutGen';
 
 export const nodeTypes = {
-    agent: NodeLayout,
+    agentHor: NodeLayout,
     agentVert: NodeLayoutVert,
     agentGen: NodeLayoutGen,
 };
@@ -20,7 +20,7 @@ export const edgeTypes = {
 };
 
 export const mapTypePos = {
-    agent: [Position.Top, Position.Bottom],
+    agentHor: [Position.Top, Position.Bottom],
     agentVert: [Position.Left, Position.Right],
     agentGen: [Position.Left, Position.Right],
 };

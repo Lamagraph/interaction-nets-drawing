@@ -22,7 +22,7 @@ export default (): JSX.Element => {
 
   // Node and edge types
 
-  const [typeNode, setTypeNode] = useState<string>('agent');
+  const [typeNode, setTypeNode] = useState<string>('agentHor');
 
   const [typeEdge, setTypeEdge] = useState<string>('bezier');
 

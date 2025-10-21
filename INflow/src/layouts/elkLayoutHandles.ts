@@ -31,7 +31,7 @@ const elk = new ELK();
 export const getLayoutedNodes = async (nodes: Agent[], edges: Edge[]): Promise<Agent[]> => {
     if (nodes.length === 0) return [];
 
-    const typeNode = (nodes[0].type as NodeType) ?? 'agent';
+    const typeNode = (nodes[0].type as NodeType) ?? 'agentHor';
     const posAuxP = mapPosSide[mapTypePos[typeNode][0]];
     const posPrP = mapPosSide[mapTypePos[typeNode][1]];
 
