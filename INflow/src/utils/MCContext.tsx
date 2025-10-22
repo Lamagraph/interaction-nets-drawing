@@ -64,11 +64,11 @@ export const MCProvider = ({ children }: { children: JSX.Element }): JSX.Element
   );
 };
 
-export const useMC = () => {
+export const useNodeParametersState = () => {
   const mcContext = useContext(MCContext);
 
   if (!mcContext) {
-    throw new Error('useMC must be used within MCProvider');
+    throw new Error('useNodeParametersState must be used within MCProvider');
   }
 
   return mcContext;

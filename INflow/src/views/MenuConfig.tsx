@@ -8,7 +8,7 @@ import { useDnD } from '../utils/DnDContext';
 
 import { defPort, type Agent, defPointCon } from '../nets';
 import NodeLayoutGen from './NodeLayoutGen';
-import { useMC } from '../utils/MCContext';
+import { useNodeParametersState } from '../utils/MCContext';
 
 interface PropsMenuConfig {
   addItem: (position: XYPosition) => void;
@@ -32,7 +32,7 @@ export default (props: PropsMenuConfig): JSX.Element => {
     setNodeAuxiliaryLinks,
     nodePrincipalLink,
     setNodePrincipalLink,
-  } = useMC();
+  } = useNodeParametersState();
   const { addItem, isAllowed, nodeSelected, isRunningLayout, typeNode } = props;
 
   const [linkShowed, setLinkShowed] = useState<boolean>(false);

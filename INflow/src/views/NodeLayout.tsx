@@ -1,7 +1,7 @@
 import { Handle, HandleType, Position } from '@xyflow/react';
 
 import { type Port, type AgentData } from '../nets';
-import HandleLayout from './HandleLayout';
+import PortLayout from './PortLayout';
 
 interface PropsHandle {
   type: HandleType;
@@ -14,7 +14,7 @@ interface PropsHandle {
 const handle = (props: PropsHandle): JSX.Element => {
   const { type, pos, id, style } = props;
   if (!props.needLimit) return <Handle type={type} position={pos} key={id} id={id} style={style} />;
-  return <HandleLayout type={type} position={pos} key={id} id={id} style={style} />;
+  return <PortLayout type={type} position={pos} key={id} id={id} style={style} />;
 };
 
 export const handleAuxiliaryPort = (port: Port, pos: Position, needLimit: boolean): JSX.Element => {

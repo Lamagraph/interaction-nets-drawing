@@ -17,7 +17,7 @@ import '@xyflow/react/dist/style.css';
 
 import { useFlowState } from '../utils/FlowContext';
 import { useDnD } from '../utils/DnDContext';
-import { useMC } from '../utils/MCContext';
+import { useNodeParametersState } from '../utils/MCContext';
 import { nodeTypes, edgeTypes } from '../utils/typesElements';
 
 import {
@@ -99,7 +99,7 @@ export default (): JSX.Element => {
     nodePrincipalLink,
     setNodePrincipalLink,
     cleanUpInfoNode,
-  } = useMC();
+  } = useNodeParametersState();
 
   /// Add node
 
