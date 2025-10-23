@@ -68,79 +68,81 @@ export default ({
   const [layoutsShowed, setLayoutsShowed] = useState<boolean>(false);
 
   return (
-    <Panel position="top-right" className="panel-layouts">
-      <div>
-        {layoutsShowed && (
-          <label className="xy-theme__label" style={{ marginBottom: '10px' }}>
-            Layouts
-          </label>
-        )}
-      </div>
+    <div id="MenuLayouts">
+      <Panel position="top-right" className="panel-layouts">
+        <div>
+          {layoutsShowed && (
+            <label className="xy-theme__label" style={{ marginBottom: '10px' }}>
+              Layouts
+            </label>
+          )}
+        </div>
 
-      <div>
-        <button
-          title={layoutsShowed ? 'Show less' : 'Show more'}
-          className="xy-theme__button"
-          onClick={() => setLayoutsShowed(!layoutsShowed)}
-        >
-          {layoutsShowed ? <FaEyeSlash /> : <FaEye />}
-        </button>
-        {layoutsShowed && (
-          <>
-            <button
-              className="xy-theme__button"
-              onClick={() => dagreLayout('TB')}
-              disabled={isRunningLayouts[indexLayout]}
-            >
-              Dagre: vertical
-            </button>
-            <button
-              className="xy-theme__button"
-              onClick={() => dagreLayout('LR')}
-              disabled={isRunningLayouts[indexLayout]}
-            >
-              Dagre: horizontal
-            </button>
-            <button
-              className="xy-theme__button"
-              onClick={elkHandlesLayout}
-              disabled={isRunningLayouts[indexLayout]}
-            >
-              ELK-handles
-            </button>
-            <button
-              className="xy-theme__button"
-              onClick={() => elkLayout('DOWN')}
-              disabled={isRunningLayouts[indexLayout]}
-            >
-              ELK: vertical
-            </button>
-            <button
-              className="xy-theme__button"
-              onClick={() => elkLayout('RIGHT')}
-              disabled={isRunningLayouts[indexLayout]}
-            >
-              ELK: horizontal
-            </button>
-            <button
-              className="xy-theme__button"
-              onClick={dLayout}
-              disabled={isRunningLayouts[indexLayout]}
-            >
-              D3-hierarchy
-            </button>
-          </>
-        )}
+        <div>
+          <button
+            title={layoutsShowed ? 'Show less' : 'Show more'}
+            className="xy-theme__button"
+            onClick={() => setLayoutsShowed(!layoutsShowed)}
+          >
+            {layoutsShowed ? <FaEyeSlash /> : <FaEye />}
+          </button>
+          {layoutsShowed && (
+            <>
+              <button
+                className="xy-theme__button"
+                onClick={() => dagreLayout('TB')}
+                disabled={isRunningLayouts[indexLayout]}
+              >
+                Dagre: vertical
+              </button>
+              <button
+                className="xy-theme__button"
+                onClick={() => dagreLayout('LR')}
+                disabled={isRunningLayouts[indexLayout]}
+              >
+                Dagre: horizontal
+              </button>
+              <button
+                className="xy-theme__button"
+                onClick={elkHandlesLayout}
+                disabled={isRunningLayouts[indexLayout]}
+              >
+                ELK-handles
+              </button>
+              <button
+                className="xy-theme__button"
+                onClick={() => elkLayout('DOWN')}
+                disabled={isRunningLayouts[indexLayout]}
+              >
+                ELK: vertical
+              </button>
+              <button
+                className="xy-theme__button"
+                onClick={() => elkLayout('RIGHT')}
+                disabled={isRunningLayouts[indexLayout]}
+              >
+                ELK: horizontal
+              </button>
+              <button
+                className="xy-theme__button"
+                onClick={dLayout}
+                disabled={isRunningLayouts[indexLayout]}
+              >
+                D3-hierarchy
+              </button>
+            </>
+          )}
 
-        <button
-          className="xy-theme__button"
-          onClick={dForceLayout}
-          id={'forceLayout'}
-          disabled={isRunningLayouts[1 - indexLayout]}
-        >
-          {isRunningLayouts[indexLayout] ? 'Stop' : 'Start'} D3-force
-        </button>
-      </div>
-    </Panel>
+          <button
+            className="xy-theme__button"
+            onClick={dForceLayout}
+            id={'forceLayout'}
+            disabled={isRunningLayouts[1 - indexLayout]}
+          >
+            {isRunningLayouts[indexLayout] ? 'Stop' : 'Start'} D3-force
+          </button>
+        </div>
+      </Panel>
+    </div>
   );
 };

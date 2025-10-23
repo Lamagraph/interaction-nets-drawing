@@ -146,14 +146,16 @@ export const SimplifyMenuControl = (props: PropsSimplifyMenuControl): JSX.Elemen
   }, [rfInstance, fileOpened]);
 
   return (
-    <Controls>
-      <ControlButton title="Edit net" disabled={isRunningLayout} onClick={goToEditNet}>
-        <FaEdit />
-      </ControlButton>
-      <ControlButton title="Download the Net" disabled={isRunningLayout} onClick={onDownload}>
-        <DownloadIcon />
-      </ControlButton>
-    </Controls>
+    <div id="SimplifyMenuControl">
+      <Controls>
+        <ControlButton title="Edit net" disabled={isRunningLayout} onClick={goToEditNet}>
+          <FaEdit />
+        </ControlButton>
+        <ControlButton title="Download the Net" disabled={isRunningLayout} onClick={onDownload}>
+          <DownloadIcon />
+        </ControlButton>
+      </Controls>
+    </div>
   );
 };
 
@@ -257,65 +259,67 @@ export default (props: PropsMenuControl) => {
   }, [netsSaved, indexCur, filesOpened]);
 
   return (
-    <Controls>
-      {netsSaved.length > 0 && (
-        <>
-          {modeNet !== NetMode.edit ? (
-            <ControlButton
-              title="Edit net"
-              disabled={isRunningLayout}
-              onClick={() => setModeNet(NetMode.edit)}
-            >
-              <FaEdit />
-            </ControlButton>
-          ) : (
-            <>
-              <ControlButton title="Save" disabled={isRunningLayout} onClick={saveNetEdited}>
-                <FaSave />
-              </ControlButton>
-
+    <div id="MenuControl">
+      <Controls>
+        {netsSaved.length > 0 && (
+          <>
+            {modeNet !== NetMode.edit ? (
               <ControlButton
-                title="Go back to nets"
+                title="Edit net"
                 disabled={isRunningLayout}
-                onClick={goBackToNets}
+                onClick={() => setModeNet(NetMode.edit)}
               >
-                <RiArrowGoBackLine />
+                <FaEdit />
               </ControlButton>
-            </>
-          )}
-        </>
-      )}
+            ) : (
+              <>
+                <ControlButton title="Save" disabled={isRunningLayout} onClick={saveNetEdited}>
+                  <FaSave />
+                </ControlButton>
 
-      {modeNet !== NetMode.edit && (
-        <>
-          <ControlButton
-            title="Next step"
-            disabled={
-              isRunningLayout ||
-              (modeNet === NetMode.sequence && indexCur >= netsSaved.length - 1) ||
-              (modeNet === NetMode.comparison && indexCur >= netsSaved.length - 2)
-            }
-            onClick={() => toggleNet(true)}
-          >
-            <ArrowRightIcon />
-          </ControlButton>
-          <ControlButton
-            title="Prev step"
-            disabled={isRunningLayout || indexCur <= 0}
-            onClick={() => toggleNet(false)}
-          >
-            <ArrowLeftIcon />
-          </ControlButton>
-        </>
-      )}
+                <ControlButton
+                  title="Go back to nets"
+                  disabled={isRunningLayout}
+                  onClick={goBackToNets}
+                >
+                  <RiArrowGoBackLine />
+                </ControlButton>
+              </>
+            )}
+          </>
+        )}
 
-      <ControlButton title="Upload Nets" disabled={isRunningLayout} onClick={onUpload}>
-        <UploadIcon />
-      </ControlButton>
+        {modeNet !== NetMode.edit && (
+          <>
+            <ControlButton
+              title="Next step"
+              disabled={
+                isRunningLayout ||
+                (modeNet === NetMode.sequence && indexCur >= netsSaved.length - 1) ||
+                (modeNet === NetMode.comparison && indexCur >= netsSaved.length - 2)
+              }
+              onClick={() => toggleNet(true)}
+            >
+              <ArrowRightIcon />
+            </ControlButton>
+            <ControlButton
+              title="Prev step"
+              disabled={isRunningLayout || indexCur <= 0}
+              onClick={() => toggleNet(false)}
+            >
+              <ArrowLeftIcon />
+            </ControlButton>
+          </>
+        )}
 
-      <ControlButton title="Download the Net" disabled={isRunningLayout} onClick={onDownload}>
-        <DownloadIcon />
-      </ControlButton>
-    </Controls>
+        <ControlButton title="Upload Nets" disabled={isRunningLayout} onClick={onUpload}>
+          <UploadIcon />
+        </ControlButton>
+
+        <ControlButton title="Download the Net" disabled={isRunningLayout} onClick={onDownload}>
+          <DownloadIcon />
+        </ControlButton>
+      </Controls>
+    </div>
   );
 };

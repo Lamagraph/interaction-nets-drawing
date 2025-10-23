@@ -61,7 +61,7 @@ export default (props: PropsMenuConfig): JSX.Element => {
   }, [getInternalNode, addItem, nodeSelected]);
 
   return (
-    <>
+    <div id="MenuConfig">
       {!isRunningLayout && (
         <Panel position="top-left">
           <div className="react-flow__node">
@@ -305,6 +305,6 @@ export default (props: PropsMenuConfig): JSX.Element => {
           </div>
         </Panel>
       )}
-    </>
+    </div>
   );
 };
