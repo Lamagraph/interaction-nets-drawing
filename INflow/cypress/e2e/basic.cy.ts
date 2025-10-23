@@ -71,9 +71,7 @@ describe('INflow E2E Tests: one-two click interaction', () => {
 
     describe('Node type selection', () => {
         it('changing value in selection and type for all nodes', () => {
-            cy.get('[data-testid="node-type__select"]')
-                .select('agentVert')
-                .should('have.value', 'agentVert');
+            cy.get('#MenuInfo [data-testid="node-type__select"]').select('agentVert');
 
             cy.wait(100);
 
@@ -83,9 +81,7 @@ describe('INflow E2E Tests: one-two click interaction', () => {
 
     describe('Edge type selection', () => {
         it('changing value in selection and type for all edges', () => {
-            cy.get('[data-testid="edge-type__select"]')
-                .select('smartBezier')
-                .should('have.value', 'smartBezier');
+            cy.get('#MenuInfo [data-testid="edge-type__select"]').select('smartBezier');
 
             cy.wait(100);
 

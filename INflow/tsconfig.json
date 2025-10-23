@@ -10,7 +10,9 @@
     "allowJs": true,
     "checkJs": true,
     "isolatedModules": true,
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "sourceMap": true,
+    "types": ["node", "cypress"]
   },
-  "include": ["./**/*.d.ts", "./**/*.{js,jsx,ts,tsx}"]
+  "include": ["./**/*.d.ts", "./**/*.{js,jsx,ts,tsx}", "./**/*.cy.{js,jsx,ts,tsx}"]
 }

@@ -13,6 +13,9 @@ export default defineConfig({
             requireEnv: false,
         }),
     ],
+    build: {
+        sourcemap: true,
+    },
     test: {
         coverage: {
             provider: 'istanbul',

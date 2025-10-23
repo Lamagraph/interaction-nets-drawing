@@ -10,7 +10,6 @@ export default defineConfig({
             return config;
         },
     },
-
     component: {
         video: false,
         devServer: {
