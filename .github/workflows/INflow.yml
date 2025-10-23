@@ -52,3 +52,7 @@ jobs:
           build: npm run build
           start: npm run dev
           wait-on: 'http://localhost:5173'
+
+      - name: Get coverage
+        working-directory: ./INflow
+        run: npx nyc report && npx nyc report --reporter=text-summary

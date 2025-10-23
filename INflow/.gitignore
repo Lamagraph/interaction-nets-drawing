@@ -1,0 +1,14 @@
+# Packages
+node_modules
+
+# Logs
+logs
+*.log
+npm-debug.log*
+*.local
+
+# Tests
+.nyc_output
+coverage
+cypress/videos
+cypress/screenshots
