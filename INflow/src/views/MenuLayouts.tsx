@@ -91,6 +91,7 @@ export default ({
               <button
                 className="xy-theme__button"
                 onClick={() => dagreLayout('TB')}
+                id="layout__Dagre-vertical"
                 disabled={isRunningLayouts[indexLayout]}
               >
                 Dagre: vertical
@@ -98,6 +99,7 @@ export default ({
               <button
                 className="xy-theme__button"
                 onClick={() => dagreLayout('LR')}
+                id="layout__Dagre-horizontal"
                 disabled={isRunningLayouts[indexLayout]}
               >
                 Dagre: horizontal
@@ -105,6 +107,7 @@ export default ({
               <button
                 className="xy-theme__button"
                 onClick={elkHandlesLayout}
+                id="layout__ELK-handles"
                 disabled={isRunningLayouts[indexLayout]}
               >
                 ELK-handles
@@ -112,6 +115,7 @@ export default ({
               <button
                 className="xy-theme__button"
                 onClick={() => elkLayout('DOWN')}
+                id="layout__ELK-vertical"
                 disabled={isRunningLayouts[indexLayout]}
               >
                 ELK: vertical
@@ -119,6 +123,7 @@ export default ({
               <button
                 className="xy-theme__button"
                 onClick={() => elkLayout('RIGHT')}
+                id="layout__ELK-horizontal"
                 disabled={isRunningLayouts[indexLayout]}
               >
                 ELK: horizontal
@@ -126,6 +131,7 @@ export default ({
               <button
                 className="xy-theme__button"
                 onClick={dLayout}
+                id="layout__D3-hierarchy"
                 disabled={isRunningLayouts[indexLayout]}
               >
                 D3-hierarchy
@@ -136,7 +142,7 @@ export default ({
           <button
             className="xy-theme__button"
             onClick={dForceLayout}
-            id={'forceLayout'}
+            id="layout__D3-force"
             disabled={isRunningLayouts[1 - indexLayout]}
           >
             {isRunningLayouts[indexLayout] ? 'Stop' : 'Start'} D3-force

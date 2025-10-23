@@ -45,18 +45,22 @@ export default ({
   needLimit?: boolean;
 }): JSX.Element => {
   return (
-    <table style={{ textAlign: 'left', margin: '2px' }}>
-      <tbody>
-        <tr>
-          <td style={{ paddingBottom: '8px', textAlign: 'center' }}>{labelAgentHTML(data, id)}</td>
-        </tr>
+    <div className={needLimit ? 'node-layout__gen' : undefined}>
+      <table style={{ textAlign: 'left', margin: '2px' }}>
+        <tbody>
+          <tr>
+            <td style={{ paddingBottom: '8px', textAlign: 'center' }}>
+              {labelAgentHTML(data, id)}
+            </td>
+          </tr>
 
-        {data.auxiliaryPorts.map((port, index) => (
-          <tr key={index}>{auxiliaryPortTD(port, needLimit)}</tr>
-        ))}
+          {data.auxiliaryPorts.map((port, index) => (
+            <tr key={index}>{auxiliaryPortTD(port, needLimit)}</tr>
+          ))}
 
-        <tr>{principalPortTD(data, undefined, needLimit)}</tr>
-      </tbody>
-    </table>
+          <tr>{principalPortTD(data, undefined, needLimit)}</tr>
+        </tbody>
+      </table>
+    </div>
   );
 };

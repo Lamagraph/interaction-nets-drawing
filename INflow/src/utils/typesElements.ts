@@ -1,12 +1,12 @@
 import { BezierEdge, Position, SmoothStepEdge } from '@xyflow/react';
 import { SmartBezierEdge, SmartStraightEdge, SmartStepEdge } from '@tisoap/react-flow-smart-edge';
 
-import NodeLayout from '../views/NodeLayout';
+import NodeLayoutHor from '../views/NodeLayout';
 import NodeLayoutVert from '../views/NodeLayoutVert';
 import NodeLayoutGen from '../views/NodeLayoutGen';
 
 export const nodeTypes = {
-    agentHor: NodeLayout,
+    agentHor: NodeLayoutHor,
     agentVert: NodeLayoutVert,
     agentGen: NodeLayoutGen,
 };

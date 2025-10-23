@@ -19,7 +19,7 @@ npm run dev
 ### Run tests
 
 ```shell
-npx cypress run
+npm run test
 ```
 
 ## Drawing

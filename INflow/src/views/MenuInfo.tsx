@@ -33,7 +33,7 @@ export default (props: PropsMenuInfo): JSX.Element => {
             <select
               className="xy-theme__select select-info"
               onChange={onChangeMode}
-              data-testid="colormode-select"
+              data-testid="mode__select"
               disabled={isRunningLayout}
             >
               <option value={NetMode.comparison}>comparison</option>
@@ -47,7 +47,7 @@ export default (props: PropsMenuInfo): JSX.Element => {
           <select
             className="xy-theme__select select-info"
             onChange={onChangeNode}
-            data-testid="colormode-select"
+            data-testid="node-type__select"
             disabled={isRunningLayout}
           >
             <option value="agentHor">horizontal</option>
@@ -61,7 +61,7 @@ export default (props: PropsMenuInfo): JSX.Element => {
           <select
             className="xy-theme__select select-info"
             onChange={onChangeEdge}
-            data-testid="colormode-select"
+            data-testid="edge-type__select"
             disabled={isRunningLayout}
           >
             <option value="bezier">bezier</option>

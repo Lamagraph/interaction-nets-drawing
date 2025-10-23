@@ -43,7 +43,7 @@ export default (props: HandleProps): JSX.Element => {
   }, [setEdges, connectionsS, connectionsT]);
 
   return (
-    <div id="PortLayout">
+    <>
       <Handle {...props} isConnectable={!isNotConnectable} />
       <Handle
         {...props}
@@ -52,6 +52,6 @@ export default (props: HandleProps): JSX.Element => {
         id={`${props.id}t`}
         isConnectable={!isNotConnectable}
       />
-    </div>
+    </>
   );
 };

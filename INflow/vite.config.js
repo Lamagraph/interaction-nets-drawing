@@ -10,7 +10,7 @@ export default defineConfig({
             cypress: true,
             include: 'src/*',
             extension: ['.js', '.jsx', '.ts', '.tsx'],
-            requireEnv: false
+            requireEnv: false,
         }),
     ],
     test: {
