@@ -1,12 +1,11 @@
 import { createContext, useContext, useState } from 'react';
-import { type Edge } from '@xyflow/react';
 
 import { NetMode } from '../views/MenuControl';
-import { type Agent } from '../nets';
+import { type Net } from '../nets';
 
 interface FlowContextType {
-  netsSaved: [Agent[], Edge[], string][];
-  setNetsSaved: React.Dispatch<React.SetStateAction<[Agent[], Edge[], string][]>>;
+  netsSaved: Net[];
+  setNetsSaved: React.Dispatch<React.SetStateAction<Net[]>>;
   indexCur: number;
   setIndexCur: React.Dispatch<React.SetStateAction<number>>;
   modeNet: NetMode;
@@ -26,7 +25,7 @@ export const FlowContext = createContext<FlowContextType | null>(null);
 export const FlowProvider = ({ children }: { children: JSX.Element }): JSX.Element => {
   // Several nets
 
-  const [netsSaved, setNetsSaved] = useState<[Agent[], Edge[], string][]>([]);
+  const [netsSaved, setNetsSaved] = useState<Net[]>([]);
   const [indexCur, setIndexCur] = useState<number>(-1);
   const [filesOpened, setFilesOpened] = useState<[string, string]>(['', '']);
 

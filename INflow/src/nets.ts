@@ -15,6 +15,11 @@ export type AgentData = {
     principalPort: Port;
 };
 export type Agent = Node<AgentData>;
+export type Net = {
+    agents: Agent[];
+    edges: Edge[];
+    name: string;
+};
 
 export const defPointCon = { idNode: '', idPort: '' };
 export const defPort = { id: '', label: null };
@@ -76,7 +81,7 @@ export async function getObjectsByName(file: string): Promise<any> {
     return objects;
 }
 
-export async function parseJSON(
+export async function parseObjects(
     net: {
         nodes?: { [key: string]: any };
         edges?: { [key: string]: any };

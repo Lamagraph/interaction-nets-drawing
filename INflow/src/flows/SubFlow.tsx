@@ -8,6 +8,7 @@ import {
   useReactFlow,
   type Edge,
   Panel,
+  ReactFlowInstance,
 } from '@xyflow/react';
 
 import '@xyflow/react/dist/style.css';
@@ -15,7 +16,7 @@ import '@xyflow/react/dist/style.css';
 import { useFlowState } from '../utils/FlowContext';
 import { nodeTypes, edgeTypes } from '../utils/typesElements';
 
-import { type Agent } from '../nets';
+import { type Agent, type Net } from '../nets';
 import { SimplifyMenuControl, NetMode, compareNet } from '../views/MenuControl';
 import MenuLayouts from '../views/MenuLayouts';
 
@@ -54,10 +55,10 @@ export default (): JSX.Element => {
   };
 
   // Several nets
-  const setNetCur = (net: [Agent[], Edge[], string]) => {
-    setNodes(net[0]);
-    setEdges(net[1]);
-    setFileOpened(net[2]);
+  const setNetCur = (net: Net) => {
+    setNodes(net.agents);
+    setEdges(net.edges);
+    setFileOpened(net.name);
   };
 
   const toggleNet = useCallback(() => {
@@ -83,7 +84,7 @@ export default (): JSX.Element => {
 
   // Utils
 
-  const [rfInstance, setRfInstance] = useState(null);
+  const [rfInstance, setRfInstance] = useState<ReactFlowInstance<Agent, Edge> | null>(null);
 
   const inabilityInteract = !isRunningLayout;
 

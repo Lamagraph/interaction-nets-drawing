@@ -11,6 +11,7 @@ import {
   useOnSelectionChange,
   Connection,
   XYPosition,
+  ReactFlowInstance,
 } from '@xyflow/react';
 
 import '@xyflow/react/dist/style.css';
@@ -23,11 +24,12 @@ import { nodeTypes, edgeTypes } from '../utils/typesElements';
 import {
   type Agent,
   getObjectsByName,
-  parseJSON,
+  parseObjects,
   isActivePair,
   getTargetHandle,
   validate,
   defPointCon,
+  type Net,
 } from '../nets';
 import MenuControl, { compareNet, NetMode } from '../views/MenuControl';
 import MenuLayouts from '../views/MenuLayouts';
@@ -74,7 +76,7 @@ export default (): JSX.Element => {
   const loadNetStart = async (nameFile: string) => {
     try {
       const net = await getObjectsByName(nameFile);
-      const [nds, eds] = await parseJSON(net, typeNode, typeEdge);
+      const [nds, eds] = await parseObjects(net, typeNode, typeEdge);
       setNodes(nds);
       setEdges(eds);
     } catch (error) {
@@ -163,9 +165,9 @@ export default (): JSX.Element => {
   const { screenToFlowPosition } = useReactFlow<Agent, Edge>();
   const dndContext = useDnD();
 
-  const onDragStart = (event: React.DragEvent<HTMLDivElement>, nodeType: string) => {
-    if (dndContext) dndContext.setType(nodeType);
-    event.dataTransfer.setData('text/plain', nodeType);
+  const onDragStart = (event: React.DragEvent<HTMLDivElement>) => {
+    if (dndContext) dndContext.setType(typeNode);
+    event.dataTransfer.setData('text/plain', typeNode);
     event.dataTransfer.effectAllowed = 'move';
   };
 
@@ -291,13 +293,13 @@ export default (): JSX.Element => {
 
   // Several nets
 
-  const setNetCur = (net: [Agent[], Edge[], string]) => {
-    setNodes(net[0]);
-    setEdges(net[1]);
-    setFileOpened(net[2]);
+  const setNetCur = (net: Net) => {
+    setNodes(net.agents);
+    setEdges(net.edges);
+    setFileOpened(net.name);
   };
 
-  const setNetIndexCur = (index: number, net: [Agent[], Edge[], string]) => {
+  const setNetIndexCur = (index: number, net: Net) => {
     setIndexCur(index);
     setNetCur(net);
   };
@@ -326,7 +328,7 @@ export default (): JSX.Element => {
 
   const reactFlowWrapper = useRef(null);
 
-  const [rfInstance, setRfInstance] = useState(null);
+  const [rfInstance, setRfInstance] = useState<ReactFlowInstance<Agent, Edge> | null>(null);
 
   const inabilityInteract = !isRunningLayout;
 

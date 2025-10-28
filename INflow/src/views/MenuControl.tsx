@@ -8,7 +8,7 @@ import '@xyflow/react/dist/style.css';
 
 import { useFlowState } from '../utils/FlowContext';
 
-import { type Agent, getObjectsFromFile, parseJSON } from '../nets';
+import { type Agent, type Net, getObjectsFromFile, parseObjects } from '../nets';
 
 export enum NetMode {
   edit = 0,
@@ -43,18 +43,21 @@ const mapKeys = {
 const modeDefault = NetMode.comparison;
 
 const downloadNet = (rfInstance: any, fileOpened: string) => {
-  const transformObject: any = (obj: any) => {
+  const transformObject = (obj: any): any => {
     if (Array.isArray(obj)) {
       return obj.map(transformObject);
     } else if (obj && typeof obj === 'object') {
-      const result = {};
+      const result: Record<string, any> = {};
 
-      for (const [key, value] of Object.entries<string>(obj)) {
+      for (const [key, value] of Object.entries(obj)) {
         if (key === 'data') {
           Object.assign(result, transformObject(value));
         } else if (allowedKeys.includes(key)) {
-          const newKey = mapKeys[key] || key;
-          const newValue = key === 'targetHandle' ? value.slice(0, -1) : transformObject(value);
+          const newKey = (mapKeys as Record<string, string>)[key] || key;
+          const newValue =
+            key === 'targetHandle' && typeof value === 'string'
+              ? value.slice(0, -1)
+              : transformObject(value);
           result[newKey] = newValue;
         }
       }
@@ -79,14 +82,14 @@ const downloadNet = (rfInstance: any, fileOpened: string) => {
 };
 
 interface PropsUpdateNet {
-  netOne: [Agent[], Edge[], string];
-  netTwo: [Agent[], Edge[], string];
+  netOne: Net;
+  netTwo: Net;
   types: [typeNode: string, typeEdge: string];
   isStepUp: boolean;
   isPinPos: boolean;
 }
 
-export function compareNet(props: PropsUpdateNet): [Agent[], Edge[], string] | undefined {
+export function compareNet(props: PropsUpdateNet): Net | undefined {
   const {
     netOne,
     netTwo,
@@ -98,7 +101,7 @@ export function compareNet(props: PropsUpdateNet): [Agent[], Edge[], string] | u
   const color = isStepUp ? 'lightgreen' : 'lightsalmon';
 
   const updateNode = (node: Agent) => {
-    const nodeExisted = netTwo[0].find(n => n.id === node.id);
+    const nodeExisted = netTwo.agents.find(n => n.id === node.id);
     return nodeExisted
       ? {
           ...nodeExisted,
@@ -110,25 +113,29 @@ export function compareNet(props: PropsUpdateNet): [Agent[], Edge[], string] | u
   };
 
   const nodesComp: Agent[] = [];
-  netOne[0].forEach(node => {
+  netOne.agents.forEach(node => {
     const nodeComp = updateNode(node);
     nodesComp.push(nodeComp);
   });
 
   const updateEdge = (edge: Edge) => {
-    const edgeExisted = netTwo[1].find(e => e.id === edge.id);
+    const edgeExisted = netTwo.edges.find(e => e.id === edge.id);
     return edgeExisted
       ? { ...edgeExisted, style: edge.style, type: typeEdge }
       : { ...edge, style: { ...edge.style, stroke: color }, type: typeEdge };
   };
 
   const edgesComp: Edge[] = [];
-  netOne[1].forEach(edge => {
+  netOne.edges.forEach(edge => {
     const edgeComp = updateEdge(edge);
     edgesComp.push(edgeComp);
   });
 
-  return [nodesComp, edgesComp, netOne[2]];
+  return {
+    agents: nodesComp,
+    edges: edgesComp,
+    name: netOne.name,
+  };
 }
 
 interface PropsSimplifyMenuControl {
@@ -165,7 +172,7 @@ interface PropsMenuControl {
   rfInstance: any;
   isRunningLayout: boolean;
   indexNet: number;
-  setNetIndexCur: (index: number, net: [Agent[], Edge[], string]) => void;
+  setNetIndexCur: (index: number, net: Net) => void;
 }
 
 export default (props: PropsMenuControl) => {
@@ -192,7 +199,7 @@ export default (props: PropsMenuControl) => {
     input.webkitdirectory = true;
     input.multiple = true;
 
-    const nets: [Agent[], Edge[], string][] = [];
+    const nets: Net[] = [];
 
     input.onchange = async event => {
       const fileList = (event.target as HTMLInputElement).files;
@@ -207,8 +214,12 @@ export default (props: PropsMenuControl) => {
 
       for (const file of files) {
         const net = await getObjectsFromFile(file);
-        const [nds, eds] = await parseJSON(net, typeNode, typeEdge);
-        nets.push([nds, eds, file.name]);
+        const [nds, eds] = await parseObjects(net, typeNode, typeEdge);
+        nets.push({
+          agents: nds,
+          edges: eds,
+          name: file.name,
+        });
       }
 
       if (nets.length > 0) {
@@ -229,7 +240,11 @@ export default (props: PropsMenuControl) => {
       const netOne = netsSaved[indexNew];
       const netTwo =
         modeNet === NetMode.sequence
-          ? ([nodes, edges, filesOpened[0]] as [Agent[], Edge[], string])
+          ? {
+              agents: nodes,
+              edges: edges,
+              name: filesOpened[0],
+            }
           : netsSaved[indexCur];
       const isStepUp = modeNet === NetMode.sequence ? flag : Boolean(indexNet);
 
@@ -248,7 +263,15 @@ export default (props: PropsMenuControl) => {
   const saveNetEdited = useCallback(() => {
     const index = indexCur - (filesOpened[0] === filesOpened[1] && indexCur > 0 ? 1 : 0);
     setNetsSaved(nets =>
-      nets.map((net, i) => (i === index ? [nodes, edges, filesOpened[0]] : net)),
+      nets.map((net, i) =>
+        i === index
+          ? {
+              agents: nodes,
+              edges: edges,
+              name: filesOpened[0],
+            }
+          : net,
+      ),
     );
   }, [indexCur, nodes, edges, filesOpened]);
 
