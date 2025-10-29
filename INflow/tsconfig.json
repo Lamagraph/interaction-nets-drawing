@@ -1,5 +1,13 @@
 {
   "compilerOptions": {
+    "baseUrl": "./",
+    "paths": {
+      "@/*": ["src/*"],
+      "@flows/*": ["src/flows/*"],
+      "@components/*": ["src/views/*"],
+      "@utils/*": ["src/utils/*"],
+      "@layouts/*": ["src/layouts/*"]
+    },
     "target": "ESNext",
     "jsx": "react-jsx",
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
@@ -8,6 +16,8 @@
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "allowJs": true,
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
     "checkJs": true,
     "isolatedModules": true,
     "esModuleInterop": true,

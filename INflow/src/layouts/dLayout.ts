@@ -5,7 +5,7 @@ import { HierarchyNode, stratify, tree } from 'd3-hierarchy';
 
 import '@xyflow/react/dist/style.css';
 
-import { type Agent } from '../nets';
+import { type Agent } from '@/nets';
 
 const g = tree<Agent>();
 

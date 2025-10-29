@@ -1,6 +1,6 @@
 import { Position } from '@xyflow/react';
-import { type Port, type AgentData } from '../nets';
-import { handleAuxiliaryPort, handlePrinciplePort, labelAgentHTML } from './NodeLayout';
+import { type Port, type AgentData } from '@/nets';
+import { handleAuxiliaryPort, handlePrinciplePort, labelAgentHTML } from '@components/NodeLayout';
 
 export const auxiliaryPortTD = (port: Port, needLimit: boolean): JSX.Element => {
   return (

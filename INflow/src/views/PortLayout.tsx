@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { type Edge, Handle, HandleProps, useNodeConnections, useReactFlow } from '@xyflow/react';
 
-import { type Agent } from '../nets';
+import { type Agent } from '@/nets';
 
 export default (props: HandleProps): JSX.Element => {
   const { setEdges } = useReactFlow<Agent, Edge>();

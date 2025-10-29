@@ -3,14 +3,14 @@ import { type Edge, Panel, useNodesInitialized, useReactFlow } from '@xyflow/rea
 
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
-import { useINflowState } from '../utils/INflowContext';
+import { useINflowState } from '@utils/INflowContext';
 
-import { type Agent } from '../nets';
-import { getLayoutedNodes as dagreLayoutNodes } from '../layouts/dagreLayout';
-import { getLayoutedNodes as elkHLayoutNodes } from '../layouts/elkLayoutHandles';
-import { getLayoutedNodes as elkLayoutNodes, elkOptions } from '../layouts/elkLayouts';
-import { getLayoutedNodes as dLayoutNodes } from '../layouts/dLayout';
-import { getLayoutedNodes as dForceLayoutNodes } from '../layouts/dForceLayout';
+import { type Agent } from '@/nets';
+import { getLayoutedNodes as dagreLayoutNodes } from '@layouts/dagreLayout';
+import { getLayoutedNodes as elkHLayoutNodes } from '@layouts/elkLayoutHandles';
+import { getLayoutedNodes as elkLayoutNodes, elkOptions } from '@layouts/elkLayouts';
+import { getLayoutedNodes as dLayoutNodes } from '@layouts/dLayout';
+import { getLayoutedNodes as dForceLayoutNodes } from '@layouts/dForceLayout';
 
 export default ({
   indexLayout,

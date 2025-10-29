@@ -1,6 +1,6 @@
-import { type AgentData } from '../nets';
-import { labelAgentHTML } from './NodeLayout';
-import { auxiliaryPortTD, principalPortTD } from './NodeLayoutGen';
+import { type AgentData } from '@/nets';
+import { labelAgentHTML } from '@components/NodeLayout';
+import { auxiliaryPortTD, principalPortTD } from '@components/NodeLayoutGen';
 
 export default ({
   id,

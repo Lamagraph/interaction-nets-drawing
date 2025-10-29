@@ -2,13 +2,13 @@ import { ReactFlowProvider } from '@xyflow/react';
 
 import '@xyflow/react/dist/style.css';
 
-import { INflowProvider, useINflowState } from './utils/INflowContext';
-import { DnDProvider } from './utils/DnDContext';
-import { MCProvider } from './utils/MCContext';
+import { INflowProvider, useINflowState } from '@utils/INflowContext';
+import { DnDProvider } from '@utils/DnDContext';
+import { MCProvider } from '@utils/MCContext';
 
-import { NetMode } from './views/MenuControl';
-import MainFlow from './flows/MainFlow';
-import SubFlow from './flows/SubFlow';
+import { NetMode } from '@components/MenuControl';
+import MainFlow from '@flows/MainFlow';
+import SubFlow from '@flows/SubFlow';
 
 const INflow = (): JSX.Element => {
   const {

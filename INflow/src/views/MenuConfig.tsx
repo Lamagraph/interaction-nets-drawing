@@ -4,11 +4,11 @@ import { Panel, useReactFlow, XYPosition } from '@xyflow/react';
 import { FaInfoCircle } from 'react-icons/fa';
 import '@xyflow/react/dist/style.css';
 
-import { useDnD } from '../utils/DnDContext';
+import { useDnD } from '@utils/DnDContext';
 
-import { defPort, type Agent, defPointCon } from '../nets';
-import NodeLayoutGen from './NodeLayoutGen';
-import { useNodeParametersState } from '../utils/MCContext';
+import { defPort, type Agent, defPointCon } from '@/nets';
+import NodeLayoutGen from '@components/NodeLayoutGen';
+import { useNodeParametersState } from '@utils/MCContext';
 
 interface PropsMenuConfig {
   addItem: (position: XYPosition) => void;

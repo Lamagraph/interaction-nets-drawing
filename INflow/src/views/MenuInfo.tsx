@@ -1,8 +1,8 @@
 import { Panel } from '@xyflow/react';
 
-import { useINflowState } from '../utils/INflowContext';
+import { useINflowState } from '@utils/INflowContext';
 
-import { NetMode } from './MenuControl';
+import { NetMode } from '@components/MenuControl';
 
 interface PropsMenuInfo {
   fileOpened: string;

@@ -3,7 +3,7 @@
 import { Edge, Position } from '@xyflow/react';
 import dagre from '@dagrejs/dagre';
 
-import { type Agent } from '../nets';
+import { type Agent } from '@/nets';
 
 const dagreGraph = new dagre.graphlib.Graph().setDefaultEdgeLabel(() => ({}));
 

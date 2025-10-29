@@ -5,7 +5,7 @@ import ELK from 'elkjs/lib/elk.bundled.js';
 
 import '@xyflow/react/dist/style.css';
 
-import { type Agent } from '../nets';
+import { type Agent } from '@/nets';
 
 const elk = new ELK();
 

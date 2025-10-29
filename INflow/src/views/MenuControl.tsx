@@ -6,9 +6,9 @@ import { FaEdit, FaSave } from 'react-icons/fa';
 import { RiArrowGoBackLine } from 'react-icons/ri';
 import '@xyflow/react/dist/style.css';
 
-import { useINflowState } from '../utils/INflowContext';
+import { useINflowState } from '@utils/INflowContext';
 
-import { type Agent, type Net, getObjectFromFile, toNetFromObject, transformObject } from '../nets';
+import { type Agent, type Net, getObjectFromFile, toNetFromObject, transformObject } from '@/nets';
 
 export enum NetMode {
   edit = 0,
@@ -175,7 +175,8 @@ export default (props: PropsMenuControl) => {
         const indexNew = 0;
         setNetsSaved(nets);
         setNetIndexCur(indexNew, nets[indexNew]);
-        setModeNet(modeDefault);
+        if (nets.length === 1) setModeNet(NetMode.edit);
+        else setModeNet(modeDefault);
       }
     };
 

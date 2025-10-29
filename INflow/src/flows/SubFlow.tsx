@@ -13,12 +13,12 @@ import {
 
 import '@xyflow/react/dist/style.css';
 
-import { useINflowState } from '../utils/INflowContext';
-import { nodeTypes, edgeTypes } from '../utils/typesElements';
+import { useINflowState } from '@utils/INflowContext';
+import { nodeTypes, edgeTypes } from '@utils/typesElements';
 
-import { type Agent, type Net } from '../nets';
-import { SimplifyMenuControl, NetMode, compareNet } from '../views/MenuControl';
-import MenuLayouts from '../views/MenuLayouts';
+import { type Agent, type Net } from '@/nets';
+import { SimplifyMenuControl, NetMode, compareNet } from '@components/MenuControl';
+import MenuLayouts from '@components/MenuLayouts';
 
 const indexNet = 1;
 

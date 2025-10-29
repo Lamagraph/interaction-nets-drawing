@@ -4,8 +4,8 @@ import { useMemo, useRef } from 'react';
 import { useReactFlow, useNodesInitialized, type Edge } from '@xyflow/react';
 import { forceSimulation, forceLink, forceManyBody, forceX, forceY } from 'd3-force';
 
-import collide from './collide.js';
-import { type Agent } from '../nets';
+import collide from '@layouts/collide.js';
+import { type Agent } from '@/nets';
 
 const simulation = forceSimulation()
     .force('charge', forceManyBody().strength(-1000))

@@ -3,9 +3,9 @@
 import { Position, type Edge } from '@xyflow/react';
 import ELK from 'elkjs/lib/elk.bundled.js';
 
-import { mapTypePos, nodeTypes } from '../utils/typesElements';
+import { mapTypePos, nodeTypes } from '@utils/typesElements';
 
-import { type Agent } from '../nets';
+import { type Agent } from '@/nets';
 
 type NodeType = keyof typeof nodeTypes;
 

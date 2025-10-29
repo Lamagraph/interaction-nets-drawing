@@ -17,10 +17,10 @@ import {
 
 import '@xyflow/react/dist/style.css';
 
-import { useINflowState } from '../utils/INflowContext';
-import { useDnD } from '../utils/DnDContext';
-import { useNodeParametersState } from '../utils/MCContext';
-import { nodeTypes, edgeTypes } from '../utils/typesElements';
+import { useINflowState } from '@utils/INflowContext';
+import { useDnD } from '@utils/DnDContext';
+import { useNodeParametersState } from '@utils/MCContext';
+import { nodeTypes, edgeTypes } from '@utils/typesElements';
 
 import {
   type Agent,
@@ -31,12 +31,13 @@ import {
   validate,
   defPointCon,
   type Net,
-} from '../nets';
-import MenuControl, { compareNet, NetMode } from '../views/MenuControl';
-import MenuLayouts from '../views/MenuLayouts';
-import MenuConfig from '../views/MenuConfig';
-import MenuInfo from '../views/MenuInfo';
+} from '@/nets';
+import MenuControl, { compareNet, NetMode } from '@components/MenuControl';
+import MenuLayouts from '@components/MenuLayouts';
+import MenuConfig from '@components/MenuConfig';
+import MenuInfo from '@components/MenuInfo';
 
+// Reset localStorage: `localStorage.removeItem(keyReactFlow);`
 const keyReactFlow = 'react-flow-startup';
 const dirNetsSaved = '../../saved-nets/';
 const nameFileStartup = 'list_add_1.json';
@@ -70,6 +71,7 @@ export default (): JSX.Element => {
   };
 
   // Add and edit net
+
   const {
     nodeId,
     setNodeId,
@@ -325,6 +327,7 @@ export default (): JSX.Element => {
           nds = flow.nodes as Agent[];
           eds = flow.edges as Edge[];
           nameFile = `IN_${nds.length}_agents_${eds.length}_edges`;
+          console.log("Startup from localStorage");
         }
       }
 
@@ -332,6 +335,7 @@ export default (): JSX.Element => {
         try {
           const net = await getObjectFromFileByName(dirNetsSaved + nameFileStartup);
           [nds, eds] = await toNetFromObject(net, typeNode, typeEdge);
+          console.log(`Startup from ${dirNetsSaved + nameFileStartup}`);
         } catch (error) {
           console.log(error);
           [nds, eds] = [[], []];

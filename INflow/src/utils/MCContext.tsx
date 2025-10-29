@@ -1,6 +1,6 @@
 import { createContext, useContext, useState } from 'react';
 
-import { type PointConnection, type Port, defPort, defPointCon } from '../nets';
+import { type PointConnection, type Port, defPort, defPointCon } from '@/nets';
 
 // MenuConfig
 interface MCContextType {

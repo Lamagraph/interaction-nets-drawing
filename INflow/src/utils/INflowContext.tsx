@@ -1,7 +1,7 @@
 import { createContext, useContext, useState } from 'react';
 
-import { NetMode } from '../views/MenuControl';
-import { transformObject, type Net } from '../nets';
+import { NetMode } from '@components/MenuControl';
+import { transformObject, type Net } from '@/nets';
 
 export type INflowInstance = {
   netsSaved: Net[];

@@ -1,7 +1,7 @@
 import { Handle, HandleType, Position } from '@xyflow/react';
 
-import { type Port, type AgentData } from '../nets';
-import PortLayout from './PortLayout';
+import { type Port, type AgentData } from '@/nets';
+import PortLayout from '@components/PortLayout';
 
 interface PropsHandle {
   type: HandleType;
