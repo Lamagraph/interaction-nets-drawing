@@ -1,14 +1,14 @@
 import { useCallback } from 'react';
-import { ControlButton, Controls, type Edge } from '@xyflow/react';
+import { ControlButton, Controls, ReactFlowInstance, type Edge } from '@xyflow/react';
 
 import { DownloadIcon, UploadIcon, ArrowRightIcon, ArrowLeftIcon } from '@radix-ui/react-icons';
 import { FaEdit, FaSave } from 'react-icons/fa';
 import { RiArrowGoBackLine } from 'react-icons/ri';
 import '@xyflow/react/dist/style.css';
 
-import { useFlowState } from '../utils/FlowContext';
+import { useINflowState } from '../utils/INflowContext';
 
-import { type Agent, type Net, getObjectsFromFile, parseObjects } from '../nets';
+import { type Agent, type Net, getObjectFromFile, toNetFromObject, transformObject } from '../nets';
 
 export enum NetMode {
   edit = 0,
@@ -16,69 +16,19 @@ export enum NetMode {
   comparison = 2,
 }
 
-const allowedKeys = [
-  'nodes',
-  'id',
-  'data',
-  'label',
-  'auxiliaryPorts',
-  'principalPort',
-  'edges',
-  'source',
-  'target',
-  'sourcePort',
-  'sourceHandle',
-  'targetPort',
-  'targetHandle',
-  'activePair',
-  'animated',
-];
-
-const mapKeys = {
-  animated: 'activePair',
-  sourceHandle: 'sourcePort',
-  targetHandle: 'targetPort',
-};
-
 const modeDefault = NetMode.comparison;
 
-const downloadNet = (rfInstance: any, fileOpened: string) => {
-  const transformObject = (obj: any): any => {
-    if (Array.isArray(obj)) {
-      return obj.map(transformObject);
-    } else if (obj && typeof obj === 'object') {
-      const result: Record<string, any> = {};
+const downloadNet = async (rfInstance: ReactFlowInstance<Agent, Edge>, fileOpened: string) => {
+  const flow = rfInstance.toObject();
+  const flowObj = await transformObject(flow);
+  const dataStr = JSON.stringify(flowObj, null, 2);
+  const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+  const exportFileDefaultName = fileOpened.slice(0, -5) + '_edited.json';
 
-      for (const [key, value] of Object.entries(obj)) {
-        if (key === 'data') {
-          Object.assign(result, transformObject(value));
-        } else if (allowedKeys.includes(key)) {
-          const newKey = (mapKeys as Record<string, string>)[key] || key;
-          const newValue =
-            key === 'targetHandle' && typeof value === 'string'
-              ? value.slice(0, -1)
-              : transformObject(value);
-          result[newKey] = newValue;
-        }
-      }
-
-      return result;
-    }
-    return obj;
-  };
-
-  if (rfInstance) {
-    const flow = rfInstance.toObject();
-
-    const dataStr = JSON.stringify(transformObject(flow), null, 2);
-    const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
-    const exportFileDefaultName = fileOpened.slice(0, -5) + '_edited.json';
-
-    const linkElement = document.createElement('a');
-    linkElement.setAttribute('href', dataUri);
-    linkElement.setAttribute('download', exportFileDefaultName);
-    linkElement.click();
-  }
+  const linkElement = document.createElement('a');
+  linkElement.setAttribute('href', dataUri);
+  linkElement.setAttribute('download', exportFileDefaultName);
+  linkElement.click();
 };
 
 interface PropsUpdateNet {
@@ -149,7 +99,9 @@ export const SimplifyMenuControl = (props: PropsSimplifyMenuControl): JSX.Elemen
   const { fileOpened, rfInstance, isRunningLayout, goToEditNet } = props;
 
   const onDownload = useCallback(() => {
-    downloadNet(rfInstance, fileOpened);
+    if (rfInstance) {
+      downloadNet(rfInstance, fileOpened);
+    }
   }, [rfInstance, fileOpened]);
 
   return (
@@ -169,7 +121,7 @@ export const SimplifyMenuControl = (props: PropsSimplifyMenuControl): JSX.Elemen
 interface PropsMenuControl {
   nodes: Agent[];
   edges: Edge[];
-  rfInstance: any;
+  rfInstance: ReactFlowInstance<Agent, Edge> | null;
   isRunningLayout: boolean;
   indexNet: number;
   setNetIndexCur: (index: number, net: Net) => void;
@@ -177,19 +129,16 @@ interface PropsMenuControl {
 
 export default (props: PropsMenuControl) => {
   const {
-    netsSaved,
+    instanceINflow: { netsSaved, indexCur, modeNet, typeNode, typeEdge, filesOpened },
     setNetsSaved,
-    indexCur,
-    modeNet,
     setModeNet,
-    typeNode,
-    typeEdge,
-    filesOpened,
-  } = useFlowState();
+  } = useINflowState();
   const { nodes, edges, rfInstance, isRunningLayout, indexNet, setNetIndexCur } = props;
 
   const onDownload = useCallback(() => {
-    downloadNet(rfInstance, filesOpened[0]);
+    if (rfInstance) {
+      downloadNet(rfInstance, filesOpened[0]);
+    }
   }, [rfInstance, filesOpened]);
 
   const onUpload = useCallback(() => {
@@ -213,8 +162,8 @@ export default (props: PropsMenuControl) => {
       );
 
       for (const file of files) {
-        const net = await getObjectsFromFile(file);
-        const [nds, eds] = await parseObjects(net, typeNode, typeEdge);
+        const net = await getObjectFromFile(file);
+        const [nds, eds] = await toNetFromObject(net, typeNode, typeEdge);
         nets.push({
           agents: nds,
           edges: eds,

@@ -3,7 +3,7 @@ import { type Edge, Panel, useNodesInitialized, useReactFlow } from '@xyflow/rea
 
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
-import { useFlowState } from '../utils/FlowContext';
+import { useINflowState } from '../utils/INflowContext';
 
 import { type Agent } from '../nets';
 import { getLayoutedNodes as dagreLayoutNodes } from '../layouts/dagreLayout';
@@ -19,7 +19,7 @@ export default ({
   indexLayout: number;
   setIsRunningLayout: (value: boolean) => void;
 }): JSX.Element => {
-  const { isRunningLayouts } = useFlowState();
+  const { isRunningLayouts } = useINflowState();
   const { getNodes, getEdges, setNodes, fitView } = useReactFlow<Agent, Edge>();
   const nodesInitialized = useNodesInitialized();
 

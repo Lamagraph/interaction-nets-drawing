@@ -12,19 +12,20 @@ import {
   Connection,
   XYPosition,
   ReactFlowInstance,
+  OnInit,
 } from '@xyflow/react';
 
 import '@xyflow/react/dist/style.css';
 
-import { useFlowState } from '../utils/FlowContext';
+import { useINflowState } from '../utils/INflowContext';
 import { useDnD } from '../utils/DnDContext';
 import { useNodeParametersState } from '../utils/MCContext';
 import { nodeTypes, edgeTypes } from '../utils/typesElements';
 
 import {
   type Agent,
-  getObjectsByName,
-  parseObjects,
+  getObjectFromFileByName,
+  toNetFromObject,
   isActivePair,
   getTargetHandle,
   validate,
@@ -36,24 +37,20 @@ import MenuLayouts from '../views/MenuLayouts';
 import MenuConfig from '../views/MenuConfig';
 import MenuInfo from '../views/MenuInfo';
 
+const keyReactFlow = 'react-flow-startup';
 const dirNetsSaved = '../../saved-nets/';
-const nameFileStart = 'list_add_1.json';
+const nameFileStartup = 'list_add_1.json';
 const indexNet = 0;
 
 export default (): JSX.Element => {
   const {
-    netsSaved,
-    indexCur,
+    instanceINflow: { netsSaved, indexCur, modeNet, typeNode, typeEdge, filesOpened },
     setIndexCur,
-    modeNet,
     setModeNet,
+    setFilesOpened,
     isRunningLayouts,
     setIsRunningLayouts,
-    typeNode,
-    typeEdge,
-    filesOpened,
-    setFilesOpened,
-  } = useFlowState();
+  } = useINflowState();
 
   // Main
 
@@ -70,20 +67,6 @@ export default (): JSX.Element => {
   const isRunningLayout = isRunningLayouts[indexNet];
   const setIsRunningLayout = (value: boolean) => {
     setIsRunningLayouts(flags => [value, flags[1]]);
-  };
-
-  // Start
-  const loadNetStart = async (nameFile: string) => {
-    try {
-      const net = await getObjectsByName(nameFile);
-      const [nds, eds] = await parseObjects(net, typeNode, typeEdge);
-      setNodes(nds);
-      setEdges(eds);
-    } catch (error) {
-      console.log(error);
-      setNodes([]);
-      setEdges([]);
-    }
   };
 
   // Add and edit net
@@ -330,14 +313,45 @@ export default (): JSX.Element => {
 
   const [rfInstance, setRfInstance] = useState<ReactFlowInstance<Agent, Edge> | null>(null);
 
+  const onInit: OnInit<Agent, Edge> = (instance: ReactFlowInstance<Agent, Edge>) => {
+    const startup = async () => {
+      let [nds, eds]: [Agent[] | null, Edge[] | null] = [null, null];
+      let nameFile: string = nameFileStartup;
+
+      const objReactFlow = localStorage.getItem(keyReactFlow);
+      if (objReactFlow) {
+        const flow = JSON.parse(objReactFlow);
+        if (flow) {
+          nds = flow.nodes as Agent[];
+          eds = flow.edges as Edge[];
+          nameFile = `IN_${nds.length}_agents_${eds.length}_edges`;
+        }
+      }
+
+      if (!nds || !eds) {
+        try {
+          const net = await getObjectFromFileByName(dirNetsSaved + nameFileStartup);
+          [nds, eds] = await toNetFromObject(net, typeNode, typeEdge);
+        } catch (error) {
+          console.log(error);
+          [nds, eds] = [[], []];
+        }
+      }
+
+      instance.setNodes(nds);
+      instance.setEdges(eds);
+      setFileOpened(nameFile);
+    };
+
+    startup();
+
+    setRfInstance(instance);
+    fitView();
+  };
+
   const inabilityInteract = !isRunningLayout;
 
   // Effects
-
-  useEffect(() => {
-    setFileOpened(nameFileStart);
-    loadNetStart(dirNetsSaved + nameFileStart);
-  }, []);
 
   useEffect(() => {
     if (isRunningLayout) unselectNode();
@@ -360,8 +374,15 @@ export default (): JSX.Element => {
   }, [typeEdge]);
 
   useEffect(() => {
-    fitView();
+    setTimeout(() => fitView(), 10);
   }, [indexCur, modeNet]);
+
+  useEffect(() => {
+    if (rfInstance) {
+      const flow = rfInstance.toObject();
+      localStorage.setItem(keyReactFlow, JSON.stringify(flow));
+    }
+  }, [nodes.length, edges.length, rfInstance]);
 
   return (
     <div className="dndflow">
@@ -371,7 +392,7 @@ export default (): JSX.Element => {
           edges={edges}
           nodeTypes={nodeTypes}
           edgeTypes={edgeTypes}
-          onInit={setRfInstance}
+          onInit={onInit}
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}

@@ -1,28 +1,33 @@
 import { type Node, type Edge, type Connection } from '@xyflow/react';
 
+// Core
+
 export interface PointConnection {
     idNode: string;
     idPort: string;
 }
+export const defPointCon = { idNode: '', idPort: '' };
 
 export type Port = {
     id: string;
     label: string | null;
 };
+export const defPort = { id: '', label: null };
+
 export type AgentData = {
     label: string;
     auxiliaryPorts: Port[];
     principalPort: Port;
 };
 export type Agent = Node<AgentData>;
+
 export type Net = {
     agents: Agent[];
     edges: Edge[];
     name: string;
 };
 
-export const defPointCon = { idNode: '', idPort: '' };
-export const defPort = { id: '', label: null };
+// Utils
 
 export function validate(item: any, type = 'string') {
     if (item === undefined || item === null) return false;
@@ -51,7 +56,14 @@ export function isActivePair(params: Edge | Connection, nodes: Agent[]): boolean
     return false;
 }
 
-export async function getObjectsFromFile(file: File): Promise<any> {
+// Serialization
+
+export type NetObject = {
+    nodes?: { [key: string]: any };
+    edges?: { [key: string]: any };
+};
+
+export async function getObjectFromFile(file: File): Promise<NetObject> {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
 
@@ -72,8 +84,8 @@ export async function getObjectsFromFile(file: File): Promise<any> {
     });
 }
 
-export async function getObjectsByName(file: string): Promise<any> {
-    const response = await fetch(file);
+export async function getObjectFromFileByName(nameFile: string): Promise<NetObject> {
+    const response = await fetch(nameFile);
     if (!response.ok) {
         throw new Error(`Response.status: ${response.status}`);
     }
@@ -81,11 +93,8 @@ export async function getObjectsByName(file: string): Promise<any> {
     return objects;
 }
 
-export async function parseObjects(
-    net: {
-        nodes?: { [key: string]: any };
-        edges?: { [key: string]: any };
-    },
+export async function toNetFromObject(
+    net: NetObject,
     typeNode: string,
     typeEdge: string,
 ): Promise<[Agent[], Edge[]]> {
@@ -155,4 +164,57 @@ export async function parseObjects(
         console.error('Failed to parse JSON:', error);
         return [[], []];
     }
+}
+
+const allowedKeys = [
+    'nodes',
+    'id',
+    'data',
+    'label',
+    'auxiliaryPorts',
+    'principalPort',
+    'edges',
+    'source',
+    'target',
+    'sourcePort',
+    'sourceHandle',
+    'targetPort',
+    'targetHandle',
+    'activePair',
+    'animated',
+];
+
+const mapKeys = {
+    animated: 'activePair',
+    sourceHandle: 'sourcePort',
+    targetHandle: 'targetPort',
+};
+
+export async function transformObject(objNet: NetObject): Promise<NetObject> {
+    const transObjRec = (obj: any): Record<string, any> => {
+        if (Array.isArray(obj)) {
+            return obj.map(transObjRec);
+        } else if (obj && typeof obj === 'object') {
+            const result: Record<string, any> = {};
+
+            for (const [key, value] of Object.entries(obj)) {
+                if (key === 'data') {
+                    Object.assign(result, transObjRec(value));
+                } else if (allowedKeys.includes(key)) {
+                    const newKey = (mapKeys as Record<string, string>)[key] || key;
+                    const newValue =
+                        key === 'targetHandle' && typeof value === 'string'
+                            ? value.slice(0, -1)
+                            : transObjRec(value);
+                    result[newKey] = newValue;
+                }
+            }
+
+            return result;
+        }
+
+        return obj;
+    };
+
+    return transObjRec(objNet);
 }

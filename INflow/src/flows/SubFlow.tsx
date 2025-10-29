@@ -13,7 +13,7 @@ import {
 
 import '@xyflow/react/dist/style.css';
 
-import { useFlowState } from '../utils/FlowContext';
+import { useINflowState } from '../utils/INflowContext';
 import { nodeTypes, edgeTypes } from '../utils/typesElements';
 
 import { type Agent, type Net } from '../nets';
@@ -24,18 +24,13 @@ const indexNet = 1;
 
 export default (): JSX.Element => {
   const {
-    netsSaved,
-    indexCur,
+    instanceINflow: { netsSaved, indexCur, modeNet, typeNode, typeEdge, filesOpened },
     setIndexCur,
-    modeNet,
     setModeNet,
+    setFilesOpened,
     isRunningLayouts,
     setIsRunningLayouts,
-    typeNode,
-    typeEdge,
-    filesOpened,
-    setFilesOpened,
-  } = useFlowState();
+  } = useINflowState();
 
   // Main
 
@@ -109,7 +104,7 @@ export default (): JSX.Element => {
   }, [typeEdge]);
 
   useEffect(() => {
-    fitView();
+    setTimeout(() => fitView(), 10);
   }, [indexCur, modeNet]);
 
   return (

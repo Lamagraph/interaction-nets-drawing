@@ -2,7 +2,7 @@ import { ReactFlowProvider } from '@xyflow/react';
 
 import '@xyflow/react/dist/style.css';
 
-import { FlowProvider, useFlowState } from './utils/FlowContext';
+import { INflowProvider, useINflowState } from './utils/INflowContext';
 import { DnDProvider } from './utils/DnDContext';
 import { MCProvider } from './utils/MCContext';
 
@@ -10,8 +10,10 @@ import { NetMode } from './views/MenuControl';
 import MainFlow from './flows/MainFlow';
 import SubFlow from './flows/SubFlow';
 
-const Flow = (): JSX.Element => {
-  const { netsSaved, modeNet } = useFlowState();
+const INflow = (): JSX.Element => {
+  const {
+    instanceINflow: { netsSaved, modeNet },
+  } = useINflowState();
 
   return (
     <div style={{ display: 'flex', height: '100%', gap: 10 }}>
@@ -38,8 +40,8 @@ const Flow = (): JSX.Element => {
 
 export default (): JSX.Element => {
   return (
-    <FlowProvider>
-      <Flow />
-    </FlowProvider>
+    <INflowProvider>
+      <INflow />
+    </INflowProvider>
   );
 };
