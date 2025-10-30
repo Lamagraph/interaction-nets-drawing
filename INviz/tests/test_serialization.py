@@ -17,7 +17,7 @@ def test_get_json_invalid():
 def test_get_json_valid():
     json = ser.get_json(PATH_GRAPHS / "two_agents_one_edge.json")
     assert json == {
-        "nodes": [
+        "agents": [
             {
                 "id": "N1",
                 "label": "2",

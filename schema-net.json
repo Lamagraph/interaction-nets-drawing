@@ -1,12 +1,12 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "object",
-  "required": ["nodes", "edges"],
+  "required": ["agents", "edges"],
   "properties": {
-    "nodes": {
+    "agents": {
       "type": "array",
       "items": {
-        "$ref": "#/definitions/node"
+        "$ref": "#/definitions/agent"
       }
     },
     "edges": {
@@ -30,7 +30,7 @@
         }
       }
     },
-    "node": {
+    "agent": {
       "type": "object",
       "required": ["id", "label", "auxiliaryPorts", "principalPort"],
       "properties": {

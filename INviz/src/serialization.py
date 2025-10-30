@@ -165,7 +165,7 @@ def gen_str_net(name_net: str, data_json: Any) -> str | None:
 
     nodes: Set[Agent] = set()
     try:
-        nodes_j = data_json.get("nodes")
+        nodes_j = data_json.get("agents")
         for node_j in nodes_j:
             gen = gen_str_agent(node_j, nodes)
             if gen:

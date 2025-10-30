@@ -1,5 +1,5 @@
 {
-  "nodes": [
+  "agents": [
     {
       "id": "N1",
       "label": "2",
@@ -142,18 +142,20 @@
       "activePair": false
     },
     {
+      "id": "E_N2:P2-N7:P0",
       "source": "N2",
       "sourcePort": "P2",
       "target": "N7",
       "targetPort": "P0",
-      "id": "xy-edge__N2P2-N7P0t"
+      "activePair": false
     },
     {
+      "id": "E_N5:P2-N7:P2",
       "source": "N5",
       "sourcePort": "P2",
       "target": "N7",
       "targetPort": "P2",
-      "id": "xy-edge__N5P2-N7P2t"
+      "activePair": false
     }
   ]
 }
