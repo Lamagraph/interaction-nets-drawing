@@ -134,7 +134,7 @@ export default (): JSX.Element => {
           isRunningLayout={isRunningLayouts[0] || isRunningLayouts[1]}
           goToEditNet={goToEditNet}
         />
-        <Panel id="SubFlowInfo" position="bottom-left" className="panel-info">
+        <Panel data-testid="SubFlowInfo" position="bottom-left" className="panel-info">
           <div className="item-info">
             <label className="label-info">File:</label>
             <label className="label-info">{fileOpened}</label>

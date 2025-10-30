@@ -61,17 +61,17 @@ export default (props: PropsMenuConfig): JSX.Element => {
   }, [getInternalNode, addItem, nodeSelected]);
 
   return (
-    <div id="MenuConfig">
+    <div data-testid="MenuConfig">
       {!isRunningLayout && (
         <Panel position="top-left">
           <div className="react-flow__node">
             <table>
               <tbody>
-                {/* Help line */}
-                <tr>
+                <tr data-testid="help-line">
                   <th>
                     Auxiliary
                     <button
+                      data-testid="add_aux-p"
                       disabled={nodeAuxiliaryPorts.length >= 15}
                       onClick={() => {
                         setNodeAuxiliaryPorts(ports => [...ports, defPort]);
@@ -84,6 +84,7 @@ export default (props: PropsMenuConfig): JSX.Element => {
                   <th>
                     <label className="xy-theme__label">Show links:</label>
                     <input
+                      data-testid="show_links"
                       type="checkbox"
                       checked={linkShowed}
                       onChange={event => setLinkShowed(event.target.checked)}
@@ -106,7 +107,7 @@ export default (props: PropsMenuConfig): JSX.Element => {
 
                 {/* Auxiliary ports */}
                 {nodeAuxiliaryPorts.map((_, i) => (
-                  <tr key={i}>
+                  <tr data-testid="auxiliary-line" key={i}>
                     <td>
                       <input
                         placeholder="id"
@@ -172,6 +173,7 @@ export default (props: PropsMenuConfig): JSX.Element => {
 
                     <td>
                       <button
+                        data-testid="remove_aux-pr"
                         onClick={() => {
                           setNodeAuxiliaryPorts(ports => ports.filter((_, j) => j !== i));
                           setNodeAuxiliaryLinks(links => links.filter((_, j) => j !== i));
@@ -183,13 +185,13 @@ export default (props: PropsMenuConfig): JSX.Element => {
                   </tr>
                 ))}
 
-                {/* Node info */}
-                <tr>
+                <tr data-testid="node-info">
                   <th colSpan={2}>Main</th>
                 </tr>
-                <tr>
+                <tr data-testid="node-props">
                   <td>
                     <input
+                      data-testid="node-id"
                       placeholder="id"
                       value={nodeId}
                       onChange={event => setNodeId(event.target.value)}
@@ -198,6 +200,7 @@ export default (props: PropsMenuConfig): JSX.Element => {
                   </td>
                   <td>
                     <input
+                      data-testid="node-label"
                       placeholder="label"
                       value={nodeLabel}
                       onChange={event => setNodeLabel(event.target.value)}
@@ -206,13 +209,13 @@ export default (props: PropsMenuConfig): JSX.Element => {
                   </td>
                 </tr>
 
-                {/* Principle port */}
                 <tr>
                   <th colSpan={2}>Principle</th>
                 </tr>
-                <tr>
+                <tr data-testid="principle-line">
                   <td>
                     <input
+                      data-testid="pr-p-id"
                       placeholder="id"
                       value={nodePrincipalPort.id}
                       onChange={event => {
@@ -223,6 +226,7 @@ export default (props: PropsMenuConfig): JSX.Element => {
                   </td>
                   <td>
                     <input
+                      data-testid="pr-p-label"
                       placeholder="label"
                       value={nodePrincipalPort.label ?? ('' as string)}
                       onChange={event => {
@@ -237,6 +241,7 @@ export default (props: PropsMenuConfig): JSX.Element => {
                     <>
                       <td>
                         <input
+                          data-testid="pr-link_node-id"
                           placeholder="node id"
                           value={nodePrincipalLink.idNode}
                           onChange={event => {
@@ -250,6 +255,7 @@ export default (props: PropsMenuConfig): JSX.Element => {
                       </td>
                       <td>
                         <input
+                          data-testid="pr-link_port-id"
                           placeholder="port id"
                           value={nodePrincipalLink.idPort}
                           onChange={event => {
@@ -268,14 +274,18 @@ export default (props: PropsMenuConfig): JSX.Element => {
                 {/* 'Add' button */}
                 <tr>
                   <td colSpan={2} style={{ padding: '10px' }}>
-                    <button className="xy-theme__button" onClick={onAdd} disabled={!isAllowed()}>
+                    <button
+                      data-testid="add-edit"
+                      className="xy-theme__button"
+                      onClick={onAdd}
+                      disabled={!isAllowed()}
+                    >
                       {nodeSelected && !isRunningLayout ? 'Edit agent' : 'Add agent'}
                     </button>
                   </td>
                 </tr>
 
-                {/* Node preview */}
-                <tr>
+                <tr data-testid="node-preview">
                   <td colSpan={2}>
                     <div style={{ display: 'flex', justifyContent: 'center' }}>
                       <div

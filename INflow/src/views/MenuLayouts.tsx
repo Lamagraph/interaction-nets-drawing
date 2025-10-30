@@ -68,7 +68,7 @@ export default ({
   const [layoutsShowed, setLayoutsShowed] = useState<boolean>(false);
 
   return (
-    <div id={`MenuLayouts-${indexNet}`}>
+    <div data-testid={`MenuLayouts-${indexNet}`}>
       <Panel position="top-right" className="panel-layouts">
         <div>
           {layoutsShowed && (
@@ -91,7 +91,7 @@ export default ({
               <button
                 className="xy-theme__button"
                 onClick={() => dagreLayout('TB')}
-                id="layout__Dagre-vertical"
+                data-testid="layout__Dagre-vertical"
                 disabled={isRunningLayouts[indexNet]}
               >
                 Dagre: vertical
@@ -99,7 +99,7 @@ export default ({
               <button
                 className="xy-theme__button"
                 onClick={() => dagreLayout('LR')}
-                id="layout__Dagre-horizontal"
+                data-testid="layout__Dagre-horizontal"
                 disabled={isRunningLayouts[indexNet]}
               >
                 Dagre: horizontal
@@ -107,7 +107,7 @@ export default ({
               <button
                 className="xy-theme__button"
                 onClick={elkHandlesLayout}
-                id="layout__ELK-handles"
+                data-testid="layout__ELK-handles"
                 disabled={isRunningLayouts[indexNet]}
               >
                 ELK-handles
@@ -115,7 +115,7 @@ export default ({
               <button
                 className="xy-theme__button"
                 onClick={() => elkLayout('DOWN')}
-                id="layout__ELK-vertical"
+                data-testid="layout__ELK-vertical"
                 disabled={isRunningLayouts[indexNet]}
               >
                 ELK: vertical
@@ -123,7 +123,7 @@ export default ({
               <button
                 className="xy-theme__button"
                 onClick={() => elkLayout('RIGHT')}
-                id="layout__ELK-horizontal"
+                data-testid="layout__ELK-horizontal"
                 disabled={isRunningLayouts[indexNet]}
               >
                 ELK: horizontal
@@ -131,7 +131,7 @@ export default ({
               <button
                 className="xy-theme__button"
                 onClick={dLayout}
-                id="layout__D3-hierarchy"
+                data-testid="layout__D3-hierarchy"
                 disabled={isRunningLayouts[indexNet]}
               >
                 D3-hierarchy
@@ -142,7 +142,7 @@ export default ({
           <button
             className="xy-theme__button"
             onClick={dForceLayout}
-            id="layout__D3-force"
+            data-testid="layout__D3-force"
             disabled={isRunningLayouts[1 - indexNet]}
           >
             {isRunningLayouts[indexNet] ? 'Stop' : 'Start'} D3-force

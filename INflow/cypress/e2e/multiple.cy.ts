@@ -8,23 +8,20 @@ describe('INflow E2E Tests: multiple options', () => {
             {
                 value: 'agentVert',
                 label: 'vertical',
-                classNode: 'node-layout__vert',
             },
             {
                 value: 'agentGen',
                 label: 'general',
-                classNode: 'node-layout__gen',
             },
             {
                 value: 'agentHor',
                 label: 'horizontal',
-                classNode: 'node-layout__hor',
             },
         ];
 
         type TestCase = (typeof testCases)[number];
-        const testNodeType = ({ value, label, classNode }: TestCase) => {
-            cy.get('#MenuInfo').within(() => {
+        const testNodeType = ({ value, label }: TestCase) => {
+            cy.get('[data-testid=MenuInfo]').within(() => {
                 cy.get('[data-testid="node-type__select"]')
                     .select(value)
                     .should('have.value', value);
@@ -34,7 +31,9 @@ describe('INflow E2E Tests: multiple options', () => {
 
             cy.wait(100);
 
-            cy.get('.react-flow__nodes').find(`.${classNode}`).should('have.length', 9);
+            cy.get('.react-flow__nodes')
+                .find(`.react-flow__node-${value}`)
+                .should('have.length', 9);
         };
 
         testCases.forEach(testCase => {
@@ -54,34 +53,28 @@ describe('INflow E2E Tests: multiple options', () => {
             {
                 value: 'smoothstep',
                 label: 'smoothstep',
-                classEdge: 'react-flow__edge-smoothstep',
             },
             {
                 value: 'smartBezier',
                 label: 'smart bezier',
-                classEdge: 'react-flow__edge-smartBezier',
             },
             {
                 value: 'smartStraight',
                 label: 'smart straight',
-                classEdge: 'react-flow__edge-smartStraight',
             },
             {
                 value: 'smartStep',
                 label: 'smart step',
-                classEdge: 'react-flow__edge-smartStep',
             },
-
             {
                 value: 'bezier',
                 label: 'bezier',
-                classEdge: 'react-flow__edge-bezier',
             },
         ];
 
         type TestCase = (typeof testCases)[number];
-        const testEdgeType = ({ value, label, classEdge }: TestCase) => {
-            cy.get('#MenuInfo').within(() => {
+        const testEdgeType = ({ value, label }: TestCase) => {
+            cy.get('[data-testid=MenuInfo]').within(() => {
                 cy.get('[data-testid="edge-type__select"]')
                     .select(value)
                     .should('have.value', value);
@@ -91,7 +84,9 @@ describe('INflow E2E Tests: multiple options', () => {
 
             cy.wait(100);
 
-            cy.get('.react-flow__edges').find(`.${classEdge}`).should('have.length', 10);
+            cy.get('.react-flow__edges')
+                .find(`.react-flow__edge-${value}`)
+                .should('have.length', 10);
         };
 
         testCases.forEach(testCase => {
@@ -137,14 +132,14 @@ describe('INflow E2E Tests: multiple options', () => {
 
         type TestCase = (typeof testCases)[number];
         const testLayout = ({ label, id }: TestCase) => {
-            cy.get('#MenuLayouts').within(() => {
-                cy.get(`button[id="layout__${id}"]`).click();
-                cy.get(`button[id="layout__${id}"]`).should('contain', label);
+            cy.get('[data-testid=MenuLayouts-0]').within(() => {
+                cy.get(`button[data-testid="layout__${id}"]`).click();
+                cy.get(`button[data-testid="layout__${id}"]`).should('contain', label);
             });
         };
 
         beforeEach(() => {
-            cy.get('#MenuLayouts button[title="Show more"]').click();
+            cy.get('[data-testid=MenuLayouts-0] button[title="Show more"]').click();
         });
 
         testCases.forEach(testCase => {

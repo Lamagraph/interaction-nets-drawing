@@ -29,7 +29,7 @@ export default (props: PropsMenuInfo): JSX.Element => {
   };
 
   return (
-    <div id="MenuInfo">
+    <div data-testid="MenuInfo">
       <Panel position="bottom-left" className="panel-info">
         {modeNet !== NetMode.edit && (
           <div className="item-info">

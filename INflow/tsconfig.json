@@ -16,6 +16,7 @@
     "jsx": "react-jsx",
     "sourceMap": true,
     "strict": true,
+    "types": ["cypress", "node"],
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,

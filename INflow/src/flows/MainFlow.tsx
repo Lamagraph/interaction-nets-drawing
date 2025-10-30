@@ -39,7 +39,7 @@ import MenuLayouts from '@components/MenuLayouts';
 import MenuConfig from '@components/MenuConfig';
 import MenuInfo from '@components/MenuInfo';
 
-// Reset localStorage: `localStorage.removeItem(keyReactFlow);`
+// Reset localStorage: `localStorage.removeItem(keyStorageNet);`
 const keyStorageNet = 'net-setup';
 
 const dirNetsSaved = '../../saved-nets/';
@@ -418,6 +418,7 @@ export default (): JSX.Element => {
           onDragOver={onDragOver}
           attributionPosition="bottom-left"
           fitView
+          data-testmode={`${modeNet}`}
           // If layout is running
           nodesDraggable={inabilityInteract}
           nodesConnectable={modeNet === NetMode.edit && inabilityInteract}

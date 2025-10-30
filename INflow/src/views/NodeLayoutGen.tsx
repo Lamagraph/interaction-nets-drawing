@@ -45,22 +45,18 @@ export default ({
   isNoPreview?: boolean;
 }): JSX.Element => {
   return (
-    <div className={isNoPreview ? 'node-layout__gen' : undefined}>
-      <table style={{ textAlign: 'left', margin: '2px' }}>
-        <tbody>
-          <tr>
-            <td style={{ paddingBottom: '8px', textAlign: 'center' }}>
-              {labelAgentHTML(data, id)}
-            </td>
-          </tr>
+    <table style={{ textAlign: 'left', margin: '2px' }}>
+      <tbody>
+        <tr>
+          <td style={{ paddingBottom: '8px', textAlign: 'center' }}>{labelAgentHTML(data, id)}</td>
+        </tr>
 
-          {data.auxiliaryPorts.map((port, index) => (
-            <tr key={index}>{auxiliaryPortTD(port, isNoPreview)}</tr>
-          ))}
+        {data.auxiliaryPorts.map((port, index) => (
+          <tr key={index}>{auxiliaryPortTD(port, isNoPreview)}</tr>
+        ))}
 
-          <tr>{principalPortTD(data, isNoPreview, undefined)}</tr>
-        </tbody>
-      </table>
-    </div>
+        <tr>{principalPortTD(data, isNoPreview, undefined)}</tr>
+      </tbody>
+    </table>
   );
 };

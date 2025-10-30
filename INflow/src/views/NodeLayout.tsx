@@ -67,7 +67,7 @@ export default ({
   isNoPreview?: boolean;
 }): JSX.Element => {
   return (
-    <div className={isNoPreview ? 'node-layout__hor' : undefined} style={{ position: 'relative' }}>
+    <div style={{ position: 'relative' }}>
       <div className="auxiliaryPorts-def">
         {data.auxiliaryPorts.map(port => (
           <div key={port.id} style={{ position: 'relative' }}>
