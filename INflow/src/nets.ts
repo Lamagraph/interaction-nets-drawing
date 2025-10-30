@@ -10,9 +10,9 @@ export const defPointCon = { idNode: '', idPort: '' };
 
 export type Port = {
     id: string;
-    label: string | null;
+    label?: string;
 };
-export const defPort = { id: '', label: null };
+export const defPort = { id: '' };
 
 export type AgentData = {
     label: string;
@@ -59,18 +59,39 @@ export function isActivePair(params: Edge | Connection, nodes: Agent[]): boolean
 // Serialization
 
 export type NetObject = {
-    nodes?: { [key: string]: any };
+    agents?: { [key: string]: any };
     edges?: { [key: string]: any };
 };
+
+export async function getObjectFromJSON(json: string): Promise<NetObject> {
+    const netObj: NetObject = JSON.parse(json);
+    if (netObj && netObj.agents && netObj.edges) {
+        return netObj;
+    }
+    throw new Error('Invalid net structure in JSON: missing required fields');
+}
+
+export async function getObjectFromFileByName(nameFile: string): Promise<NetObject> {
+    const response = await fetch(nameFile);
+    if (!response.ok) {
+        throw new Error(`Response.status: ${response.status}`);
+    }
+
+    const netObj: NetObject = await response.json();
+    if (netObj && netObj.agents && netObj.edges) {
+        return netObj;
+    }
+    throw new Error(`Invalid net structure in ${nameFile}: missing required fields`);
+}
 
 export async function getObjectFromFile(file: File): Promise<NetObject> {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
 
-        reader.onload = event => {
+        reader.onload = async event => {
             try {
-                const dataJson = JSON.parse(event.target?.result as string);
-                resolve(dataJson);
+                const netObj = await getObjectFromJSON(event.target?.result as string);
+                resolve(netObj);
             } catch (error) {
                 reject(new Error(`Failed to parse objects: ${error}`));
             }
@@ -84,23 +105,14 @@ export async function getObjectFromFile(file: File): Promise<NetObject> {
     });
 }
 
-export async function getObjectFromFileByName(nameFile: string): Promise<NetObject> {
-    const response = await fetch(nameFile);
-    if (!response.ok) {
-        throw new Error(`Response.status: ${response.status}`);
-    }
-    const objects = await response.json();
-    return objects;
-}
-
 export async function toNetFromObject(
-    net: NetObject,
+    netObj: NetObject,
     typeNode: string,
     typeEdge: string,
-): Promise<[Agent[], Edge[]]> {
+): Promise<Net> {
     try {
-        const nodesObj = net.nodes ? Object.entries(net.nodes) : [];
-        const nodes: Agent[] = [];
+        const nodesObj = netObj.agents ? Object.entries(netObj.agents) : [];
+        const nodesMap = new Map<string, Agent>();
         let index = 0;
 
         for (const [, nodeObj] of nodesObj) {
@@ -111,8 +123,9 @@ export async function toNetFromObject(
                     Array.isArray(nodeObj.auxiliaryPorts)) &&
                 (validate(nodeObj.data?.principalPort.id) || validate(nodeObj.principalPort.id))
             ) {
-                nodes.push({
-                    id: nodeObj.id,
+                const nodeId = nodeObj.id;
+                nodesMap.set(nodeId, {
+                    id: nodeId,
                     data: nodeObj.data ?? {
                         label: nodeObj.label,
                         auxiliaryPorts: nodeObj.auxiliaryPorts,
@@ -130,8 +143,8 @@ export async function toNetFromObject(
             }
         }
 
-        const edgesObj = net.edges ? Object.entries(net.edges) : [];
-        const edges: Edge[] = [];
+        const edgesObj = netObj.edges ? Object.entries(netObj.edges) : [];
+        const edgesMap = new Map<string, Edge>();
 
         for (const [, edgeObj] of edgesObj) {
             if (
@@ -142,10 +155,11 @@ export async function toNetFromObject(
             ) {
                 const sourceHandle = edgeObj.sourcePort || edgeObj.sourceHandle;
                 const targetHandle = edgeObj.targetPort || edgeObj.targetHandle;
-                edges.push({
-                    id:
-                        edgeObj.id ||
-                        `E_${edgeObj.source}:${sourceHandle}-${edgeObj.target}:${targetHandle}`,
+                const edgeId =
+                    edgeObj.id ||
+                    `E_${edgeObj.source}:${sourceHandle}-${edgeObj.target}:${targetHandle}`;
+                edgesMap.set(edgeId, {
+                    id: edgeId,
                     source: edgeObj.source,
                     target: edgeObj.target,
                     sourceHandle: sourceHandle,
@@ -159,15 +173,19 @@ export async function toNetFromObject(
             }
         }
 
-        return [nodes, edges];
+        return {
+            agents: Array.from(nodesMap.values()),
+            edges: Array.from(edgesMap.values()),
+            name: '',
+        };
     } catch (error) {
         console.error('Failed to parse JSON:', error);
-        return [[], []];
+        return { agents: [], edges: [], name: '' };
     }
 }
 
 const allowedKeys = [
-    'nodes',
+    'agents',
     'id',
     'data',
     'label',
@@ -190,23 +208,34 @@ const mapKeys = {
     targetHandle: 'targetPort',
 };
 
-export async function transformObject(objNet: NetObject): Promise<NetObject> {
-    const transObjRec = (obj: any): Record<string, any> => {
+function removeDuplicatesById<T extends { id: string }>(array: T[]): T[] {
+    const seen = new Set<string>();
+    return array.filter(item => {
+        if (seen.has(item.id)) {
+            return false;
+        }
+        seen.add(item.id);
+        return true;
+    });
+}
+
+export async function toObjectFromNet(net: Net): Promise<NetObject> {
+    const toObject = (obj: any): Record<string, any> => {
         if (Array.isArray(obj)) {
-            return obj.map(transObjRec);
+            return obj.map(toObject);
         } else if (obj && typeof obj === 'object') {
             const result: Record<string, any> = {};
 
             for (const [key, value] of Object.entries(obj)) {
                 if (key === 'data') {
-                    Object.assign(result, transObjRec(value));
+                    Object.assign(result, toObject(value));
                 } else if (allowedKeys.includes(key)) {
-                    const newKey = (mapKeys as Record<string, string>)[key] || key;
-                    const newValue =
+                    const keyNew = (mapKeys as Record<string, string>)[key] || key;
+                    const valueNew =
                         key === 'targetHandle' && typeof value === 'string'
                             ? value.slice(0, -1)
-                            : transObjRec(value);
-                    result[newKey] = newValue;
+                            : toObject(value);
+                    result[keyNew] = valueNew;
                 }
             }
 
@@ -216,5 +245,11 @@ export async function transformObject(objNet: NetObject): Promise<NetObject> {
         return obj;
     };
 
-    return transObjRec(objNet);
+    const netUnique = {
+        ...net,
+        agents: removeDuplicatesById(net.agents),
+        edges: removeDuplicatesById(net.edges),
+    };
+
+    return toObject(netUnique);
 }

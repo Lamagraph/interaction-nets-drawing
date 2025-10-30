@@ -21,13 +21,15 @@ const modeDefault = NetMode.comparison;
 const downloadNet = async (net: Net) => {
   const netObj = await toObjectFromNet(net);
   const netJSON = JSON.stringify(netObj, null, 2);
-  const netUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(netJSON);
+  const netURI = 'data:application/json;charset=utf-8,' + encodeURIComponent(netJSON);
   const exportFileDefaultName = net.name.slice(0, -5) + '_edited.json';
 
-  const linkElement = document.createElement('a');
-  linkElement.setAttribute('href', netUri);
-  linkElement.setAttribute('download', exportFileDefaultName);
-  linkElement.click();
+  const link = document.createElement('a');
+  link.setAttribute('href', netURI);
+  link.setAttribute('download', exportFileDefaultName);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
 };
 
 interface PropsUpdateNet {
@@ -102,7 +104,7 @@ export const SimplifyMenuControl = (props: PropsSimplifyMenuControl): JSX.Elemen
   }, [getNodes, getEdges, fileOpened]);
 
   return (
-    <div id="SimplifyMenuControl">
+    <div data-testid="SimplifyMenuControl">
       <Controls>
         <ControlButton title="Edit net" disabled={isRunningLayout} onClick={goToEditNet}>
           <FaEdit />
@@ -146,32 +148,38 @@ export default (props: PropsMenuControl) => {
     const nets: Net[] = [];
 
     input.onchange = async event => {
-      const fileList = (event.target as HTMLInputElement).files;
-      if (!fileList || fileList.length === 0) return;
+      try {
+        const fileList = (event.target as HTMLInputElement).files;
+        if (!fileList || fileList.length === 0) throw new Error('Unselect uploaded files');
 
-      const files = Array.from(fileList).sort((a, b) =>
-        a.name.localeCompare(b.name, undefined, {
-          numeric: true,
-          sensitivity: 'base',
-        }),
-      );
+        const files = Array.from(fileList).sort((a, b) =>
+          a.name.localeCompare(b.name, undefined, {
+            numeric: true,
+            sensitivity: 'base',
+          }),
+        );
 
-      for (const file of files) {
-        const netObj = await getObjectFromFile(file);
-        const net = await toNetFromObject(netObj, typeNode, typeEdge);
-        nets.push({ ...net, name: file.name });
-      }
+        for (const file of files) {
+          const netObj = await getObjectFromFile(file);
+          const net = await toNetFromObject(netObj, typeNode, typeEdge);
+          nets.push({ ...net, name: file.name });
+        }
 
-      if (nets.length > 0) {
-        const indexNew = 0;
-        setNetsSaved(nets);
-        setNetIndexCur(indexNew, nets[indexNew]);
-        if (nets.length === 1) setModeNet(NetMode.edit);
-        else setModeNet(modeDefault);
+        if (nets.length > 0) {
+          const indexNew = 0;
+          setNetsSaved(nets);
+          setNetIndexCur(indexNew, nets[indexNew]);
+          if (nets.length === 1) setModeNet(NetMode.edit);
+          else setModeNet(modeDefault);
+        }
+      } catch (error) {
+        console.log(error);
       }
     };
 
+    document.body.appendChild(input);
     input.click();
+    document.body.removeChild(input);
   }, [typeNode, typeEdge, modeNet]);
 
   const toggleNet = useCallback(
@@ -223,7 +231,7 @@ export default (props: PropsMenuControl) => {
   }, [netsSaved, indexCur, filesOpened]);
 
   return (
-    <div id="MenuControl">
+    <div data-testid="MenuControl">
       <Controls>
         {netsSaved.length > 0 && (
           <>
@@ -276,11 +284,21 @@ export default (props: PropsMenuControl) => {
           </>
         )}
 
-        <ControlButton title="Upload Nets" disabled={isRunningLayout} onClick={onUpload}>
+        <ControlButton
+          title="Upload Nets"
+          disabled={isRunningLayout}
+          onClick={onUpload}
+          data-testid="upload"
+        >
           <UploadIcon />
         </ControlButton>
 
-        <ControlButton title="Download the Net" disabled={isRunningLayout} onClick={onDownload}>
+        <ControlButton
+          title="Download the Net"
+          disabled={isRunningLayout}
+          onClick={onDownload}
+          data-testid="download"
+        >
           <DownloadIcon />
         </ControlButton>
       </Controls>
