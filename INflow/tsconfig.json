@@ -1,28 +1,32 @@
 {
   "compilerOptions": {
-    "baseUrl": "./",
-    "paths": {
-      "@/*": ["src/*"],
-      "@flows/*": ["src/flows/*"],
-      "@components/*": ["src/views/*"],
-      "@utils/*": ["src/utils/*"],
-      "@layouts/*": ["src/layouts/*"]
-    },
     "target": "ESNext",
-    "jsx": "react-jsx",
-    "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "useDefineForClassFields": true,
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "module": "ESNext",
+    "skipLibCheck": true,
     "moduleResolution": "bundler",
-    "resolveJsonModule": true,
-    "allowJs": true,
     "allowImportingTsExtensions": true,
-    "noEmit": true,
-    "checkJs": true,
+    "resolveJsonModule": true,
     "isolatedModules": true,
+    "noEmit": true,
     "esModuleInterop": true,
+    "allowJs": true,
+    "checkJs": false,
+    "jsx": "react-jsx",
     "sourceMap": true,
-    "types": ["node", "cypress"]
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "paths": {
+      "@/*": ["./src/*"],
+      "@flows/*": ["./src/flows/*"],
+      "@components/*": ["./src/views/*"],
+      "@utils/*": ["./src/utils/*"],
+      "@layouts/*": ["./src/layouts/*"]
+    }
   },
-  "include": ["./**/*.d.ts", "./**/*.{js,jsx,ts,tsx}", "./**/*.cy.{js,jsx,ts,tsx}"]
+  "include": ["src", "cypress/e2e", "cypress/support"],
+  "exclude": ["node_modules", "dist"]
 }

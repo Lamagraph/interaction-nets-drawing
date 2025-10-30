@@ -10,5 +10,9 @@ npm-debug.log*
 # Tests
 .nyc_output
 coverage
+cypress/downloads
 cypress/videos
 cypress/screenshots
+
+# Build
+dist
