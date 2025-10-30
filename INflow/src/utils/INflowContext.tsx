@@ -1,7 +1,9 @@
 import { createContext, useContext, useState } from 'react';
 
 import { NetMode } from '@components/MenuControl';
-import { transformObject, type Net } from '@/nets';
+import { type Net, toObjectFromNet } from '@/nets';
+
+// Interaction Nets
 
 export type INflowInstance = {
   netsSaved: Net[];
@@ -14,7 +16,7 @@ export type INflowInstance = {
 
 export const instanceToObject = (instance: INflowInstance) => {
   return {
-    netsSaved: instance.netsSaved.map(transformObject),
+    netsSaved: instance.netsSaved.map(toObjectFromNet),
     indexCur: instance.indexCur,
     modeNet: instance.modeNet,
     typeNode: instance.typeNode,
@@ -84,10 +86,8 @@ export const INflowProvider = ({ children }: { children: JSX.Element }): JSX.Ele
 
 export const useINflowState = (): INflowContextType => {
   const context = useContext(INflowContext);
-
-  if (!context) {
-    throw new Error('useINflowState must be used within FlowProvider');
+  if (context) {
+    return context;
   }
-
-  return context;
+  throw new Error('useINflowState must be used within FlowProvider');
 };

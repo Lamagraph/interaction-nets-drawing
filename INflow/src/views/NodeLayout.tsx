@@ -1,37 +1,50 @@
-import { Handle, HandleType, Position } from '@xyflow/react';
+import { HandleType, Position } from '@xyflow/react';
 
 import { type Port, type AgentData } from '@/nets';
 import PortLayout from '@components/PortLayout';
 
 interface PropsHandle {
+  id: string;
   type: HandleType;
   pos: Position;
-  id: string;
   style: React.CSSProperties;
-  needLimit: boolean;
+  isNoPreview: boolean;
 }
 
 const handle = (props: PropsHandle): JSX.Element => {
   const { type, pos, id, style } = props;
-  if (!props.needLimit) return <Handle type={type} position={pos} key={id} id={id} style={style} />;
+  if (!props.isNoPreview) {
+    return (
+      <div
+        id={id || 'P0'}
+        key={'preview_port'}
+        className={`react-flow__handle react-flow__handle-${pos} nodrag nopan source connectablestart connectableend`}
+        style={style}
+      />
+    );
+  }
   return <PortLayout type={type} position={pos} key={id} id={id} style={style} />;
 };
 
-export const handleAuxiliaryPort = (port: Port, pos: Position, needLimit: boolean): JSX.Element => {
-  return handle({ type: 'source', pos: pos, id: port.id, style: {}, needLimit: needLimit });
+export const handleAuxiliaryPort = (
+  port: Port,
+  pos: Position,
+  isNoPreview: boolean,
+): JSX.Element => {
+  return handle({ type: 'source', pos: pos, id: port.id, style: {}, isNoPreview: isNoPreview });
 };
 
 export const handlePrinciplePort = (
   data: AgentData,
   pos: Position,
-  needLimit: boolean,
+  isNoPreview: boolean,
 ): JSX.Element => {
   return handle({
     type: 'source',
     pos: pos,
     id: data.principalPort.id,
     style: { background: 'blue' },
-    needLimit: needLimit,
+    isNoPreview: isNoPreview,
   });
 };
 
@@ -47,18 +60,18 @@ export const labelAgentHTML = (data: AgentData, id: string): JSX.Element => {
 export default ({
   id,
   data,
-  needLimit = true,
+  isNoPreview = true,
 }: {
   id: string;
   data: AgentData;
-  needLimit?: boolean;
+  isNoPreview?: boolean;
 }): JSX.Element => {
   return (
-    <div className={needLimit ? 'node-layout__hor' : undefined} style={{ position: 'relative' }}>
+    <div className={isNoPreview ? 'node-layout__hor' : undefined} style={{ position: 'relative' }}>
       <div className="auxiliaryPorts-def">
         {data.auxiliaryPorts.map(port => (
           <div key={port.id} style={{ position: 'relative' }}>
-            {handleAuxiliaryPort(port, Position.Top, needLimit)}
+            {handleAuxiliaryPort(port, Position.Top, isNoPreview)}
           </div>
         ))}
       </div>
@@ -83,7 +96,7 @@ export default ({
 
       <div className="principalPort-def">
         <div style={{ position: 'relative' }}>
-          {handlePrinciplePort(data, Position.Bottom, needLimit)}
+          {handlePrinciplePort(data, Position.Bottom, isNoPreview)}
         </div>
       </div>
     </div>

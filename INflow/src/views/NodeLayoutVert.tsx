@@ -5,14 +5,14 @@ import { auxiliaryPortTD, principalPortTD } from '@components/NodeLayoutGen';
 export default ({
   id,
   data,
-  needLimit = true,
+  isNoPreview = true,
 }: {
   id: string;
   data: AgentData;
-  needLimit?: boolean;
+  isNoPreview?: boolean;
 }): JSX.Element => {
   return (
-    <div className={needLimit ? 'node-layout__vert' : undefined}>
+    <div className={isNoPreview ? 'node-layout__vert' : undefined}>
       <table style={{ textAlign: 'left' }}>
         <tbody>
           <tr>
@@ -24,12 +24,12 @@ export default ({
           {data.auxiliaryPorts.length ? (
             data.auxiliaryPorts.map((port, index) => (
               <tr key={index}>
-                {auxiliaryPortTD(port, needLimit)}
-                {index === 0 && principalPortTD(data, data.auxiliaryPorts.length, needLimit)}
+                {auxiliaryPortTD(port, isNoPreview)}
+                {index === 0 && principalPortTD(data, isNoPreview, data.auxiliaryPorts.length)}
               </tr>
             ))
           ) : (
-            <tr>{principalPortTD(data, data.auxiliaryPorts.length, needLimit)}</tr>
+            <tr>{principalPortTD(data, isNoPreview, data.auxiliaryPorts.length)}</tr>
           )}
         </tbody>
       </table>

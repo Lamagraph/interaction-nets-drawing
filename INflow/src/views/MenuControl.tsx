@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { ControlButton, Controls, ReactFlowInstance, type Edge } from '@xyflow/react';
+import { ControlButton, Controls, useReactFlow, type Edge } from '@xyflow/react';
 
 import { DownloadIcon, UploadIcon, ArrowRightIcon, ArrowLeftIcon } from '@radix-ui/react-icons';
 import { FaEdit, FaSave } from 'react-icons/fa';
@@ -8,7 +8,7 @@ import '@xyflow/react/dist/style.css';
 
 import { useINflowState } from '@utils/INflowContext';
 
-import { type Agent, type Net, getObjectFromFile, toNetFromObject, transformObject } from '@/nets';
+import { type Agent, type Net, getObjectFromFile, toNetFromObject, toObjectFromNet } from '@/nets';
 
 export enum NetMode {
   edit = 0,
@@ -18,15 +18,14 @@ export enum NetMode {
 
 const modeDefault = NetMode.comparison;
 
-const downloadNet = async (rfInstance: ReactFlowInstance<Agent, Edge>, fileOpened: string) => {
-  const flow = rfInstance.toObject();
-  const flowObj = await transformObject(flow);
-  const dataStr = JSON.stringify(flowObj, null, 2);
-  const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
-  const exportFileDefaultName = fileOpened.slice(0, -5) + '_edited.json';
+const downloadNet = async (net: Net) => {
+  const netObj = await toObjectFromNet(net);
+  const netJSON = JSON.stringify(netObj, null, 2);
+  const netUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(netJSON);
+  const exportFileDefaultName = net.name.slice(0, -5) + '_edited.json';
 
   const linkElement = document.createElement('a');
-  linkElement.setAttribute('href', dataUri);
+  linkElement.setAttribute('href', netUri);
   linkElement.setAttribute('download', exportFileDefaultName);
   linkElement.click();
 };
@@ -39,7 +38,7 @@ interface PropsUpdateNet {
   isPinPos: boolean;
 }
 
-export function compareNet(props: PropsUpdateNet): Net | undefined {
+export function compareNet(props: PropsUpdateNet): Net {
   const {
     netOne,
     netTwo,
@@ -90,19 +89,17 @@ export function compareNet(props: PropsUpdateNet): Net | undefined {
 
 interface PropsSimplifyMenuControl {
   fileOpened: string;
-  rfInstance: any;
   isRunningLayout: boolean;
   goToEditNet: () => void;
 }
 
 export const SimplifyMenuControl = (props: PropsSimplifyMenuControl): JSX.Element => {
-  const { fileOpened, rfInstance, isRunningLayout, goToEditNet } = props;
+  const { fileOpened, isRunningLayout, goToEditNet } = props;
+  const { getNodes, getEdges } = useReactFlow<Agent, Edge>();
 
   const onDownload = useCallback(() => {
-    if (rfInstance) {
-      downloadNet(rfInstance, fileOpened);
-    }
-  }, [rfInstance, fileOpened]);
+    downloadNet({ agents: getNodes(), edges: getEdges(), name: fileOpened });
+  }, [getNodes, getEdges, fileOpened]);
 
   return (
     <div id="SimplifyMenuControl">
@@ -121,7 +118,6 @@ export const SimplifyMenuControl = (props: PropsSimplifyMenuControl): JSX.Elemen
 interface PropsMenuControl {
   nodes: Agent[];
   edges: Edge[];
-  rfInstance: ReactFlowInstance<Agent, Edge> | null;
   isRunningLayout: boolean;
   indexNet: number;
   setNetIndexCur: (index: number, net: Net) => void;
@@ -133,13 +129,12 @@ export default (props: PropsMenuControl) => {
     setNetsSaved,
     setModeNet,
   } = useINflowState();
-  const { nodes, edges, rfInstance, isRunningLayout, indexNet, setNetIndexCur } = props;
+  const { nodes, edges, isRunningLayout, indexNet, setNetIndexCur } = props;
+  const { getNodes, getEdges } = useReactFlow<Agent, Edge>();
 
   const onDownload = useCallback(() => {
-    if (rfInstance) {
-      downloadNet(rfInstance, filesOpened[0]);
-    }
-  }, [rfInstance, filesOpened]);
+    downloadNet({ agents: getNodes(), edges: getEdges(), name: filesOpened[0] });
+  }, [getNodes, getEdges, filesOpened[0]]);
 
   const onUpload = useCallback(() => {
     const input = document.createElement('input');
@@ -162,13 +157,9 @@ export default (props: PropsMenuControl) => {
       );
 
       for (const file of files) {
-        const net = await getObjectFromFile(file);
-        const [nds, eds] = await toNetFromObject(net, typeNode, typeEdge);
-        nets.push({
-          agents: nds,
-          edges: eds,
-          name: file.name,
-        });
+        const netObj = await getObjectFromFile(file);
+        const net = await toNetFromObject(netObj, typeNode, typeEdge);
+        nets.push({ ...net, name: file.name });
       }
 
       if (nets.length > 0) {

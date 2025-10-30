@@ -2,10 +2,10 @@ import { Position } from '@xyflow/react';
 import { type Port, type AgentData } from '@/nets';
 import { handleAuxiliaryPort, handlePrinciplePort, labelAgentHTML } from '@components/NodeLayout';
 
-export const auxiliaryPortTD = (port: Port, needLimit: boolean): JSX.Element => {
+export const auxiliaryPortTD = (port: Port, isNoPreview: boolean): JSX.Element => {
   return (
     <td style={{ left: '-12px' }}>
-      {handleAuxiliaryPort(port, Position.Left, needLimit)}
+      {handleAuxiliaryPort(port, Position.Left, isNoPreview)}
       <div style={{ paddingLeft: '4px' }}>
         <span style={{ color: 'gray', left: '-10px' }}>
           {port.id ? `(${port.id})` : undefined}{' '}
@@ -18,8 +18,8 @@ export const auxiliaryPortTD = (port: Port, needLimit: boolean): JSX.Element => 
 
 export const principalPortTD = (
   data: AgentData,
-  rowSpan: number | undefined,
-  needLimit: boolean,
+  isNoPreview: boolean,
+  rowSpan?: number,
 ): JSX.Element => {
   return (
     <td style={{ right: '-12px', textAlign: 'right' }} rowSpan={rowSpan}>
@@ -30,7 +30,7 @@ export const principalPortTD = (
           {data.principalPort.id ? `(${data.principalPort.id})` : undefined}
         </span>
       </div>
-      {handlePrinciplePort(data, Position.Right, needLimit)}
+      {handlePrinciplePort(data, Position.Right, isNoPreview)}
     </td>
   );
 };
@@ -38,14 +38,14 @@ export const principalPortTD = (
 export default ({
   id,
   data,
-  needLimit = true,
+  isNoPreview = true,
 }: {
   id: string;
   data: AgentData;
-  needLimit?: boolean;
+  isNoPreview?: boolean;
 }): JSX.Element => {
   return (
-    <div className={needLimit ? 'node-layout__gen' : undefined}>
+    <div className={isNoPreview ? 'node-layout__gen' : undefined}>
       <table style={{ textAlign: 'left', margin: '2px' }}>
         <tbody>
           <tr>
@@ -55,10 +55,10 @@ export default ({
           </tr>
 
           {data.auxiliaryPorts.map((port, index) => (
-            <tr key={index}>{auxiliaryPortTD(port, needLimit)}</tr>
+            <tr key={index}>{auxiliaryPortTD(port, isNoPreview)}</tr>
           ))}
 
-          <tr>{principalPortTD(data, undefined, needLimit)}</tr>
+          <tr>{principalPortTD(data, isNoPreview, undefined)}</tr>
         </tbody>
       </table>
     </div>

@@ -13,7 +13,7 @@ import { useNodeParametersState } from '@utils/MCContext';
 interface PropsMenuConfig {
   addItem: (position: XYPosition) => void;
   isAllowed: () => boolean;
-  nodeSelected: Agent | undefined;
+  nodeSelected?: Agent;
   isRunningLayout: boolean;
   typeNode: string;
 }
@@ -294,7 +294,7 @@ export default (props: PropsMenuConfig): JSX.Element => {
                             auxiliaryPorts: nodeAuxiliaryPorts,
                             principalPort: nodePrincipalPort,
                           }}
-                          needLimit={false}
+                          isNoPreview={false}
                         />
                       </div>
                     </div>

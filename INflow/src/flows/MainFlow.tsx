@@ -25,12 +25,14 @@ import { nodeTypes, edgeTypes } from '@utils/typesElements';
 import {
   type Agent,
   getObjectFromFileByName,
+  getObjectFromJSON,
   toNetFromObject,
   isActivePair,
   getTargetHandle,
   validate,
   defPointCon,
   type Net,
+  toObjectFromNet,
 } from '@/nets';
 import MenuControl, { compareNet, NetMode } from '@components/MenuControl';
 import MenuLayouts from '@components/MenuLayouts';
@@ -38,9 +40,11 @@ import MenuConfig from '@components/MenuConfig';
 import MenuInfo from '@components/MenuInfo';
 
 // Reset localStorage: `localStorage.removeItem(keyReactFlow);`
-const keyReactFlow = 'react-flow-startup';
+const keyStorageNet = 'net-setup';
+
 const dirNetsSaved = '../../saved-nets/';
 const nameFileStartup = 'list_add_1.json';
+
 const indexNet = 0;
 
 export default (): JSX.Element => {
@@ -52,6 +56,53 @@ export default (): JSX.Element => {
     isRunningLayouts,
     setIsRunningLayouts,
   } = useINflowState();
+
+  // Setup
+
+  const updateLocalStorage = async () => {
+    const netObj = await toObjectFromNet({ agents: nodes, edges: edges, name: fileOpened });
+    localStorage.setItem(keyStorageNet, JSON.stringify(netObj));
+  };
+
+  const onInit: OnInit<Agent, Edge> = (instance: ReactFlowInstance<Agent, Edge>) => {
+    const setup = async () => {
+      let [nds, eds]: [Agent[] | null, Edge[] | null] = [null, null];
+      let nameFile: string = '';
+
+      try {
+        const netJSON = localStorage.getItem(keyStorageNet);
+        if (netJSON) {
+          const netObj = await getObjectFromJSON(netJSON);
+          const net: Net = await toNetFromObject(netObj, typeNode, typeEdge);
+          [nds, eds] = [net.agents, net.edges];
+          nameFile = `IN_${net.agents.length}_agents_${net.edges.length}_edges.back`;
+          console.log("Setup from 'localStorage'");
+        }
+      } catch (error) {
+        console.log(error);
+      }
+
+      if (!nds || !eds) {
+        try {
+          const netObj = await getObjectFromFileByName(dirNetsSaved + nameFileStartup);
+          const net: Net = await toNetFromObject(netObj, typeNode, typeEdge);
+          [nds, eds] = [net.agents, net.edges];
+          nameFile = nameFileStartup;
+        } catch (error) {
+          console.log(error);
+          [nds, eds] = [[], []];
+        }
+      }
+
+      instance.setNodes(nds);
+      instance.setEdges(eds);
+      setFileOpened(nameFile);
+    };
+
+    setup();
+    fitView();
+    // updateLocalStorage();
+  };
 
   // Main
 
@@ -68,6 +119,7 @@ export default (): JSX.Element => {
   const isRunningLayout = isRunningLayouts[indexNet];
   const setIsRunningLayout = (value: boolean) => {
     setIsRunningLayouts(flags => [value, flags[1]]);
+    // if (!value) updateLocalStorage();
   };
 
   // Add and edit net
@@ -143,6 +195,7 @@ export default (): JSX.Element => {
     });
 
     cleanUpInfoNode();
+    // updateLocalStorage();
   };
 
   //// Add node with drag
@@ -193,8 +246,10 @@ export default (): JSX.Element => {
           eds,
         ),
       );
+
+      // updateLocalStorage();
     },
-    [typeEdge, nodes],
+    [typeEdge, nodes, updateLocalStorage],
   );
 
   const onDragOver = useCallback((event: any) => {
@@ -313,49 +368,13 @@ export default (): JSX.Element => {
 
   const reactFlowWrapper = useRef(null);
 
-  const [rfInstance, setRfInstance] = useState<ReactFlowInstance<Agent, Edge> | null>(null);
-
-  const onInit: OnInit<Agent, Edge> = (instance: ReactFlowInstance<Agent, Edge>) => {
-    const startup = async () => {
-      let [nds, eds]: [Agent[] | null, Edge[] | null] = [null, null];
-      let nameFile: string = nameFileStartup;
-
-      const objReactFlow = localStorage.getItem(keyReactFlow);
-      if (objReactFlow) {
-        const flow = JSON.parse(objReactFlow);
-        if (flow) {
-          nds = flow.nodes as Agent[];
-          eds = flow.edges as Edge[];
-          nameFile = `IN_${nds.length}_agents_${eds.length}_edges`;
-          console.log("Startup from localStorage");
-        }
-      }
-
-      if (!nds || !eds) {
-        try {
-          const net = await getObjectFromFileByName(dirNetsSaved + nameFileStartup);
-          [nds, eds] = await toNetFromObject(net, typeNode, typeEdge);
-          console.log(`Startup from ${dirNetsSaved + nameFileStartup}`);
-        } catch (error) {
-          console.log(error);
-          [nds, eds] = [[], []];
-        }
-      }
-
-      instance.setNodes(nds);
-      instance.setEdges(eds);
-      setFileOpened(nameFile);
-    };
-
-    startup();
-
-    setRfInstance(instance);
-    fitView();
-  };
-
   const inabilityInteract = !isRunningLayout;
 
   // Effects
+
+  useEffect(() => {
+    if (nodes.length) updateLocalStorage();
+  }, [nodes.length, edges.length, updateLocalStorage]);
 
   useEffect(() => {
     if (isRunningLayout) unselectNode();
@@ -381,17 +400,11 @@ export default (): JSX.Element => {
     setTimeout(() => fitView(), 10);
   }, [indexCur, modeNet]);
 
-  useEffect(() => {
-    if (rfInstance) {
-      const flow = rfInstance.toObject();
-      localStorage.setItem(keyReactFlow, JSON.stringify(flow));
-    }
-  }, [nodes.length, edges.length, rfInstance]);
-
   return (
     <div className="dndflow">
       <div className="reactflow-wrapper" ref={reactFlowWrapper}>
         <ReactFlow
+          id={`${indexNet}`}
           nodes={nodes}
           edges={edges}
           nodeTypes={nodeTypes}
@@ -429,12 +442,11 @@ export default (): JSX.Element => {
               typeNode={typeNode}
             />
           )}
-          <MenuLayouts indexLayout={indexNet} setIsRunningLayout={setIsRunningLayout} />
+          <MenuLayouts indexNet={indexNet} setIsRunningLayout={setIsRunningLayout} />
           <div>
             <MenuControl
               nodes={nodes}
               edges={edges}
-              rfInstance={rfInstance}
               isRunningLayout={isRunningLayouts[0] || isRunningLayouts[1]}
               indexNet={indexNet}
               setNetIndexCur={setNetIndexCur}
@@ -455,8 +467,8 @@ export default (): JSX.Element => {
               isRunningLayout={isRunningLayouts[0] || isRunningLayouts[1]}
             />
           </div>
-          <Background />
-          <MiniMap />
+          <Background id={`${indexNet}`} />
+          <MiniMap id={`${indexNet}`} />
         </ReactFlow>
       </div>
     </div>

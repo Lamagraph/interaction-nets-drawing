@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect } from 'react';
 import {
   ReactFlow,
   Background,
@@ -8,7 +8,6 @@ import {
   useReactFlow,
   type Edge,
   Panel,
-  ReactFlowInstance,
 } from '@xyflow/react';
 
 import '@xyflow/react/dist/style.css';
@@ -59,7 +58,7 @@ export default (): JSX.Element => {
   const toggleNet = useCallback(() => {
     const netLeft = netsSaved[indexCur];
     const netRight = netsSaved[indexCur + 1];
-    if (!netRight) return;
+    if (!netRight) return; // only for safety
 
     const netComp = compareNet({
       netOne: netRight,
@@ -78,9 +77,6 @@ export default (): JSX.Element => {
   };
 
   // Utils
-
-  const [rfInstance, setRfInstance] = useState<ReactFlowInstance<Agent, Edge> | null>(null);
-
   const inabilityInteract = !isRunningLayout;
 
   // Effects
@@ -109,11 +105,11 @@ export default (): JSX.Element => {
 
   return (
     <ReactFlow
+      id={`${indexNet}`}
       nodes={nodes}
       edges={edges}
       nodeTypes={nodeTypes}
       edgeTypes={edgeTypes}
-      onInit={setRfInstance}
       onNodesChange={onNodesChange}
       onEdgesChange={onEdgesChange}
       attributionPosition="bottom-left"
@@ -131,23 +127,22 @@ export default (): JSX.Element => {
       connectOnClick={modeNet === NetMode.edit && inabilityInteract}
       deleteKeyCode={modeNet === NetMode.edit && inabilityInteract ? ['Delete', 'Backspace'] : null}
     >
-      <MenuLayouts indexLayout={indexNet} setIsRunningLayout={setIsRunningLayout} />
+      <MenuLayouts indexNet={indexNet} setIsRunningLayout={setIsRunningLayout} />
       <div>
         <SimplifyMenuControl
           fileOpened={fileOpened}
-          rfInstance={rfInstance}
           isRunningLayout={isRunningLayouts[0] || isRunningLayouts[1]}
           goToEditNet={goToEditNet}
         />
-        <Panel position="bottom-left" className="panel-info">
+        <Panel id="SubFlowInfo" position="bottom-left" className="panel-info">
           <div className="item-info">
             <label className="label-info">File:</label>
             <label className="label-info">{fileOpened}</label>
           </div>
         </Panel>
       </div>
-      <Background />
-      <MiniMap />
+      <Background id={`${indexNet}`} />
+      <MiniMap id={`${indexNet}`} />
     </ReactFlow>
   );
 };

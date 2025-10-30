@@ -2,6 +2,8 @@
 
 import { createContext, useContext, useState } from 'react';
 
+// Drag-and-drop
+
 interface DnDContextType {
   type: string;
   setType: React.Dispatch<React.SetStateAction<string>>;
