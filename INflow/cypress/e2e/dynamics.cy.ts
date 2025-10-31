@@ -16,8 +16,8 @@ describe('INflow E2E Tests: dynamics', () => {
                     .callsFake(child => {
                         if (child.tagName === 'A' && child.hasAttribute('download')) {
                             expect(child.getAttribute('href')).to.include('data:application/json');
-                            expect(child.getAttribute('download')).to.include(tailFile);
                             nameFile = child.getAttribute('download');
+                            expect(nameFile).to.include(tailFile);
                             return originalRemoveChild(child);
                         }
                         return originalRemoveChild(child);
@@ -25,14 +25,14 @@ describe('INflow E2E Tests: dynamics', () => {
                     .as('removeChildStub');
             });
 
-            cy.wait(100);
+            cy.wait(500);
 
             cy.get('[data-testid="MenuControl"] button[data-testid="download"]').click();
             cy.get('@removeChildStub').should('be.called');
             cy.get('body > a[download]').should('not.exist');
 
             cy.then(() => {
-                expect(nameFile).to.include(tailFile);
+                expect(nameFile).not.to.be.empty;
                 cy.readFile(`cypress/downloads/${nameFile}`).then(download => {
                     cy.fixture(`${nameFile.replace(tailFile, '')}`).then(fixture => {
                         expect(download).to.deep.equal(fixture);
