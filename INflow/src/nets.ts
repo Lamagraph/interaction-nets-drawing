@@ -219,7 +219,9 @@ function removeDuplicatesById<T extends { id: string }>(array: T[]): T[] {
     });
 }
 
-export async function toObjectFromNet(net: Net): Promise<NetObject> {
+export async function toObjectFromNet(net: Net, savePos: boolean = false): Promise<NetObject> {
+    const keys = savePos ? [...allowedKeys, 'position', 'x', 'y'] : allowedKeys;
+
     const toObject = (obj: any): Record<string, any> => {
         if (Array.isArray(obj)) {
             return obj.map(toObject);
@@ -229,7 +231,7 @@ export async function toObjectFromNet(net: Net): Promise<NetObject> {
             for (const [key, value] of Object.entries(obj)) {
                 if (key === 'data') {
                     Object.assign(result, toObject(value));
-                } else if (allowedKeys.includes(key)) {
+                } else if (keys.includes(key)) {
                     const keyNew = (mapKeys as Record<string, string>)[key] || key;
                     const valueNew =
                         key === 'targetHandle' && typeof value === 'string'

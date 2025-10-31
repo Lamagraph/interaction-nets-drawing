@@ -60,7 +60,7 @@ export default (): JSX.Element => {
   // Setup
 
   const updateLocalStorage = async () => {
-    const netObj = await toObjectFromNet({ agents: nodes, edges: edges, name: fileOpened });
+    const netObj = await toObjectFromNet({ agents: nodes, edges: edges, name: fileOpened }, true);
     localStorage.setItem(keyStorageNet, JSON.stringify(netObj));
   };
 
@@ -374,7 +374,7 @@ export default (): JSX.Element => {
 
   useEffect(() => {
     if (nodes.length) updateLocalStorage();
-  }, [nodes.length, edges.length, updateLocalStorage]);
+  }, [nodes.length, edges.length]);
 
   useEffect(() => {
     if (isRunningLayout) unselectNode();
