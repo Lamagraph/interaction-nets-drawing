@@ -66,11 +66,9 @@ export const MCProvider = ({ children }: { children: JSX.Element }): JSX.Element
 };
 
 export const useNodeParametersState = () => {
-  const mcContext = useContext(MCContext);
-
-  if (!mcContext) {
-    throw new Error('useNodeParametersState must be used within MCProvider');
+  const context = useContext(MCContext);
+  if (context) {
+    return context;
   }
-
-  return mcContext;
+  throw new Error('useNodeParametersState must be used within MCProvider');
 };

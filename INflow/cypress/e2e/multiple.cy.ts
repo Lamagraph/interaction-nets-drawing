@@ -21,7 +21,7 @@ describe('INflow E2E Tests: multiple options', () => {
 
         type TestCase = (typeof testCases)[number];
         const testNodeType = ({ value, label }: TestCase) => {
-            cy.get('[data-testid=MenuInfo]').within(() => {
+            cy.get('[data-testid="MenuInfo"]').within(() => {
                 cy.get('[data-testid="node-type__select"]')
                     .select(value)
                     .should('have.value', value);
@@ -74,7 +74,7 @@ describe('INflow E2E Tests: multiple options', () => {
 
         type TestCase = (typeof testCases)[number];
         const testEdgeType = ({ value, label }: TestCase) => {
-            cy.get('[data-testid=MenuInfo]').within(() => {
+            cy.get('[data-testid="MenuInfo"]').within(() => {
                 cy.get('[data-testid="edge-type__select"]')
                     .select(value)
                     .should('have.value', value);
@@ -132,14 +132,14 @@ describe('INflow E2E Tests: multiple options', () => {
 
         type TestCase = (typeof testCases)[number];
         const testLayout = ({ label, id }: TestCase) => {
-            cy.get('[data-testid=MenuLayouts-0]').within(() => {
+            cy.get('[data-testid="MenuLayouts-0"]').within(() => {
                 cy.get(`button[data-testid="layout__${id}"]`).click();
                 cy.get(`button[data-testid="layout__${id}"]`).should('contain', label);
             });
         };
 
         beforeEach(() => {
-            cy.get('[data-testid=MenuLayouts-0] button[title="Show more"]').click();
+            cy.get('[data-testid="MenuLayouts-0"] button[title="Show more"]').click();
         });
 
         testCases.forEach(testCase => {

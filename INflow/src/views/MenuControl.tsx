@@ -106,10 +106,20 @@ export const SimplifyMenuControl = (props: PropsSimplifyMenuControl): JSX.Elemen
   return (
     <div data-testid="SimplifyMenuControl">
       <Controls>
-        <ControlButton title="Edit net" disabled={isRunningLayout} onClick={goToEditNet}>
+        <ControlButton
+          title="Edit net"
+          disabled={isRunningLayout}
+          onClick={goToEditNet}
+          data-testid="edit-net"
+        >
           <FaEdit />
         </ControlButton>
-        <ControlButton title="Download the Net" disabled={isRunningLayout} onClick={onDownload}>
+        <ControlButton
+          title="Download the Net"
+          disabled={isRunningLayout}
+          onClick={onDownload}
+          data-testid="download"
+        >
           <DownloadIcon />
         </ControlButton>
       </Controls>
@@ -233,19 +243,25 @@ export default (props: PropsMenuControl) => {
   return (
     <div data-testid="MenuControl">
       <Controls>
-        {netsSaved.length > 0 && (
+        {netsSaved.length > 1 && (
           <>
             {modeNet !== NetMode.edit ? (
               <ControlButton
                 title="Edit net"
                 disabled={isRunningLayout}
                 onClick={() => setModeNet(NetMode.edit)}
+                data-testid="edit-net"
               >
                 <FaEdit />
               </ControlButton>
             ) : (
               <>
-                <ControlButton title="Save" disabled={isRunningLayout} onClick={saveNetEdited}>
+                <ControlButton
+                  title="Save"
+                  disabled={isRunningLayout}
+                  onClick={saveNetEdited}
+                  data-testid="save-net"
+                >
                   <FaSave />
                 </ControlButton>
 
@@ -253,6 +269,7 @@ export default (props: PropsMenuControl) => {
                   title="Go back to nets"
                   disabled={isRunningLayout}
                   onClick={goBackToNets}
+                  data-testid="go-back"
                 >
                   <RiArrowGoBackLine />
                 </ControlButton>
@@ -271,6 +288,7 @@ export default (props: PropsMenuControl) => {
                 (modeNet === NetMode.comparison && indexCur >= netsSaved.length - 2)
               }
               onClick={() => toggleNet(true)}
+              data-testid="next-step"
             >
               <ArrowRightIcon />
             </ControlButton>
@@ -278,6 +296,7 @@ export default (props: PropsMenuControl) => {
               title="Prev step"
               disabled={isRunningLayout || indexCur <= 0}
               onClick={() => toggleNet(false)}
+              data-testid="prev-step"
             >
               <ArrowLeftIcon />
             </ControlButton>

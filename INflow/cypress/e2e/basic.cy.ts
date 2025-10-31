@@ -11,10 +11,10 @@ describe('INflow E2E Tests: setup', () => {
 
     describe('Menus', () => {
         it('should available all menus', () => {
-            cy.get('[data-testid=MenuConfig]');
-            cy.get('[data-testid=MenuControl]');
-            cy.get('[data-testid=MenuLayouts-0]');
-            cy.get('[data-testid=MenuInfo]');
+            cy.get('[data-testid="MenuConfig"]');
+            cy.get('[data-testid="MenuControl"]');
+            cy.get('[data-testid="MenuLayouts-0"]');
+            cy.get('[data-testid="MenuInfo"]');
             cy.get('div .react-flow__minimap');
         });
     });
@@ -28,12 +28,15 @@ describe('INflow E2E Tests: setup', () => {
 
     describe('Default values', () => {
         it('should set default values', () => {
-            cy.get('[data-testid=MenuConfig] button:contains("Add agent")')
+            cy.get('[data-testid="MenuConfig"] button:contains("Add agent")')
                 .should('exist')
                 .should('be.disabled');
 
-            cy.get('[data-testid=MenuInfo]').should('not.contain', '[data-testid="mode__select"]');
-            cy.get('[data-testid=MenuInfo]').within(() => {
+            cy.get('[data-testid="MenuInfo"]').should(
+                'not.contain',
+                '[data-testid="mode__select"]',
+            );
+            cy.get('[data-testid="MenuInfo"]').within(() => {
                 cy.get('[data-testid="node-type__select"]').should('have.value', 'agentHor');
                 cy.get('[data-testid="edge-type__select"]').should('have.value', 'bezier');
             });
@@ -48,21 +51,21 @@ describe('INflow E2E Tests: one-two click interaction', () => {
 
     describe('Run force layout', () => {
         it('should hide MenuConfig and disable buttons', () => {
-            cy.get('[data-testid=MenuConfig] .react-flow__panel').should('be.visible');
-            cy.get('[data-testid=MenuInfo]').within(() => {
+            cy.get('[data-testid="MenuConfig"] .react-flow__panel').should('be.visible');
+            cy.get('[data-testid="MenuInfo"]').within(() => {
                 cy.get('[data-testid="node-type__select"]').should('not.be.disabled');
                 cy.get('[data-testid="node-type__select"]').should('not.be.disabled');
             });
 
-            cy.get('[data-testid=MenuLayouts-0]').within(() => {
+            cy.get('[data-testid="MenuLayouts-0"]').within(() => {
                 cy.get('button:contains("Start D3-force")').click();
 
                 cy.get('button').should('contain', 'Stop D3-force');
             });
 
-            cy.get('[data-testid=MenuConfig]').should('exist').should('not.be.visible');
-            cy.get('[data-testid=MenuConfig] .react-flow__panel').should('not.exist');
-            cy.get('[data-testid=MenuInfo]').within(() => {
+            cy.get('[data-testid="MenuConfig"]').should('exist').should('not.be.visible');
+            cy.get('[data-testid="MenuConfig"] .react-flow__panel').should('not.exist');
+            cy.get('[data-testid="MenuInfo"]').within(() => {
                 cy.get('[data-testid="node-type__select"]').should('be.disabled');
                 cy.get('[data-testid="node-type__select"]').should('be.disabled');
             });
@@ -71,7 +74,9 @@ describe('INflow E2E Tests: one-two click interaction', () => {
 
     describe('Node type selection', () => {
         it('should change value in selection and type for all nodes', () => {
-            cy.get('[data-testid=MenuInfo] [data-testid="node-type__select"]').select('agentVert');
+            cy.get('[data-testid="MenuInfo"] [data-testid="node-type__select"]').select(
+                'agentVert',
+            );
 
             cy.wait(100);
 
@@ -81,7 +86,7 @@ describe('INflow E2E Tests: one-two click interaction', () => {
 
     describe('Edge type selection', () => {
         it('should change value in selection and type for all edges', () => {
-            cy.get('[data-testid=MenuInfo] [data-testid="edge-type__select"]').select(
+            cy.get('[data-testid="MenuInfo"] [data-testid="edge-type__select"]').select(
                 'smartBezier',
             );
 
@@ -95,7 +100,7 @@ describe('INflow E2E Tests: one-two click interaction', () => {
 
     describe('Show more layouts button', () => {
         it('should show all layouts and run some of them', () => {
-            cy.get('[data-testid=MenuLayouts-0]').within(() => {
+            cy.get('[data-testid="MenuLayouts-0"]').within(() => {
                 cy.get('button[title="Show more"]').click();
 
                 cy.get('button').first().should('have.attr', 'title', 'Show less');
