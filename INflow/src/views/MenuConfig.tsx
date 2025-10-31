@@ -159,7 +159,7 @@ export default (props: PropsMenuConfig): JSX.Element => {
                         </td>
                         <td>
                           <input
-                          data-testid={`aux-link_port-id-${i}`}
+                            data-testid={`aux-link_port-id-${i}`}
                             placeholder="port id"
                             value={nodeAuxiliaryLinks[i].idPort}
                             onChange={event => {

@@ -136,7 +136,7 @@ describe('INflow E2E Tests: dynamics', () => {
             it('should go to next step and set sequence mode', () => {
                 cy.get('[data-testid="next-step"]').click();
 
-                cy.wait(100);
+                cy.wait(500);
 
                 cy.get('[data-testid="MenuInfo"]').should('contain', namesFile[1]);
                 cy.get('[data-testid="SubFlowInfo"]').should('contain', namesFile[2]);
@@ -147,7 +147,7 @@ describe('INflow E2E Tests: dynamics', () => {
                     cy.get('option[value=1]').should('contain', 'sequence');
                 });
 
-                cy.wait(100);
+                cy.wait(500);
 
                 cy.get('.react-flow[id="1"]').should('not.exist');
                 cy.get('[data-testid="MenuInfo"]').should('contain', namesFile[1]);
