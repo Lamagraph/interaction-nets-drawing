@@ -32,7 +32,7 @@ describe('INflow E2E Tests: dynamics', () => {
             cy.get('body > a[download]').should('not.exist');
 
             cy.then(() => {
-                expect(nameFile).not.to.be.empty;
+                cy.wrap({ value: nameFile }).its('value').should('not.be.empty');
                 cy.readFile(`cypress/downloads/${nameFile}`).then(download => {
                     cy.fixture(`${nameFile.replace(tailFile, '')}`).then(fixture => {
                         expect(download).to.deep.equal(fixture);
@@ -107,6 +107,8 @@ describe('INflow E2E Tests: dynamics', () => {
                 .then(() => {
                     cy.get('body > input[type="file"]').selectFile(pathsFullFile);
                 });
+
+            cy.wait(100); // only for ResizeObserver
         });
 
         describe('Comparison', () => {

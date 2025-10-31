@@ -32,6 +32,7 @@
   },
   "devDependencies": {
     "@cypress/code-coverage": "^3.14.7",
+    "@eslint/compat": "^1.4.1",
     "@eslint/js": "^9.37.0",
     "@istanbuljs/nyc-config-typescript": "^1.0.2",
     "@types/cypress": "^0.1.6",
