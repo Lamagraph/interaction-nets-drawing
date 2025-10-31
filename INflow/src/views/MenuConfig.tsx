@@ -110,6 +110,7 @@ export default (props: PropsMenuConfig): JSX.Element => {
                   <tr data-testid="auxiliary-line" key={i}>
                     <td>
                       <input
+                        data-testid={`aux-p-id-${i}`}
                         placeholder="id"
                         value={nodeAuxiliaryPorts[i].id}
                         onChange={event => {
@@ -124,6 +125,7 @@ export default (props: PropsMenuConfig): JSX.Element => {
                     </td>
                     <td>
                       <input
+                        data-testid={`aux-p-label-${i}`}
                         placeholder="label"
                         value={nodeAuxiliaryPorts[i].label ?? ('' as string)}
                         onChange={event => {
@@ -142,6 +144,7 @@ export default (props: PropsMenuConfig): JSX.Element => {
                       <>
                         <td>
                           <input
+                            data-testid={`aux-link_node-id-${i}`}
                             placeholder="node id"
                             value={nodeAuxiliaryLinks[i].idNode}
                             onChange={event => {
@@ -156,6 +159,7 @@ export default (props: PropsMenuConfig): JSX.Element => {
                         </td>
                         <td>
                           <input
+                          data-testid={`aux-link_port-id-${i}`}
                             placeholder="port id"
                             value={nodeAuxiliaryLinks[i].idPort}
                             onChange={event => {
