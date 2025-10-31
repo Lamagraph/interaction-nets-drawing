@@ -10,7 +10,7 @@ export const defPointCon = { idNode: '', idPort: '' };
 
 export type Port = {
     id: string;
-    label?: string;
+    label: string | null;
 };
 export const defPort = { id: '' };
 
@@ -105,6 +105,11 @@ export async function getObjectFromFile(file: File): Promise<NetObject> {
     });
 }
 
+export const calculatePosition = (index: number) => ({
+    x: 50 + 300 * Math.floor(index / 5),
+    y: 50 + 120 * (index % 5),
+});
+
 export async function toNetFromObject(
     netObj: NetObject,
     typeNode: string,
@@ -131,10 +136,7 @@ export async function toNetFromObject(
                         auxiliaryPorts: nodeObj.auxiliaryPorts,
                         principalPort: nodeObj.principalPort,
                     },
-                    position: nodeObj.position || {
-                        x: 50 + 300 * Math.floor(index / 5),
-                        y: 50 + 120 * (index % 5),
-                    },
+                    position: nodeObj.position || calculatePosition(index),
                     type: typeNode,
                 });
                 index += 1;

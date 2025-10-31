@@ -21,10 +21,10 @@ import { useINflowState } from '@utils/INflowContext';
 import { useDnD } from '@utils/DnDContext';
 import { useNodeParametersState } from '@utils/MCContext';
 import { nodeTypes, edgeTypes } from '@utils/typesElements';
+import { netSetup } from '@utils/netSetup';
 
 import {
   type Agent,
-  getObjectFromFileByName,
   getObjectFromJSON,
   toNetFromObject,
   isActivePair,
@@ -41,9 +41,6 @@ import MenuInfo from '@components/MenuInfo';
 
 // Reset localStorage: `localStorage.removeItem(keyStorageNet);`
 const keyStorageNet = 'net-setup';
-
-const dirNetsSaved = '../../saved-nets/';
-const nameFileStartup = 'list_add_1.json';
 
 const indexNet = 0;
 
@@ -83,15 +80,7 @@ export default (): JSX.Element => {
       }
 
       if (!nds || !eds) {
-        try {
-          const netObj = await getObjectFromFileByName(dirNetsSaved + nameFileStartup);
-          const net: Net = await toNetFromObject(netObj, typeNode, typeEdge);
-          [nds, eds] = [net.agents, net.edges];
-          nameFile = nameFileStartup;
-        } catch (error) {
-          console.log(error);
-          [nds, eds] = [[], []];
-        }
+        [nds, eds, nameFile] = [netSetup.agents, netSetup.edges, netSetup.name];
       }
 
       instance.setNodes(nds);
