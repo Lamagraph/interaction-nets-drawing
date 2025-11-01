@@ -110,7 +110,7 @@ describe('INflow E2E Tests: dynamics', () => {
                     cy.get('body > input[type="file"]').selectFile(pathsFullFile);
                 });
 
-            cy.wait(500);
+            cy.wait(1000);
 
             cy.get('.react-flow[id="0"]').should('be.visible');
             cy.get('.react-flow[id="1"]').should('be.visible');
