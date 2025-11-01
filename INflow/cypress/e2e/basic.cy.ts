@@ -78,8 +78,6 @@ describe('INflow E2E Tests: one-two click interaction', () => {
                 'agentVert',
             );
 
-            cy.wait(100);
-
             cy.get('.react-flow__nodes .react-flow__node-agentVert').should('have.length', 9);
         });
     });
@@ -89,8 +87,6 @@ describe('INflow E2E Tests: one-two click interaction', () => {
             cy.get('[data-testid="MenuInfo"] [data-testid="edge-type__select"]').select(
                 'smartBezier',
             );
-
-            cy.wait(100);
 
             cy.get('.react-flow__edges')
                 .find('.react-flow__edge-smartBezier')

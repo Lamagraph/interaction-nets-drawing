@@ -29,8 +29,6 @@ describe('INflow E2E Tests: multiple options', () => {
                 cy.get(`option[value=${value}]`).should('contain', label);
             });
 
-            cy.wait(100);
-
             cy.get('.react-flow__nodes')
                 .find(`.react-flow__node-${value}`)
                 .should('have.length', 9);
@@ -81,8 +79,6 @@ describe('INflow E2E Tests: multiple options', () => {
 
                 cy.get(`option[value=${value}]`).should('contain', label);
             });
-
-            cy.wait(100);
 
             cy.get('.react-flow__edges')
                 .find(`.react-flow__edge-${value}`)

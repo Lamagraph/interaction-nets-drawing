@@ -94,8 +94,6 @@ describe('INflow E2E Tests: interaction with MenuConfig', () => {
         it('should select node N9 and update MenuConfig', () => {
             cy.get('.react-flow__nodes [data-id="N9"]').should('exist').click();
 
-            cy.wait(100);
-
             cy.get('.react-flow__nodes [data-id="N9"]').should('have.class', 'selected');
             cy.get('[data-testid="MenuConfig"]').within(() => {
                 cy.get('input[data-testid="aux-p-id-0"]').should('have.value', 'P1');
@@ -130,8 +128,6 @@ describe('INflow E2E Tests: interaction with MenuConfig', () => {
         it('should select node N9 and change props', () => {
             cy.get('.react-flow__nodes [data-id="N9"]').should('exist').click();
 
-            cy.wait(100);
-
             cy.get('[data-testid="MenuConfig"]').within(() => {
                 cy.get('input[data-testid="aux-p-label-1"]')
                     .clear()
@@ -141,8 +137,6 @@ describe('INflow E2E Tests: interaction with MenuConfig', () => {
                 cy.get('button[data-testid="add-edit"]').should('contain', 'Edit agent');
                 cy.get('button[data-testid="add-edit"]').should('not.be.disabled').click();
             });
-
-            cy.wait(100);
 
             cy.get('.react-flow__nodes [data-id="N9"]').should('exist').contains('1234');
         });

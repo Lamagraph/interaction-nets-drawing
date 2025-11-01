@@ -9,26 +9,29 @@ describe('INflow E2E Tests: dynamics', () => {
             let nameFile = '';
             const tailFile = '_edited.json';
 
-            cy.document().then(doc => {
-                const originalRemoveChild = doc.body.removeChild.bind(doc.body);
+            cy.document()
+                .then(doc => {
+                    const originalRemoveChild = doc.body.removeChild.bind(doc.body);
 
-                cy.stub(doc.body, 'removeChild')
-                    .callsFake(child => {
-                        if (child.tagName === 'A' && child.hasAttribute('download')) {
-                            expect(child.getAttribute('href')).to.include('data:application/json');
-                            nameFile = child.getAttribute('download');
-                            expect(nameFile).to.include(tailFile);
+                    cy.stub(doc.body, 'removeChild')
+                        .callsFake(child => {
+                            if (child.tagName === 'A' && child.hasAttribute('download')) {
+                                expect(child.getAttribute('href')).to.include(
+                                    'data:application/json',
+                                );
+                                nameFile = child.getAttribute('download');
+                                expect(nameFile).to.include(tailFile);
+                                return originalRemoveChild(child);
+                            }
                             return originalRemoveChild(child);
-                        }
-                        return originalRemoveChild(child);
-                    })
-                    .as('removeChildStub');
-            });
+                        })
+                        .as('removeChildStub');
+                })
+                .then(() => {
+                    cy.get('[data-testid="MenuControl"] button[data-testid="download"]').click();
+                });
 
-            cy.wait(500);
-
-            cy.get('[data-testid="MenuControl"] button[data-testid="download"]').click();
-            cy.get('@removeChildStub').should('be.called');
+            cy.get('@removeChildStub', { timeout: 2000 }).should('be.called');
             cy.get('body > a[download]').should('not.exist');
 
             cy.then(() => {
@@ -48,21 +51,24 @@ describe('INflow E2E Tests: dynamics', () => {
         it('should click button and upload net in edit mode', () => {
             const nameFile = 'list_add_3.json';
 
-            cy.document().then(doc => {
-                const originalRemoveChild = doc.body.removeChild.bind(doc.body);
+            cy.document()
+                .then(doc => {
+                    const originalRemoveChild = doc.body.removeChild.bind(doc.body);
 
-                cy.stub(doc.body, 'removeChild')
-                    .callsFake(child => {
-                        if (child.tagName === 'INPUT' && child.type === 'file') {
-                            return child;
-                        }
-                        return originalRemoveChild(child);
-                    })
-                    .as('removeChildStub');
-            });
+                    cy.stub(doc.body, 'removeChild')
+                        .callsFake(child => {
+                            if (child.tagName === 'INPUT' && child.type === 'file') {
+                                return child;
+                            }
+                            return originalRemoveChild(child);
+                        })
+                        .as('removeChildStub');
+                })
+                .then(() => {
+                    cy.get('[data-testid="MenuControl"] button[data-testid="upload"]').click();
+                });
 
-            cy.get('[data-testid="MenuControl"] button[data-testid="upload"]').click();
-            cy.get('@removeChildStub')
+            cy.get('@removeChildStub', { timeout: 2000 })
                 .should('be.called')
                 .then(() => {
                     cy.get('body > input[type="file"]').selectFile('cypress/fixtures/' + nameFile);
@@ -89,28 +95,28 @@ describe('INflow E2E Tests: dynamics', () => {
         beforeEach(() => {
             const pathsFullFile = namesFile.map(name => 'cypress/fixtures/' + name);
 
-            cy.document().then(doc => {
-                const originalRemoveChild = doc.body.removeChild.bind(doc.body);
+            cy.document()
+                .then(doc => {
+                    const originalRemoveChild = doc.body.removeChild.bind(doc.body);
 
-                cy.stub(doc.body, 'removeChild')
-                    .callsFake(child => {
-                        if (child.tagName === 'INPUT' && child.type === 'file') {
-                            return child;
-                        }
-                        return originalRemoveChild(child);
-                    })
-                    .as('removeChildStub');
-            });
+                    cy.stub(doc.body, 'removeChild')
+                        .callsFake(child => {
+                            if (child.tagName === 'INPUT' && child.type === 'file') {
+                                return child;
+                            }
+                            return originalRemoveChild(child);
+                        })
+                        .as('removeChildStub');
+                })
+                .then(() => {
+                    cy.get('[data-testid="MenuControl"] button[data-testid="upload"]').click();
+                });
 
-            cy.get('[data-testid="MenuControl"] button[data-testid="upload"]').click();
-
-            cy.get('@removeChildStub')
+            cy.get('@removeChildStub', { timeout: 2000 })
                 .should('be.called')
                 .then(() => {
                     cy.get('body > input[type="file"]').selectFile(pathsFullFile);
                 });
-
-            cy.wait(1000);
 
             cy.get('.react-flow[id="0"]').should('be.visible');
             cy.get('.react-flow[id="1"]').should('be.visible');
@@ -143,8 +149,6 @@ describe('INflow E2E Tests: dynamics', () => {
             it('should go to next step and set sequence mode', () => {
                 cy.get('[data-testid="next-step"]').click();
 
-                cy.wait(500);
-
                 cy.get('[data-testid="MenuInfo"]').should('contain', namesFile[1]);
                 cy.get('[data-testid="SubFlowInfo"]').should('contain', namesFile[2]);
 
@@ -153,8 +157,6 @@ describe('INflow E2E Tests: dynamics', () => {
 
                     cy.get('option[value=1]').should('contain', 'sequence');
                 });
-
-                cy.wait(500);
 
                 cy.get('.react-flow[id="1"]').should('not.exist');
                 cy.get('[data-testid="MenuInfo"]').should('contain', namesFile[1]);
