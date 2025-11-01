@@ -110,7 +110,10 @@ describe('INflow E2E Tests: dynamics', () => {
                     cy.get('body > input[type="file"]').selectFile(pathsFullFile);
                 });
 
-            cy.wait(100); // only for ResizeObserver
+            cy.wait(500);
+
+            cy.get('.react-flow[id="0"]').should('be.visible');
+            cy.get('.react-flow[id="1"]').should('be.visible');
         });
 
         describe('Comparison', () => {
