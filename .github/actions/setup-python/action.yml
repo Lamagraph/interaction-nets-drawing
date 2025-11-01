@@ -1,0 +1,17 @@
+name: 'Setup Python'
+description: 'Setup Python environment for INviz'
+
+runs:
+  using: composite
+  steps:
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      working-directory: ./INviz
+      run: |
+          python -m pip install --upgrade pip
+          pip install ruff pytest
+      shell: bash

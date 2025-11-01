@@ -1,0 +1,37 @@
+{
+  "agents": [
+    {
+      "id": "N1",
+      "label": "2",
+      "auxiliaryPorts": [],
+      "principalPort": {
+        "id": "P0",
+        "label": null
+      }
+    },
+    {
+      "id": "N2",
+      "label": "Cons",
+      "auxiliaryPorts": [
+        {
+          "id": "P1",
+          "label": null
+        }
+      ],
+      "principalPort": {
+        "id": "P0",
+        "label": null
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "E_N1:P0-N2:P1",
+      "source": "N1",
+      "target": "N2",
+      "sourcePort": "P0",
+      "targetPort": "P1",
+      "activePair": false
+    }
+  ]
+}

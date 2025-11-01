@@ -1,0 +1,62 @@
+name: Project INflow
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ['react-flow', 'main']
+    paths: [INflow/**]
+  pull_request:
+    branches: ['**']
+    paths: [INflow/**]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  formatter:
+    name: Formatter
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clone project
+        uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-node
+
+      - name: Run Prettier
+        working-directory: ./INflow
+        run: npm run format
+
+  linter:
+    name: Linter
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clone project
+        uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-node
+
+      - name: Run ESlint
+        working-directory: ./INflow
+        run: npm run lint
+
+  tests:
+    name: Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clone project
+        uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-node
+
+      - name: Run Cypress
+        uses: cypress-io/github-action@v6
+        with:
+          working-directory: ./INflow
+          build: npm run build
+          start: npm run dev
+          wait-on: 'http://localhost:5173'
+
+      - name: Get coverage
+        working-directory: ./INflow
+        run: npx nyc report && npx nyc report --reporter=text-summary

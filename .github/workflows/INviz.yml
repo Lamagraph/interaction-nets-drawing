@@ -1,0 +1,54 @@
+name: Project INviz
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ['graphviz', 'main']
+    paths: [INviz/**]
+  pull_request:
+    branches: ['**']
+    paths: [INviz/**]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  formatter:
+    name: Formatter
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clone project
+        uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-python
+
+      - name: Run Ruff
+        working-directory: ./INviz
+        run: ruff format --check .
+
+  linter:
+    name: Linter
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clone project
+        uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-python
+
+      - name: Run Ruff
+        working-directory: ./INviz
+        run: ruff check .
+
+  tests:
+    name: Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clone project
+        uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-python
+
+      - name: Run Pytest
+        working-directory: ./INviz
+        run: python -m pytest -vv

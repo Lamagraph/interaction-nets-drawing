@@ -1,12 +1,16 @@
-# React + Vite
+# interaction-nets-drawing
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**interaction-nets-drawing** — a tool for visualizations of [Interaction Nets](https://en.m.wikipedia.org/wiki/Interaction_nets). It has two different ways to show these nets:
 
-Currently, two official plugins are available:
+* [INviz](./INviz) is a script/utility that makes static representation of nets
+* [INflow](./INflow) is an interactive web application that enables real-time visualization, editing, and manipulation of nets
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Format
 
-## Expanding the ESLint configuration
+The library utilizes a structured JSON format for network representation. For complete schema definition and validation rules, see [`JSON Schema`](./schema-net.json).
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+See [the example](./example-nets/list_add) demonstrating dynamic execution of incremental list construction operations.
+
+## License
+
+Distributed under the [MIT License](https://choosealicense.com/licenses/mit/). See [`LICENSE`](LICENSE) for more information.
