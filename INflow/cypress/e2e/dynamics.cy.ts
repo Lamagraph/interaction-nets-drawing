@@ -37,7 +37,8 @@ describe('INflow E2E Tests: dynamics', () => {
             cy.then(() => {
                 cy.wrap({ value: nameFile }).its('value').should('not.be.empty');
                 cy.readFile(`cypress/downloads/${nameFile}`).then(download => {
-                    cy.fixture(`${nameFile.replace(tailFile, '')}`).then(fixture => {
+                    const nameFixture = nameFile.replace(tailFile, '');
+                    cy.fixture(nameFixture, { timeout: 5000 }).then(fixture => {
                         expect(download.agents).to.deep.equal(fixture.agents);
                         expect(download.edges).to.deep.equal(fixture.edges);
                         expect(download.name).to.equal(fixture.name);

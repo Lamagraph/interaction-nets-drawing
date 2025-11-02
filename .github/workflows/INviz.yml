@@ -10,7 +10,7 @@ on:
     paths: [INviz/**]
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.ref }}-INviz
   cancel-in-progress: true
 
 jobs:
