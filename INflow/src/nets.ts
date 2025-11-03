@@ -12,7 +12,7 @@ export type Port = {
     id: string;
     label: string | null;
 };
-export const defPort = { id: '' };
+export const defPort = { id: '', label: null };
 
 export type AgentData = {
     label: string;

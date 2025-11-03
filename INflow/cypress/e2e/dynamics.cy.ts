@@ -6,6 +6,7 @@ describe('INflow E2E Tests: dynamics', () => {
     describe('Download button', () => {
         it('should click button and download net in JSON', () => {
             cy.get('body > a[download]').should('not.exist');
+            cy.get('[data-testid="MenuInfo"]').should('contain', '.json');
             let nameFile = '';
             const tailFile = '_edited.json';
 
@@ -37,8 +38,7 @@ describe('INflow E2E Tests: dynamics', () => {
             cy.then(() => {
                 cy.wrap({ value: nameFile }).its('value').should('not.be.empty');
                 cy.readFile(`cypress/downloads/${nameFile}`).then(download => {
-                    const nameFixture = nameFile.replace(tailFile, '');
-                    cy.fixture(nameFixture, { timeout: 5000 }).then(fixture => {
+                    cy.fixture(nameFile.replace(tailFile, '.json')).then(fixture => {
                         expect(download.agents).to.deep.equal(fixture.agents);
                         expect(download.edges).to.deep.equal(fixture.edges);
                         expect(download.name).to.equal(fixture.name);
