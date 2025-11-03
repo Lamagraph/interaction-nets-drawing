@@ -32,7 +32,7 @@ describe('INflow E2E Tests: dynamics', () => {
                     cy.get('[data-testid="MenuControl"] button[data-testid="download"]').click();
                 });
 
-            cy.get('@removeChildStub', { timeout: 2000 }).should('be.called');
+            cy.get('@removeChildStub').should('be.called');
             cy.get('body > a[download]').should('not.exist');
 
             cy.then(() => {
@@ -69,7 +69,7 @@ describe('INflow E2E Tests: dynamics', () => {
                     cy.get('[data-testid="MenuControl"] button[data-testid="upload"]').click();
                 });
 
-            cy.get('@removeChildStub', { timeout: 2000 })
+            cy.get('@removeChildStub')
                 .should('be.called')
                 .then(() => {
                     cy.get('body > input[type="file"]').selectFile('cypress/fixtures/' + nameFile);
@@ -94,6 +94,8 @@ describe('INflow E2E Tests: dynamics', () => {
         const namesFile = ['list_add_1.json', 'list_add_2.json', 'list_add_3.json'];
 
         beforeEach(() => {
+            cy.get('.react-flow[id="0"] .react-flow__nodes').children().should('have.length', 9);
+
             const pathsFullFile = namesFile.map(name => 'cypress/fixtures/' + name);
 
             cy.document()
@@ -113,14 +115,18 @@ describe('INflow E2E Tests: dynamics', () => {
                     cy.get('[data-testid="MenuControl"] button[data-testid="upload"]').click();
                 });
 
-            cy.get('@removeChildStub', { timeout: 2000 })
+            cy.get('@removeChildStub')
                 .should('be.called')
                 .then(() => {
                     cy.get('body > input[type="file"]').selectFile(pathsFullFile);
                 });
 
-            cy.get('.react-flow[id="0"]').should('be.visible');
-            cy.get('.react-flow[id="1"]').should('be.visible');
+            cy.get('.react-flow[id="0"] .react-flow__nodes', { timeout: 10000 })
+                .children()
+                .should('have.length', 9);
+            cy.get('.react-flow[id="1"] .react-flow__nodes', { timeout: 10000 })
+                .children()
+                .should('have.length', 9);
         });
 
         describe('Comparison', () => {
