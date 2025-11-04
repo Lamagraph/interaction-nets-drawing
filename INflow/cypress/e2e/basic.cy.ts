@@ -6,7 +6,7 @@ describe('INflow E2E Tests: hosting', () => {
 
 describe('INflow E2E Tests: setup', () => {
     beforeEach(() => {
-        cy.visit('/');
+        cy.visit('/interaction-nets-drawing/');
     });
 
     describe('Menus', () => {
@@ -109,6 +109,99 @@ describe('INflow E2E Tests: one-two click interaction', () => {
                 cy.get('button[data-testid="layout__D3-force"]').click();
                 cy.get('button[disabled]').should('have.length', 0);
             });
+        });
+    });
+});
+
+describe('INflow E2E Tests: data transfer', () => {
+    beforeEach(() => {
+        cy.visit('/');
+    });
+
+    describe('Download button', () => {
+        it('should click button and download net in JSON', () => {
+            cy.get('body > a[download]').should('not.exist');
+            cy.get('[data-testid="MenuInfo"]').should('contain', '.json');
+            let nameFile = '';
+            const tailFile = '_edited.json';
+
+            cy.document()
+                .then(doc => {
+                    const originalRemoveChild = doc.body.removeChild.bind(doc.body);
+
+                    cy.stub(doc.body, 'removeChild')
+                        .callsFake(child => {
+                            if (child.tagName === 'A' && child.hasAttribute('download')) {
+                                expect(child.getAttribute('href')).to.include(
+                                    'data:application/json',
+                                );
+                                nameFile = child.getAttribute('download');
+                                expect(nameFile).to.include(tailFile);
+                                return originalRemoveChild(child);
+                            }
+                            return originalRemoveChild(child);
+                        })
+                        .as('removeChildStub');
+                })
+                .then(() => {
+                    cy.get('[data-testid="MenuControl"] button[data-testid="download"]').click();
+                });
+
+            cy.get('@removeChildStub').should('be.called');
+            cy.get('body > a[download]').should('not.exist');
+
+            cy.then(() => {
+                cy.wrap({ value: nameFile }).its('value').should('not.be.empty');
+                cy.readFile(`cypress/downloads/${nameFile}`).then(download => {
+                    cy.fixture(nameFile.replace(tailFile, '.json')).then(fixture => {
+                        expect(download.agents).to.deep.equal(fixture.agents);
+                        expect(download.edges).to.deep.equal(fixture.edges);
+                        expect(download.name).to.equal(fixture.name);
+                    });
+                });
+            });
+        });
+    });
+
+    describe('Upload button', () => {
+        it('should click button and upload net in edit mode', () => {
+            const nameFile = 'list_add_3.json';
+
+            cy.document()
+                .then(doc => {
+                    const originalRemoveChild = doc.body.removeChild.bind(doc.body);
+
+                    cy.stub(doc.body, 'removeChild')
+                        .callsFake(child => {
+                            if (child.tagName === 'INPUT' && child.type === 'file') {
+                                return child;
+                            }
+                            return originalRemoveChild(child);
+                        })
+                        .as('removeChildStub');
+                })
+                .then(() => {
+                    cy.get('[data-testid="MenuControl"] button[data-testid="upload"]').click();
+                });
+
+            cy.get('@removeChildStub')
+                .should('be.called')
+                .then(() => {
+                    cy.get('body > input[type="file"]').selectFile('cypress/fixtures/' + nameFile);
+                });
+
+            cy.get('[data-testid="MenuInfo"]').should('contain', nameFile);
+            cy.get('[data-testid="MenuControl"]').within(() => {
+                cy.get('.react-flow__controls-zoomin').should('exist').should('not.be.disabled');
+                cy.get('.react-flow__controls-zoomout').should('exist').should('not.be.disabled');
+                cy.get('.react-flow__controls-fitview').should('exist').should('not.be.disabled');
+                cy.get('.react-flow__controls-interactive')
+                    .should('exist')
+                    .should('not.be.disabled');
+            });
+            cy.get('.react-flow').should('have.attr', 'data-testmode').and('equal', '0');
+            cy.get('.react-flow__nodes').children().should('have.length', 7);
+            cy.get('.react-flow__edges').children().should('have.length', 7);
         });
     });
 });

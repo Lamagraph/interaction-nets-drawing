@@ -1,6 +1,6 @@
 describe('INflow E2E Tests: specific of Interaction Nets', () => {
     beforeEach(() => {
-        cy.visit('/');
+        cy.visit('/interaction-nets-drawing/');
     });
 
     describe('Active pair', () => {

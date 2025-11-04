@@ -1,6 +1,6 @@
 describe('INflow E2E Tests: multiple options', () => {
     beforeEach(() => {
-        cy.visit('/');
+        cy.visit('/interaction-nets-drawing/');
     });
 
     describe('Node type selection', () => {

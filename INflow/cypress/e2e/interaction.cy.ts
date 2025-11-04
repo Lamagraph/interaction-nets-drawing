@@ -1,6 +1,6 @@
 describe('INflow E2E Tests: interaction with MenuConfig', () => {
     beforeEach(() => {
-        cy.visit('/');
+        cy.visit('/interaction-nets-drawing/');
     });
 
     describe('Initial state', () => {
