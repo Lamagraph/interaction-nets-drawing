@@ -16,8 +16,9 @@ import { useINflowState } from '@utils/INflowContext';
 import { nodeTypes, edgeTypes } from '@utils/typesElements';
 
 import { type Agent, type Net } from '@/nets';
-import { SimplifyMenuControl, NetMode, compareNet } from '@components/MenuControl';
+import { SimplifyMenuControl, NetMode } from '@components/MenuControl';
 import MenuLayouts from '@components/MenuLayouts';
+import { compareNet } from '@/utils/netCompare';
 
 const indexNet = 1;
 

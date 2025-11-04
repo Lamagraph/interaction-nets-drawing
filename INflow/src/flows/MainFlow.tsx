@@ -21,26 +21,14 @@ import { useINflowState } from '@utils/INflowContext';
 import { useDnD } from '@utils/DnDContext';
 import { useNodeParametersState } from '@utils/MCContext';
 import { nodeTypes, edgeTypes } from '@utils/typesElements';
-import { netSetup } from '@utils/netSetup';
+import { compareNet } from '@/utils/netCompare';
+import { getNetSetup, updateLocalStorage } from '@/utils/dataManagement';
 
-import {
-  type Agent,
-  getObjectFromJSON,
-  toNetFromObject,
-  isActivePair,
-  getTargetHandle,
-  validate,
-  defPointCon,
-  type Net,
-  toObjectFromNet,
-} from '@/nets';
-import MenuControl, { compareNet, NetMode } from '@components/MenuControl';
+import { type Agent, isActivePair, type Net, isAllowedToCreate } from '@/nets';
+import MenuControl, { NetMode } from '@components/MenuControl';
 import MenuLayouts from '@components/MenuLayouts';
 import MenuConfig from '@components/MenuConfig';
 import MenuInfo from '@components/MenuInfo';
-
-// Reset localStorage: `localStorage.removeItem(keyStorageNet);`
-const keyStorageNet = 'net-setup';
 
 const indexNet = 0;
 
@@ -55,42 +43,16 @@ export default (): JSX.Element => {
   } = useINflowState();
 
   // Setup
-
-  const updateLocalStorage = async () => {
-    const netObj = await toObjectFromNet({ agents: nodes, edges: edges, name: fileOpened }, true);
-    localStorage.setItem(keyStorageNet, JSON.stringify(netObj));
-  };
-
   const onInit: OnInit<Agent, Edge> = (instance: ReactFlowInstance<Agent, Edge>) => {
     const setup = async () => {
-      let [nds, eds]: [Agent[] | null, Edge[] | null] = [null, null];
-      let nameFile: string = '';
-
-      try {
-        const netJSON = localStorage.getItem(keyStorageNet);
-        if (netJSON) {
-          const netObj = await getObjectFromJSON(netJSON);
-          const net: Net = await toNetFromObject(netObj, typeNode, typeEdge);
-          [nds, eds] = [net.agents, net.edges];
-          nameFile = `IN_${net.agents.length}_agents_${net.edges.length}_edges.back`;
-          console.log("Setup from 'localStorage'");
-        }
-      } catch (error) {
-        console.log(error);
-      }
-
-      if (!nds || !eds) {
-        [nds, eds, nameFile] = [netSetup.agents, netSetup.edges, netSetup.name];
-      }
-
-      instance.setNodes(nds);
-      instance.setEdges(eds);
-      setFileOpened(nameFile);
+      const net = await getNetSetup(typeNode, typeEdge);
+      instance.setNodes(net.agents);
+      instance.setEdges(net.edges);
+      setFileOpened(net.name);
     };
 
     setup();
     fitView();
-    // updateLocalStorage();
   };
 
   // Main
@@ -108,25 +70,19 @@ export default (): JSX.Element => {
   const isRunningLayout = isRunningLayouts[indexNet];
   const setIsRunningLayout = (value: boolean) => {
     setIsRunningLayouts(flags => [value, flags[1]]);
-    // if (!value) updateLocalStorage();
   };
 
   // Add and edit net
 
   const {
     nodeId,
-    setNodeId,
     nodeLabel,
-    setNodeLabel,
     nodeAuxiliaryPorts,
-    setNodeAuxiliaryPorts,
     nodePrincipalPort,
-    setNodePrincipalPort,
     nodeAuxiliaryLinks,
-    setNodeAuxiliaryLinks,
     nodePrincipalLink,
-    setNodePrincipalLink,
     cleanUpInfoNode,
+    setMCContext,
   } = useNodeParametersState();
 
   /// Add node
@@ -184,7 +140,6 @@ export default (): JSX.Element => {
     });
 
     cleanUpInfoNode();
-    // updateLocalStorage();
   };
 
   //// Add node with drag
@@ -216,6 +171,7 @@ export default (): JSX.Element => {
   );
 
   /// Add edge with drag
+
   const onConnect = useCallback(
     (params: Connection) => {
       const isActPair = isActivePair(params, nodes);
@@ -235,10 +191,8 @@ export default (): JSX.Element => {
           eds,
         ),
       );
-
-      // updateLocalStorage();
     },
-    [typeEdge, nodes, updateLocalStorage],
+    [typeEdge, nodes],
   );
 
   const onDragOver = useCallback((event: any) => {
@@ -248,16 +202,7 @@ export default (): JSX.Element => {
 
   /// Adding button
   const isAllowed = useCallback(() => {
-    if (!validate(nodeId) || !validate(nodeLabel) || !validate(nodePrincipalPort.id)) return false;
-
-    const setPorts = new Set([nodePrincipalPort.id]);
-
-    for (const port of nodeAuxiliaryPorts) {
-      if (!validate(port.id)) return false;
-      setPorts.add(port.id.trim());
-    }
-
-    return setPorts.size === nodeAuxiliaryPorts.length + 1;
+    return isAllowedToCreate(nodeId, nodeLabel, nodePrincipalPort, nodeAuxiliaryPorts);
   }, [nodeId, nodeLabel, nodePrincipalPort, nodeAuxiliaryPorts]);
 
   // Selected node
@@ -275,50 +220,6 @@ export default (): JSX.Element => {
   }, []);
 
   useOnSelectionChange({ onChange });
-
-  const setNodeInfoBySelect = useCallback(() => {
-    if (!nodeSelected) {
-      cleanUpInfoNode();
-      return;
-    }
-
-    setNodeId(nodeSelected.id);
-    setNodeLabel(nodeSelected.data.label);
-    const auxPorts = nodeSelected.data.auxiliaryPorts;
-    setNodeAuxiliaryPorts(auxPorts);
-    setNodePrincipalPort(nodeSelected.data.principalPort);
-    setNodeAuxiliaryLinks(Array(auxPorts.length).fill(defPointCon));
-
-    edges.forEach(edge => {
-      if (edge.source === nodeSelected.id) {
-        if (nodeSelected.data.principalPort.id === edge.sourceHandle) {
-          setNodePrincipalLink({ idNode: edge.target, idPort: getTargetHandle(edge) });
-        } else {
-          const indexAuxPort = auxPorts.findIndex(port => port.id === edge.sourceHandle);
-          setNodeAuxiliaryLinks(links =>
-            links.map((port, i) =>
-              i === indexAuxPort
-                ? { ...port, idNode: edge.target, idPort: getTargetHandle(edge) }
-                : port,
-            ),
-          );
-        }
-      } else if (edge.target === nodeSelected.id) {
-        if (nodeSelected.data.principalPort.id === getTargetHandle(edge)) {
-          setNodePrincipalLink({ idNode: edge.source, idPort: edge.sourceHandle ?? '' });
-        } else {
-          const indexAuxPort = auxPorts.findIndex(port => port.id === getTargetHandle(edge));
-          setNodeAuxiliaryLinks(links =>
-            links.map((port, i) =>
-              i === indexAuxPort
-                ? { ...port, idNode: edge.source, idPort: edge.sourceHandle ?? '' }
-                : port,
-            ),
-          );
-        }
-      }
-    });
-  }, [nodeSelected]);
 
   // Several nets
 
@@ -362,14 +263,17 @@ export default (): JSX.Element => {
   // Effects
 
   useEffect(() => {
-    if (nodes.length) updateLocalStorage();
+    if (nodes.length) updateLocalStorage(nodes, edges, fileOpened);
   }, [nodes.length, edges.length]);
 
   useEffect(() => {
     if (isRunningLayout) unselectNode();
   }, [unselectNode]);
 
-  useEffect(setNodeInfoBySelect, [setNodeInfoBySelect]);
+  useEffect(() => {
+    setMCContext(nodeSelected, edges);
+    // setNodeInfoBySelect();
+  }, [nodeSelected]);
 
   useEffect(() => {
     if (indexCur < 0 || netsSaved.length === 0) return;

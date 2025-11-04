@@ -61,4 +61,6 @@ jobs:
         run: |
           npx nyc report
           echo '## Coverage' >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
           npx nyc report --reporter=text-summary >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY

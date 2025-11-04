@@ -1,4 +1,9 @@
-import { type Net, calculatePosition } from '@/nets';
+import { type Net } from '@/nets';
+
+export const calculatePosition = (index: number) => ({
+    x: 50 + 300 * Math.floor(index / 5),
+    y: 50 + 120 * (index % 5),
+});
 
 export const netSetup: Net = {
     agents: [

@@ -1,7 +1,8 @@
 import { createContext, useContext, useState } from 'react';
 
 import { NetMode } from '@components/MenuControl';
-import { type Net, toObjectFromNet } from '@/nets';
+import { type Net } from '@/nets';
+import { toObjectFromNet } from '@utils/dataManagement';
 
 // Interaction Nets
 
@@ -16,7 +17,7 @@ export type INflowInstance = {
 
 export const instanceToObject = (instance: INflowInstance) => {
   return {
-    netsSaved: instance.netsSaved.map(toObjectFromNet),
+    netsSaved: instance.netsSaved.map(net => toObjectFromNet(net, true)),
     indexCur: instance.indexCur,
     modeNet: instance.modeNet,
     typeNode: instance.typeNode,
