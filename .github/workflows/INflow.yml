@@ -55,6 +55,7 @@ jobs:
           working-directory: ./INflow
           start: npm run dev
           wait-on: 'http://localhost:5173'
+          browser: chrome
 
       - name: Get coverage
         working-directory: ./INflow

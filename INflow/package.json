@@ -11,8 +11,8 @@
     "lint:fix": "eslint --fix .",
     "format": "prettier --check .",
     "format:fix": "prettier --write .",
-    "test": "cypress run",
-    "test:coverage": "cypress run && npx nyc report && npx nyc report --reporter=text-summary"
+    "test": "cypress run -b chrome",
+    "test:coverage": "cypress run -b chrome && npx nyc report && npx nyc report --reporter=text-summary"
   },
   "dependencies": {
     "@dagrejs/dagre": "^1.1.5",
