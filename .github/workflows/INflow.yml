@@ -50,13 +50,15 @@ jobs:
       - uses: ./.github/actions/setup-node
 
       - name: Run Cypress
-        uses: cypress-io/github-action@v6
+        uses: cypress-io/github-action@v6.10.0
         with:
           working-directory: ./INflow
-          build: npm run build
           start: npm run dev
           wait-on: 'http://localhost:5173'
 
       - name: Get coverage
         working-directory: ./INflow
-        run: npx nyc report && npx nyc report --reporter=text-summary
+        run: |
+          npx nyc report
+          echo '## Coverage' >> $GITHUB_STEP_SUMMARY
+          npx nyc report --reporter=text-summary >> $GITHUB_STEP_SUMMARY

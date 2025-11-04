@@ -29,13 +29,22 @@ describe('INflow E2E Tests: dynamics modes', () => {
                 cy.get('body > input[type="file"]').selectFile(pathsFullFile);
             });
 
-        cy.get('.react-flow[id=1] .react-flow__nodes').children().should('have.length', 9);
-        cy.get('.react-flow[id=0] .react-flow__nodes').children().should('have.length', 9);
+        cy.get('.react-flow[id="0"]').should('have.attr', 'data-testmode').and('equal', '2');
+
+        cy.then(() => {
+            cy.get('.react-flow[id=1] .react-flow__nodes')
+                .children()
+                .should('be.visible')
+                .and('have.length', 9);
+            cy.get('.react-flow[id=0] .react-flow__nodes')
+                .children()
+                .should('be.visible')
+                .and('have.length', 9);
+        });
     });
 
     describe('Comparison', () => {
         it('should upload nets and set comparison mode', () => {
-            cy.get('.react-flow[id="0"]').should('have.attr', 'data-testmode').and('equal', '2');
             cy.get('[data-testid="MenuInfo"]').should('contain', namesFile[0]);
             cy.get('[data-testid="MenuControl"]').within(() => {
                 cy.get('[data-testid="edit-net"]').should('exist').should('not.be.disabled');
