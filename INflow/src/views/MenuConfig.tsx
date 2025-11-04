@@ -61,7 +61,7 @@ export default (props: PropsMenuConfig): JSX.Element => {
   }, [getInternalNode, addItem, nodeSelected]);
 
   return (
-    <div data-testid="MenuConfig">
+    <div className="MenuConfig" data-testid="MenuConfig">
       {!isRunningLayout && (
         <Panel position="top-left">
           <div className="react-flow__node">
@@ -77,6 +77,7 @@ export default (props: PropsMenuConfig): JSX.Element => {
                         setNodeAuxiliaryPorts(ports => [...ports, defPort]);
                         setNodeAuxiliaryLinks(links => [...links, defPointCon]);
                       }}
+                      className="button-plus-minus"
                     >
                       +
                     </button>
@@ -182,6 +183,7 @@ export default (props: PropsMenuConfig): JSX.Element => {
                           setNodeAuxiliaryPorts(ports => ports.filter((_, j) => j !== i));
                           setNodeAuxiliaryLinks(links => links.filter((_, j) => j !== i));
                         }}
+                        className="button-plus-minus"
                       >
                         -
                       </button>

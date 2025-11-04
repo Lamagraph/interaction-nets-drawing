@@ -1,5 +1,12 @@
 @import url('./xy-theme.css');
 
+@media (max-width: 500px) {
+  .MenuConfig,
+  .react-flow__minimap {
+    display: none !important;
+  }
+}
+
 html,
 body {
   margin: 0;
@@ -28,6 +35,12 @@ th {
 td {
   min-width: 20px;
   position: relative;
+}
+
+.button-plus-minus {
+  border: none;
+  border-radius: 4px;
+  background-color: #eeeeee;
 }
 
 .auxiliaryPorts-gen {
@@ -147,6 +160,11 @@ td {
 .select-info {
   height: 25px;
   width: 100%;
+  border-radius: 6px;
+  font-family: sans-serif;
+  background-color: #eeeeee;
+  padding: 0;
+  padding-left: 1;
 }
 
 .select-info:disabled {

@@ -78,7 +78,7 @@ export default ({
           )}
         </div>
 
-        <div>
+        <div style={{ display: 'flex' }}>
           <button
             title={layoutsShowed ? 'Show less' : 'Show more'}
             className="xy-theme__button"
@@ -145,7 +145,9 @@ export default ({
             data-testid="layout__D3-force"
             disabled={isRunningLayouts[1 - indexNet]}
           >
+            {/* <span style={{ fontFamily: 'sans-serif' }}> */}
             {isRunningLayouts[indexNet] ? 'Stop' : 'Start'} D3-force
+            {/* </span> */}
           </button>
         </div>
       </Panel>
