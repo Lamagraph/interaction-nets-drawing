@@ -165,10 +165,9 @@ export default (props: PropsMenuControl) => {
   );
 
   const saveNetEdited = useCallback(() => {
-    const index = indexCur - (filesOpened[0] === filesOpened[1] && indexCur > 0 ? 1 : 0);
     setNetsSaved(nets =>
       nets.map((net, i) =>
-        i === index
+        i === indexCur
           ? {
               agents: nodes,
               edges: edges,
