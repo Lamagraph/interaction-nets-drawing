@@ -16,3 +16,15 @@
 // Import commands.js using ES2015 syntax:
 import './commands';
 import '@cypress/code-coverage/support';
+
+// This error often occurs in CI (not always), so I will have to disable this error until the bug is resolved.
+// https://github.com/cypress-io/cypress/issues/29277
+// https://github.com/cypress-io/cypress/issues/31479
+Cypress.on('uncaught:exception', (err, runnable) => {
+    if (err.message.includes('ResizeObserver loop')) {
+        const testName = runnable?.title || 'Unknown test';
+        console.warn(`Warning: catch ResizeObserver in test: ${testName}`, err);
+        return false;
+    }
+    return true;
+});
