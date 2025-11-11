@@ -70,6 +70,7 @@ export default (): JSX.Element => {
   const isRunningLayout = isRunningLayouts[indexNet];
   const setIsRunningLayout = (value: boolean) => {
     setIsRunningLayouts(flags => [value, flags[1]]);
+    if (!value) updateLocalStorage(nodes, edges, fileOpened);
   };
 
   // Add and edit net
