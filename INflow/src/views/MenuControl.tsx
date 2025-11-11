@@ -1,7 +1,21 @@
 import { useCallback } from 'react';
-import { ControlButton, Controls, useReactFlow, type Edge } from '@xyflow/react';
+import {
+  ControlButton,
+  Controls,
+  useReactFlow,
+  type Edge,
+  getViewportForBounds,
+  Rect,
+} from '@xyflow/react';
+import { toSvg } from 'html-to-image';
 
-import { DownloadIcon, UploadIcon, ArrowRightIcon, ArrowLeftIcon } from '@radix-ui/react-icons';
+import {
+  DownloadIcon,
+  UploadIcon,
+  ImageIcon,
+  ArrowRightIcon,
+  ArrowLeftIcon,
+} from '@radix-ui/react-icons';
 import { FaEdit, FaSave } from 'react-icons/fa';
 import { RiArrowGoBackLine } from 'react-icons/ri';
 import '@xyflow/react/dist/style.css';
@@ -20,7 +34,7 @@ export enum NetMode {
 
 const modeDefault = NetMode.comparison;
 
-const downloadNet = async (net: Net) => {
+const downloadJSON = async (net: Net) => {
   const netObj = await toObjectFromNet(net);
   const netJSON = JSON.stringify(netObj, null, 2);
   const netURI = 'data:application/json;charset=utf-8,' + encodeURIComponent(netJSON);
@@ -34,6 +48,36 @@ const downloadNet = async (net: Net) => {
   document.body.removeChild(link);
 };
 
+const downloadSVG = async (boundNodes: Rect, nameNet: string) => {
+  const flow = document.querySelector('.react-flow__viewport');
+  if (!flow) return;
+
+  const imageWidth = boundNodes.width + 100;
+  const imageHeight = boundNodes.height + 100;
+
+  const viewport = getViewportForBounds(boundNodes, imageWidth, imageHeight, 0.5, 2, 0.1);
+
+  toSvg(flow as HTMLElement, {
+    // backgroundColor: '#F7F9FB',
+    width: imageWidth,
+    height: imageHeight,
+    style: {
+      width: `${imageWidth}px`,
+      height: `${imageHeight}px`,
+      transform: `translate(${viewport.x}px, ${viewport.y}px) scale(${viewport.zoom})`,
+    },
+  }).then(dataUrl => {
+    const exportFileDefaultName = nameNet.slice(0, -5) + '_edited.svg';
+
+    const link = document.createElement('a');
+    link.setAttribute('href', dataUrl);
+    link.setAttribute('download', exportFileDefaultName);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  });
+};
+
 interface PropsSimplifyMenuControl {
   fileOpened: string;
   isRunningLayout: boolean;
@@ -42,11 +86,16 @@ interface PropsSimplifyMenuControl {
 
 export const SimplifyMenuControl = (props: PropsSimplifyMenuControl): JSX.Element => {
   const { fileOpened, isRunningLayout, goToEditNet } = props;
-  const { getNodes, getEdges } = useReactFlow<Agent, Edge>();
+  const { getNodes, getEdges, getNodesBounds } = useReactFlow<Agent, Edge>();
 
-  const onDownload = useCallback(() => {
-    downloadNet({ agents: getNodes(), edges: getEdges(), name: fileOpened });
+  const onDownloadJSON = useCallback(() => {
+    downloadJSON({ agents: getNodes(), edges: getEdges(), name: fileOpened });
   }, [getNodes, getEdges, fileOpened]);
+
+  const onDownloadSVG = useCallback(() => {
+    const boundNodes = getNodesBounds(getNodes());
+    downloadSVG(boundNodes, fileOpened);
+  }, [getNodes, fileOpened]);
 
   return (
     <div data-testid="SimplifyMenuControl">
@@ -62,10 +111,18 @@ export const SimplifyMenuControl = (props: PropsSimplifyMenuControl): JSX.Elemen
         <ControlButton
           title="Download the Net"
           disabled={isRunningLayout}
-          onClick={onDownload}
+          onClick={onDownloadJSON}
           data-testid="download"
         >
           <DownloadIcon />
+        </ControlButton>
+        <ControlButton
+          title="Download as SVG"
+          disabled={isRunningLayout}
+          onClick={onDownloadSVG}
+          data-testid="download-svg"
+        >
+          <ImageIcon />
         </ControlButton>
       </Controls>
     </div>
@@ -87,11 +144,16 @@ export default (props: PropsMenuControl) => {
     setModeNet,
   } = useINflowState();
   const { nodes, edges, isRunningLayout, indexNet, setNetIndexCur } = props;
-  const { getNodes, getEdges } = useReactFlow<Agent, Edge>();
+  const { getNodes, getEdges, getNodesBounds } = useReactFlow<Agent, Edge>();
 
-  const onDownload = useCallback(() => {
-    downloadNet({ agents: getNodes(), edges: getEdges(), name: filesOpened[0] });
+  const onDownloadJSON = useCallback(() => {
+    downloadJSON({ agents: getNodes(), edges: getEdges(), name: filesOpened[0] });
   }, [getNodes, getEdges, filesOpened[0]]);
+
+  const onDownloadSVG = useCallback(() => {
+    const boundNodes = getNodesBounds(getNodes());
+    downloadSVG(boundNodes, filesOpened[0]);
+  }, [getNodes, filesOpened[0]]);
 
   const onUpload = useCallback(() => {
     const input = document.createElement('input');
@@ -255,14 +317,21 @@ export default (props: PropsMenuControl) => {
         >
           <UploadIcon />
         </ControlButton>
-
         <ControlButton
-          title="Download the Net"
+          title="Download the Net in JSON"
           disabled={isRunningLayout}
-          onClick={onDownload}
+          onClick={onDownloadJSON}
           data-testid="download"
         >
           <DownloadIcon />
+        </ControlButton>
+        <ControlButton
+          title="Download the Net in SVG"
+          disabled={isRunningLayout}
+          onClick={onDownloadSVG}
+          data-testid="download-svg"
+        >
+          <ImageIcon />
         </ControlButton>
       </Controls>
     </div>
